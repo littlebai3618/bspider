@@ -1,17 +1,17 @@
 # bspider
 
-#### 介绍
+#### 介绍 -v0.1 beta
 分布式、高可用的抓取框架
 
 #### 软件架构
-软件架构说明
+参考scrapy、pyspider、k8s设计的一款高可用抓取框架
+依赖于 rabbitmq、mysql
 
 
 #### 安装教程
 
-1. xxxx
-2. xxxx
-3. xxxx
+1. python install py
+2. sh start.sh agent/master
 
 #### 使用说明
 
