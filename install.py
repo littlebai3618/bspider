@@ -35,7 +35,8 @@ if __name__ == '__main__':
     init_dict = dict(
         root_path=root_path,
         loglevel=frame_settings.LOGGER_LEVEL.lower(),
-        agent_service=frame_settings.AGENT_SERVICE,
+        agent_service=frame_settings.AGENT_SERVICE.replace('http://', '').replace('https://', ''),
+        master_service=frame_settings.MASTER_SERVICE.replace('http://', '').replace('https://', ''),
         supervisor_username=frame_settings.SUPERVISOR_RPC[0],
         supervisor_password=frame_settings.SUPERVISOR_RPC[1],
         supervisor_port=frame_settings.SUPERVISOR_RPC[2],

@@ -5,14 +5,26 @@
 
 
 def make_gunicorn_conf(path, **kwargs):
-    gunicorn = """import gevent.monkey
+    agent = """import gevent.monkey
 gevent.monkey.patch_all()
 loglevel = '{loglevel}'
 bind = '{agent_service}'
-pidfile = '{root_path}/cache/gunicorn.pid'
+pidfile = '{root_path}/cache/agent_gunicorn.pid'
 workers = 1
 worker_connections = 2000
 worker_class = 'gevent'
 x_forwarded_for_header = 'X-FORWARDED-FOR'"""
-    with open(f'{path}/cache/gunicorn.py', 'w') as f:
-        f.write(gunicorn.format(**kwargs))
+
+    master = """import gevent.monkey
+gevent.monkey.patch_all()
+loglevel = '{loglevel}'
+bind = '{master_service}'
+pidfile = '{root_path}/cache/master_gunicorn.pid'
+workers = 1
+worker_connections = 2000
+worker_class = 'gevent'
+x_forwarded_for_header = 'X-FORWARDED-FOR'"""
+    with open(f'{path}/cache/master_gunicorn.py', 'w') as f:
+        f.write(master.format(**kwargs))
+    with open(f'{path}/cache/agent_gunicorn.py', 'w') as f:
+        f.write(agent.format(**kwargs))

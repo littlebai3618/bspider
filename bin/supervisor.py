@@ -24,7 +24,7 @@ password={supervisor_password}
     """
 
     agent = """[program:agent]
-command=gunicorn -c {root_path}/cache/gunicorn.py --chdir {root_path}/ agent_manager:app
+command=gunicorn -c {root_path}/cache/agent_gunicorn.py --chdir {root_path}/ agent_manager:app
 directory={root_path}
 user=bspider
 startsecs=0
@@ -35,7 +35,7 @@ stdout_logfile={root_path}/log/agent.log
 stderr_logfile={root_path}/log/agent.log"""
 
     master = """[program:master]
-command=gunicorn -c {root_path}/cache/gunicorn.py --chdir {root_path}/ master_manager:app
+command=gunicorn -c {root_path}/cache/master_gunicorn.py --chdir {root_path}/ master_manager:app
 directory={root_path}
 user=bspider
 startsecs=0
