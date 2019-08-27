@@ -9,7 +9,7 @@ def make_supervisor_conf(path, install_type='single_node', **kwargs):
 file={root_path}/cache/supervisor.sock;
 [supervisord]
 logfile={root_path}/log/supervisord.log;
-loglevel={loglevel};
+loglevel=info;
 pidfile={root_path}/cache/supervisord.pid;
 [rpcinterface:supervisor]
 supervisor.rpcinterface_factory = supervisor.rpcinterface:make_main_rpcinterface
