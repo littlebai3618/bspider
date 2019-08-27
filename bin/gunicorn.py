@@ -7,7 +7,7 @@
 def make_gunicorn_conf(path, **kwargs):
     gunicorn = """import gevent.monkey
 gevent.monkey.patch_all()
-loglevel = {loglevel}
+loglevel = '{loglevel}'
 bind = '{agent_service}'
 pidfile = '{root_path}/cache/gunicorn.pid'
 workers = 1
