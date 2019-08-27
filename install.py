@@ -25,9 +25,9 @@ if [ "$process_type" != "agent" ] && [ "$process_type" == "master" ] && [ "$proc
     exit 255
 else
     echo "try to start ${process_type}"
-    nohup supervisor -c %s/supervisor.conf >%s/supervisor_${process_type}.log 2>&1 &
+    nohup supervisord -c %s/supervisor_${process_type}.conf >%s/supervisor_${process_type}.log 2>&1 &
     echo "please check ${process_type} process:"
-    echo "tail -f log/supervisor.log"
+    echo "tail -f log/supervisor_${process_type}.log"
 fi"""
 
 if __name__ == '__main__':
