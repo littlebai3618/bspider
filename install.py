@@ -40,9 +40,9 @@ if __name__ == '__main__':
         supervisor_password=frame_settings.SUPERVISOR_RPC[1],
         supervisor_port=frame_settings.SUPERVISOR_RPC[2],
     )
-    process_type = sys.argv[1]
-    make_supervisor_conf(root_path, process_type)
-    make_gunicorn_conf(root_path)
+    process_type = 'single_node'
+    make_supervisor_conf(root_path, process_type, **init_dict)
+    make_gunicorn_conf(root_path, **init_dict)
 
     with open(f'{root_path}/start.sh', 'w') as f:
         f.write(bash % (root_path, root_path, root_path))
