@@ -14,5 +14,5 @@ workers = 1
 worker_connections = 2000
 worker_class = 'gevent'
 x_forwarded_for_header = 'X-FORWARDED-FOR'"""
-    with open(f'{path}/cache/supervisor.conf', 'w') as f:
+    with open(f'{path}/cache/gunicorn.py', 'w') as f:
         f.write(gunicorn.format(**kwargs))
