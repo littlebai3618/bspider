@@ -44,12 +44,34 @@ def make_supervisor_conf(path, install_type='single_node', **kwargs):
     autorestart=true;
     stdout_logfile={root_path}/log/master.log;
     stderr_logfile={root_path}/log/master.log;"""
+
+    bcorn = """[program:bcorn]
+    command=python {root_path}/bcorn_manager.py;
+    directory={root_path}
+    user=bspider
+    startsecs=0;
+    stopwaitsecs=0;
+    autostart=true;
+    autorestart=true;
+    stdout_logfile={root_path}/log/bcorn.log;
+    stderr_logfile={root_path}/log/bcorn.log;"""
+
+    scheduler = """[program:scheduler]
+    command=python {root_path}/scheduler_manager.py;
+    directory={root_path}
+    user=bspider
+    startsecs=0;
+    stopwaitsecs=0;
+    autostart=true;
+    autorestart=true;
+    stdout_logfile={root_path}/log/bcorn.log;
+    stderr_logfile={root_path}/log/bcorn.log;"""
     if install_type == 'single_node':
         with open(f'{path}/cache/supervisor_single_node.conf', 'w') as f:
-            f.write(f'{base}\n{agent}\n{master}'.format(**kwargs))
+            f.write(f'{base}\n{agent}\n{master}\n{scheduler}\n{bcorn}'.format(**kwargs))
     else:
         with open(f'{path}/cache/supervisor_agent.conf', 'w') as f:
             f.write(f'{base}\n{agent}'.format(**kwargs))
 
         with open(f'{path}/cache/supervisor_master.conf', 'w') as f:
-            f.write(f'{base}\n{master}'.format(**kwargs))
+            f.write(f'{base}\n{master}\n{scheduler}\n{bcorn}'.format(**kwargs))
