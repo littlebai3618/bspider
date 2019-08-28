@@ -15,19 +15,13 @@ from config import frame_settings
 
 
 bash = """#!/bin/sh
-
-process_type="$1"
-
 export PYTHONPATH=%s:${PYTHONPATH}
 
-if [ "$process_type" != "agent" ] && [ "$process_type" == "master" ] && [ "$process_type" == "single_node" ] ; then
-    echo "unknow process_type ${process_type}"
-    exit 255
-else
-    echo "try to start ${process_type}"
-    nohup supervisord -c %s/supervisor_${process_type}.conf >%s/supervisor_${process_type}.log 2>&1 &
-    echo "please check ${process_type} process:"
-    echo "tail -f log/supervisor_${process_type}.log"
+echo "try to start by model: ${process_type}"
+nohup supervisord -c {root_path}/supervisor_{process_type}.conf >{root_path}/supervisor_{process_type}.log 2>&1 &
+echo "please check {process_type} process:"
+echo "tail -f log/supervisor_{process_type}.log"
+    
 fi"""
 
 if __name__ == '__main__':
@@ -46,4 +40,4 @@ if __name__ == '__main__':
     make_gunicorn_conf(root_path, **init_dict)
 
     with open(f'{root_path}/start.sh', 'w') as f:
-        f.write(bash % (root_path, root_path, root_path))
+        f.write(bash.format(root_path=root_path, process_type=process_type))
