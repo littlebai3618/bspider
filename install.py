@@ -15,7 +15,7 @@ from config import frame_settings
 
 
 bash = """#!/bin/sh
-export PYTHONPATH=%s:${PYTHONPATH}
+export PYTHONPATH={root_path}:${PYTHONPATH}
 
 echo "try to start by model: ${process_type}"
 nohup supervisord -c {root_path}/supervisor_{process_type}.conf >{root_path}/supervisor_{process_type}.log 2>&1 &
