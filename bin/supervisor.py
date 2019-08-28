@@ -64,8 +64,8 @@ startsecs=0
 stopwaitsecs=0
 autostart=true
 autorestart=true
-stdout_logfile={root_path}/log/bcorn.log
-stderr_logfile={root_path}/log/bcorn.log"""
+stdout_logfile={root_path}/log/scheduler.log
+stderr_logfile={root_path}/log/scheduler.log"""
     if install_type == 'single_node':
         with open(f'{path}/cache/supervisor_single_node.conf', 'w') as f:
             f.write(f'{base}\n{agent}\n{master}\n{scheduler}\n{bcorn}'.format(**kwargs))
