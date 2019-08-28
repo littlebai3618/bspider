@@ -15,9 +15,9 @@ from config import frame_settings
 
 
 bash = """#!/bin/sh
-export PYTHONPATH={root_path}:${PYTHONPATH}
+export PYTHONPATH={root_path}:$|PYTHONPATH|
 
-echo "try to start by model: ${process_type}"
+echo "try to start by model: {process_type}"
 nohup supervisord -c {root_path}/supervisor_{process_type}.conf >{root_path}/supervisor_{process_type}.log 2>&1 &
 echo "please check {process_type} process:"
 echo "tail -f log/supervisor_{process_type}.log"
@@ -40,4 +40,4 @@ if __name__ == '__main__':
     make_gunicorn_conf(root_path, **init_dict)
 
     with open(f'{root_path}/start.sh', 'w') as f:
-        f.write(bash.format(root_path=root_path, process_type=process_type))
+        f.write(bash.format(root_path=root_path, process_type=process_type).replace('$|PYTHONPATH|', '${PYTHONPATH}'))
