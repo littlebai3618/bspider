@@ -3,8 +3,8 @@
 # @File    : install
 # @Use     :
 """
-1. 初始化supervisor 配置文件
-2. 初始化gunicorn 配置文件
+1. 初始化 supervisor 配置文件
+2. 初始化 gunicorn 配置文件
 """
 import os
 import sys
