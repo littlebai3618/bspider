@@ -4,6 +4,7 @@
 # @Use     :
 from flask import Blueprint
 
+from core.api import auth
 from core.api.exception import ParameterException
 from web_studio.controller.validators.project_form import UpdateForm, AddForm
 from web_studio.service.project import ProjectService
@@ -14,21 +15,25 @@ project_service = ProjectService()
 
 
 @project.route('/project/<int:project_id>', methods=['GET'])
+@auth.login_required
 def get_project(project_id):
     return project_service.get(project_id)
 
 
 @project.route('/project', methods=['GET'])
+@auth.login_required
 def get_projects():
     return project_service.gets()
 
 
 @project.route('/project/<int:project_id>', methods=['DELETE'])
+@auth.login_required
 def delete_project(project_id):
     return project_service.delete(project_id)
 
 
 @project.route('/project', methods=['PATCH'])
+@auth.login_required
 def update():
     form = UpdateForm()
     changes = form.get_dict()
@@ -38,6 +43,7 @@ def update():
 
 
 @project.route('/project', methods=['POST'])
+@auth.login_required
 def add():
     form = AddForm()
     return project_service.add_project(form.name.data, form.status.data, form.type.data, form.group.data,

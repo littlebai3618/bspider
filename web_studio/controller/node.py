@@ -18,6 +18,7 @@
 """
 from flask import Blueprint
 
+from core.api import auth
 from core.api.exception import ParameterException
 from .validators.node_forms import AddNodeForm, DeleteNodeForm, GetNodeForm, ChangeNodeForm, AddWorkerForm, \
     DeleteWorkerForm, ChangeWorkerForm, GetWorkerForm
@@ -29,21 +30,21 @@ node_service = Node()
 
 
 @node.route('/node', methods=['POST'])
-# @Auth
+@auth.login_required
 def add_node():
     form = AddNodeForm()
     return node_service.add_node(form.node_ip.data, form.desc.data, form.name.data)
 
 
 @node.route('/node', methods=['DELETE'])
-# @Auth
+@auth.login_required
 def delete_node():
     form = DeleteNodeForm()
     return node_service.delete_node(form.node_ip.data)
 
 
 @node.route('/node', methods=['PATCH'])
-# @Auth
+@auth.login_required
 def change_node():
     form = ChangeNodeForm()
     print(form.get_dict())
@@ -56,33 +57,33 @@ def change_node():
 
 
 @node.route('/node', methods=['GET'])
-# @Auth
+@auth.login_required
 def get_nodes():
     return node_service.get_nodes()
 
 
 @node.route('/node/<string:node_ip>', methods=['GET'])
-# @Auth
+@auth.login_required
 def get_node(node_ip):
     return node_service.get_node(node_ip)
 
 
 @node.route('/worker', methods=['POST'])
-# @Auth
+@auth.login_required
 def add_worker():
     form = AddWorkerForm()
     return node_service.add_worker(form.node_ip.data, form.name.data, form.worker_type.data, form.desc.data)
 
 
 @node.route('/worker', methods=['DELETE'])
-# @Auth
+@auth.login_required
 def delete_worker():
     form = DeleteWorkerForm()
     return node_service.delete_worker(form.node_ip.data, form.name.data, form.worker_type.data)
 
 
 @node.route('/worker', methods=['PATCH'])
-# @Auth
+@auth.login_required
 def change_worker():
     form = ChangeWorkerForm()
     if form.op.data == 'start':
@@ -94,7 +95,7 @@ def change_worker():
 
 
 @node.route('/worker', methods=['GET'])
-# @Auth
+@auth.login_required
 def get_worker():
     form = GetWorkerForm()
     if form.is_all.data == 1:

@@ -4,6 +4,7 @@
 # @Use     :
 from flask import Blueprint
 
+from core.api import auth
 from web_studio.controller.validators.code_forms import GetForm, AddForm, UpdateForm
 from web_studio.service.code import CodeService
 
@@ -12,12 +13,12 @@ code = Blueprint('code_bp', __name__)
 code_service = CodeService()
 
 @code.route('/code/<int:code_id>', methods=['GET'])
-# @Auth
+@auth.login_required
 def get(code_id):
     return code_service.get_code(code_id)
 
 @code.route('/code', methods=['GET'])
-# @Auth
+@auth.login_required
 def gets():
     form = GetForm()
     param = form.get_dict()
@@ -27,18 +28,18 @@ def gets():
     return code_service.get_codes()
 
 @code.route('/code', methods=['POST'])
-# @Auth
+@auth.login_required
 def add():
     form = AddForm()
     return code_service.add(form.name.data, form.description.data, form.type.data, form.content.data, form.editor.data)
 
 @code.route('/code/<int:code_id>', methods=['DELETE'])
-# @Auth
+@auth.login_required
 def delete(code_id):
     return code_service.delete(code_id)
 
 @code.route('/code', methods=['PATCH'])
-# @Auth
+@auth.login_required
 def update():
     form = UpdateForm()
     changes = form.get_dict()

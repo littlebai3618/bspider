@@ -34,11 +34,13 @@ def add_user():
 
 
 @user.route('/user/<int:user_id>', methods=['DELETE'])
+@auth.login_required
 def delete_user(user_id):
     return user_service.remove_user(user_id)
 
 
 @user.route('/user/<int:user_id>', methods=['PATCH'])
+@auth.login_required
 def update_user(user_id):
     form = UpdateForm()
     data = {
@@ -52,11 +54,13 @@ def update_user(user_id):
 
 
 @user.route('/user', methods=['GET'])
+@auth.login_required
 def get_users():
     return user_service.get_users()
 
 
 @user.route('/user/<int:user_id>', methods=['GET'])
+@auth.login_required
 def get_user(user_id):
     return user_service.get_user(user_id)
 

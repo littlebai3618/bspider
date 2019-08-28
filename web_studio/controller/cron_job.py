@@ -1,9 +1,10 @@
 # @Time    : 2019/6/20 7:22 PM
-# # @Author  : 白尚林
+# @Auth    : 白尚林
 # @File    : cron_job
 # @Use     :
 from flask import Blueprint
 
+from core.api import auth
 from web_studio.controller.validators.cron_job_forms import AddForm, UpdateForm
 from web_studio.service.cron_job import CronJobService
 
@@ -13,7 +14,7 @@ cron_job_service = CronJobService()
 
 
 @cron_job.route('/cron', methods=['POST'])
-# @Auth
+@auth.login_required
 def add():
     form = AddForm()
     return cron_job_service.add_job(form.project_id.data, form.project_name.data, form.class_name.data, form.trigger.data,
@@ -21,13 +22,13 @@ def add():
 
 
 @cron_job.route('/cron/<int:job_id>', methods=['DELETE'])
-# @Auth
+@auth.login_required
 def delete(job_id):
     return cron_job_service.delete_job(job_id)
 
 
 @cron_job.route('/cron', methods=['PATCH'])
-# @Auth
+@auth.login_required
 def update():
     form = UpdateForm()
     changes = form.get_dict()
@@ -37,11 +38,11 @@ def update():
 
 
 @cron_job.route('/cron/<int:job_id>', methods=['GET'])
-# @Auth
+@auth.login_required
 def get(job_id):
     return cron_job_service.get_job(job_id)
 
 @cron_job.route('/cron', methods=['GET'])
-# @Auth
+@auth.login_required
 def gets():
     return cron_job_service.get_jobs()
