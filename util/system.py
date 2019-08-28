@@ -4,7 +4,7 @@
 # @Use     : 获取系统相关信息
 import psutil
 
-from config import frame_settings
+from config import node_settings
 
 
 def cpu_used():
@@ -23,13 +23,16 @@ def disk_used():
 
 def ip_addr():
     """获取机器内网ip"""
-    ip = frame_settings.NODE_IP
-    ip_list = psutil.net_if_addrs()
-    if 'eth0' in ip_list:
-        ip = ip_list['eth0'][0].address
-    elif 'eth1' in ip_list:
-        ip = ip_list['eth1'][0].address
-    return ip
+    try:
+        return node_settings.IP
+    except AttributeError:
+        ip_list = psutil.net_if_addrs()
+        if 'eth0' in ip_list:
+            ip = ip_list['eth0'][0].address
+        else:
+            ip = ip_list['eth1'][0].address
+        return ip
+
 
 def process_info(pid):
     p = psutil.Process(pid)
