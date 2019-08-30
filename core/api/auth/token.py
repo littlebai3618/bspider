@@ -5,13 +5,14 @@
 from collections import namedtuple
 
 import casbin
-from flask import current_app, request
+from flask import request
 from itsdangerous import TimedJSONWebSignatureSerializer, BadSignature, SignatureExpired
 
 from core.api.auth import MySQLAdapter
 from core.api.exception import AuthFailed, Forbidden
 from util.path import ROOT_PATH
 from util.logger.log_handler import LoggerPool
+from config.frame_settings import WEB_SECRET_KEY
 
 __log = LoggerPool().get_logger('api_auth', module='api_auth')
 
@@ -20,12 +21,12 @@ e = casbin.Enforcer(f'{ROOT_PATH}/core/api/auth/rbac_model.conf', adapter=MySQLA
 
 
 def make_token(user_id, role):
-    s = TimedJSONWebSignatureSerializer(current_app.config['SECRET_KEY'], expires_in=7200)
+    s = TimedJSONWebSignatureSerializer(WEB_SECRET_KEY , expires_in=7200)
     return s.dumps({'user_id': user_id, 'role': role}).decode('ascii')
 
 
 def verify_token(token):
-    s = TimedJSONWebSignatureSerializer(current_app.config['SECRET_KEY'])
+    s = TimedJSONWebSignatureSerializer(WEB_SECRET_KEY)
     try:
         data = s.loads(token)
     except BadSignature:
