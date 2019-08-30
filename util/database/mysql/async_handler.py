@@ -11,7 +11,7 @@ import hashlib
 import aiomysql
 from aiomysql import Pool, DictCursor
 
-from util.singleton import singleton
+from util import singleton
 from util.tools import coroutine_result
 
 

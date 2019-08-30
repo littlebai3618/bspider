@@ -7,7 +7,7 @@ from functools import wraps
 import pika
 
 from core.lib import QUEUE_ARG
-from util.singleton import singleton
+from util import singleton
 
 
 def retry(func):

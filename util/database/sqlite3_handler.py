@@ -5,7 +5,7 @@
 import sqlite3
 
 from util.path import ROOT_PATH
-from util.singleton import singleton
+from util import singleton
 
 
 @singleton

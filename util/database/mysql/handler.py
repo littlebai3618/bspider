@@ -11,7 +11,7 @@ from DBUtils.PooledDB import PooledDB
 from pymysql.cursors import DictCursor
 
 from util.database.mysql.session import DBSession
-from util.singleton import singleton
+from util import singleton
 
 
 @singleton

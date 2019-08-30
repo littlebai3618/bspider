@@ -8,7 +8,7 @@ import re
 
 from config import frame_settings
 from util.logger.formatter import get_json_formatter, get_stream_formatter
-from util.singleton import singleton
+from util import singleton
 
 
 class RabbitMQLogHandler(logging.Handler):
