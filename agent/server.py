@@ -16,7 +16,7 @@ from core.lib.project_cache import ProjectCache
 from config.node_settings import IP, NAME, DESC
 from agent.controller.project import project
 from agent.controller.node import node
-from util.singleton import singleton
+from util import singleton
 
 
 @singleton
