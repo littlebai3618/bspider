@@ -6,6 +6,7 @@ import json
 import xmlrpc.client
 
 import requests
+from flask import g
 
 from config.frame_settings import SUPERVISOR_RPC
 from util.exceptions.exceptions import RemoteOPError
@@ -22,7 +23,7 @@ class RemoteMixIn(object):
         if data is None:
             headers=None
         else:
-            headers={'Content-Type': 'application/json'}
+            headers={'Content-Type': 'application/json', 'Authorization': f'Bearer {g.user.token}'}
         req = requests.request(method, url, headers=headers, data=data, params=params)
         return req
 

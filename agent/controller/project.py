@@ -4,6 +4,7 @@
 # @Use     :
 from flask import Blueprint
 
+from core.api import auth
 from .validators.project_form import AddProjectForm, UpdateProjectForm, UpdateCodeForm
 from agent.service.project import ProjectService
 
@@ -12,12 +13,14 @@ project_service = ProjectService()
 
 
 @project.route('/project', methods=['POST'])
+@auth.login_required
 def add_project():
     form = AddProjectForm()
     return project_service.add_project(form.project_id.data, form.project_name.data, form.config.data,
                                        form.rate.data, form.status.data)
 
 @project.route('/project', methods=['PATCH'])
+@auth.login_required
 def update_project():
     form = UpdateProjectForm()
     changes = form.get_dict()
@@ -26,11 +29,13 @@ def update_project():
     return project_service.update_project(project_id, changes)
 
 @project.route('/project/<int:project_id>', methods=['DELETE'])
+@auth.login_required
 def delete_project(project_id):
     return project_service.delete_project(project_id)
 
 
 @project.route('/project', methods=['GET'])
+@auth.login_required
 def get_projects():
     return project_service.get_projects()
 

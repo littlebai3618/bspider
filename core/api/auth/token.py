@@ -15,7 +15,7 @@ from util.logger.log_handler import LoggerPool
 
 __log = LoggerPool().get_logger('api_auth', module='api_auth')
 
-User = namedtuple('User', ['user_id', 'role'])
+User = namedtuple('User', ['user_id', 'role', 'token'])
 e = casbin.Enforcer(f'{ROOT_PATH}/core/api/auth/rbac_model.conf', adapter=MySQLAdapter())
 
 
@@ -34,6 +34,6 @@ def verify_token(token):
         raise AuthFailed(msg='token is expired', errno=10003)
     if e.enforce(data['role'], request.method, request.endpoint):
         __log.info('user:{}-{} request:{} pass verify'.format(data['user_id'], data['role'], request.endpoint))
-        return User(data['user_id'], data['role'])
+        return User(data['user_id'], data['role'], token)
     __log.info('user:{}-{} request:{} auth failed'.format(data['user_id'], data['role'], request.endpoint))
     raise Forbidden(code=403, msg='forbidden, op failed')

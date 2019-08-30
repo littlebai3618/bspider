@@ -7,6 +7,7 @@ import json
 import requests
 
 from config.frame_settings import MASTER_SERVICE
+from core.api.auth.token import make_token
 
 
 class Connection(object):
@@ -17,6 +18,7 @@ class Connection(object):
 
     def query(self, uri, method, data=None):
         url = self.master + uri
+        self.__headers['Authorization'] = 'Bearer {}'.format(make_token(0, 'agent'))
         return requests.request(method=method, url=url, data=json.dumps(data), headers=self.__headers).json()
 
     def agent_register(self, data):
