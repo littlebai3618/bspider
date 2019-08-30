@@ -13,7 +13,7 @@ import signal
 
 from core.api import BaseImpl
 from core.lib.broker import RabbitMQBroker
-from util.exceptions.exceptions import MethordError
+from util.exceptions.exceptions import MethodError
 from util.logger import log_pool
 
 
@@ -61,7 +61,7 @@ class BaseManager(object):
         self.is_close = True
 
     async def do_work(self):
-        raise MethordError('you must rebuild self.do_work()')
+        raise MethodError('you must rebuild self.do_work()')
 
     # INNER API
     # def _save_success_result(self, request, response, project_name, exception=None):

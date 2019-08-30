@@ -6,7 +6,7 @@ class SettingsError(Exception):
     pass
 
 
-class MethordError(Exception):
+class MethodError(Exception):
     pass
 
 

@@ -21,8 +21,7 @@ class APIException(HTTPException):
             self.msg = msg
         if errno:
             self.errno = errno
-        if data:
-            self.data = data
+        self.data = data
         super().__init__(description=self.msg)
 
     def get_body(self, environ=None):

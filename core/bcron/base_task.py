@@ -7,7 +7,7 @@ import json
 
 from core.lib import EXCHANGE_NAME
 from core.lib.http import Request
-from util.exceptions.exceptions import MethordError
+from util.exceptions.exceptions import MethodError
 from util.logger import log_pool
 from util.rabbitMQ import RabbitMQHandler
 from util.tools import make_sign
@@ -24,7 +24,7 @@ class BaseTask(object):
         self.__mq_handler = RabbitMQHandler(frame_settings.RABBITMQ_CONFIG)
 
     def execute_task(self):
-        raise MethordError('you must rebuild execute_task()')
+        raise MethodError('you must rebuild execute_task()')
 
     # Public API
 
