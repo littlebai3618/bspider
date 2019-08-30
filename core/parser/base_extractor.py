@@ -1,0 +1,43 @@
+# @Time    : 2019-08-29 19:50
+# @Author  : 白尚林
+# @File    : base_extractor
+# @Use     :
+"""
+extractor 方法 如果传入Response 匹配到callback 那么执行self.callback 否则 抛出异常
+extractor 也是Pipeline中的一种，通过执行Response 中的callback方法返回item
+"""
+from core.lib.http import Response
+from core.parser.base_pipeline import BasePipeline
+from util.exceptions.exceptions import ExtractorCallbackError
+
+
+class BaseExtractor(BasePipeline):
+
+    def process_item(self, response):
+        if isinstance(response, Response):
+            if hasattr(self, response.callback):
+                try:
+                    yield getattr(self, response.callback)(response)
+                except Exception as e:
+                    if hasattr(self, response.errback):
+                        yield getattr(self, response.callback)(response, e)
+                    raise e
+            else:
+                raise ExtractorCallbackError('Cannot find callback {callback} in extractor {name}',
+                                             name=self.__class__.__name__, callback=response.callback)
+        yield response
+
+    def parser(self, response):
+        """
+        此方法需要被重构
+        当一个respons对象没有指定callback方法时此方法将被执行
+        """
+        pass
+
+    def exception(self, response, e):
+        """
+        此方法不一定需要重构
+        只是提供一个demo
+        ***一个extractor 可以有多个errback方法和 callback方法
+        """
+        raise e

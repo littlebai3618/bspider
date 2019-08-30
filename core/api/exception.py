@@ -32,7 +32,7 @@ class APIException(HTTPException):
             'errno': self.errno,
             'request': req_uri,
         }
-        if self.data:
+        if self.data is not None:
             body['data'] = self.data
         return json.dumps(body)
 

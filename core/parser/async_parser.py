@@ -2,10 +2,13 @@
 # @Author  : 白尚林
 # @File    : async_parser
 # @Use     :
-"""初始化解析器类 加上异步mysql 的处理"""
+"""初始化解析器类 加上异步mysql 的处理
+   2019-08-29 增加callback 参数处理 - 需要单独抽象出extractor类
+   将Request 对象发送到待下载队列
+"""
 from types import GeneratorType
 
-from core.lib.http import Response
+from core.lib.http import Response, Request
 from util.exceptions.exceptions import ParserError
 from util.logger import log_pool
 from util.moduler import ModuleImporter
@@ -35,37 +38,51 @@ class AsyncParser(object):
                 msg = f'{project_name} pipeline init failed: {cls_name}'
                 raise ParserError(msg)
 
-
     async def parse(self, response: Response):
-        item = response
-        all_items = []
-        for index, pipline in enumerate(self.pipes):
-            cur_items = []
-            if index == 0:
-                self.__get_items(pipline, item, cur_items)
-                all_items = cur_items
-            else:
-                for item in all_items:
-                    self.__get_items(pipline, item, cur_items)
-                all_items = cur_items
-        del all_items
-
-    def __get_items(self, pipline, pre_item, cur_item):
         """
-        得到产生的item
-        :param pipline: 当前pipline 方法
-        :param pre_item: 上一个pipline 产生的item
-        :param cur_item: 这个pipline 产生的item
+        :param response:
         :return:
         """
-        temp_items = pipline.process_item(pre_item)
+        all_items = [response]
+        requests = []
+
+        for index, pipeline in enumerate(self.pipes):
+            cur_items = []
+            for item in all_items:
+                self.__get_items(pipeline, item, cur_items, requests)
+            all_items = cur_items
+
+        return requests
+
+    def __get_items(self, pipeline, pre_item, cur_item, requests):
+        """
+        得到产生的item
+        :param pipeline: 当前 pipline 对象
+        :param pre_item: 上一个 pipline 产生的item
+        :param cur_item: 这个 pipline 产生的item
+        :return:
+        """
+        temp_items = pipeline.process_item(pre_item)
+        # 处理生成器类型
         if isinstance(temp_items, GeneratorType):
             while True:
                 try:
-                    cur_item.append(next(temp_items))
+                    result = next(temp_items)
+                    if result:
+                        if isinstance(result, Request):
+                            requests.append(result)
+                        else:
+                            cur_item.append(result)
                 except StopIteration as e:
                     if e.value:
-                        cur_item.append(e.value)
+                        if isinstance(e.value, Request):
+                            requests.append(e.value)
+                        else:
+                            cur_item.append(e.value)
                     break
         else:
-            cur_item.append(temp_items)
+            if temp_items:
+                if isinstance(temp_items, Request):
+                    requests.append(temp_items)
+                else:
+                    cur_item.append(temp_items)

@@ -22,19 +22,21 @@ class ParserManager(BaseManager):
             while True:
                 all_queue_is_none = True
 
-                msg_id, response, parser, job_name = await self.__get_response()
+                msg_id, response, parser, project_name = await self.__get_response()
                 if response:
                     all_queue_is_none = False
                     try:
-                        await parser.parse(response)
-                        await asyncio.sleep(0.25)
-                        self._save_success_result(response.request, response, job_name)
-                        self.log.info('{} complete parse: {}'.format(job_name, response.url))
+                        requests = await parser.parse(response)
+                        while requests:
+                            # 发送request到待下载队列
+                            await self.broker.set_request(requests.pop(), project_name)
+                        self._save_success_result(response.request, response, project_name)
+                        self.log.info('{} complete parse: {}'.format(project_name, response.url))
                     except Exception as e:
                         tp, msg, tb = sys.exc_info()
                         e_msg = ''.join(traceback.format_exception(tp, msg, tb))
                         self.log.exception(e)
-                        self._save_error_result(response.request, job_name, e_msg, status=-1)
+                        self._save_error_result(response.request, project_name, e_msg, status=-1)
                         # await self.broker.report_ack(msg_id)
                         # continue
 

@@ -6,9 +6,8 @@ import asyncio
 import json
 import random
 
-from config import frame_settings
+from core.lib.broker import RabbitMQBroker
 from core.lib.project_cache import ProjectCache
-from util.rabbitMQ import AioRabbitMQHandler
 
 
 class BaseMonitor(object):
@@ -20,7 +19,7 @@ class BaseMonitor(object):
         """
         self.log = log
         self.__cache = ProjectCache()
-        self.__mq_handler = AioRabbitMQHandler.from_settings(frame_settings.RABBITMQ_CONFIG)
+        self.__mq_handler = RabbitMQBroker(log).mq_handler
         self.projects = dict()
         self.__weight = None
         self.__total_sum = 0

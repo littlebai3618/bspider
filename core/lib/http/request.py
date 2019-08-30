@@ -15,16 +15,18 @@ class Request(BaseHttp):
     def __init__(self,
                  url,
                  method='GET',
+                 callback='parser',
                  headers=None,
                  data=None,
                  cookies=None,
                  meta=None,
-                 priority=3,
+                 priority: int=3,
                  sign='',
                  proxy=None,
-                 allow_redirect=False,
-                 timeout=10,
-                 verify_ssl=False):
+                 allow_redirect: bool=False,
+                 timeout: int=10,
+                 verify_ssl: bool=False,
+                 errback=None):
         """去掉了scrapy中的不必要的属性, 去掉了私有属性"""
         self.url = self._set_url(url)
         self.headers = self._set_headers(headers)
@@ -38,6 +40,8 @@ class Request(BaseHttp):
         self.allow_redirect = allow_redirect # 下载是否需要重定向
         self.timeout = timeout
         self.verify_ssl = verify_ssl
+        self.callback = self._set_callback(callback)
+        self.errback = self._set_errback(errback)
 
     @classmethod
     def loads(cls, param: dict):

@@ -18,7 +18,7 @@ from pamqp import specification as spec
 from config.frame_settings import RABBITMQ_CONFIG
 from core.lib import QUEUE_ARG
 from util.rabbitMQ.async_handler.pool import Pool
-from util.singleton import singleton
+from util import singleton
 
 
 @singleton

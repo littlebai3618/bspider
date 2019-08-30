@@ -6,10 +6,6 @@
 
 class BaseHttp(object):
 
-
-    # SET ATTR METHOD _set_{attr_name}
-    req_attr = {'url', 'headers', 'cookies', 'method', 'data', 'meta', 'priority', 'sign', 'proxy', 'allow_redirect', 'timeout', 'verify_ssl'}
-
     def _set_url(self, url):
         if isinstance(url, str):
             return url
@@ -60,31 +56,6 @@ class BaseHttp(object):
         else:
             return data
 
-    def __set_priority(self, priority):
-        if priority is None:
-            return
-        elif isinstance(priority, int):
-            return priority
-        raise TypeError("{} priority must be int. ".format(type(self).__name__))
-
-    def __set_allow_redirect(self, allow_redirect):
-        """默认禁止重定向"""
-        if isinstance(allow_redirect, bool):
-            return allow_redirect
-        return False
-
-    def __set_timeout(self, timeout):
-        """默认时间是20秒"""
-        if isinstance(timeout, int):
-            return timeout
-        return 20
-
-    def __set_verify_ssl(self, verify_ssl):
-        if isinstance(verify_ssl, bool):
-            return verify_ssl
-        return False
-
-
     # Response API
     def _set_text(self, text):
         if text is None:
@@ -93,3 +64,19 @@ class BaseHttp(object):
             raise TypeError("{} text must be str. ".format(type(self).__name__))
         else:
             return text
+
+    def _set_callback(self, callback):
+        if callable(callback):
+            self.callback = callback.__name__
+        elif isinstance(callback, str):
+            self.callback = callback
+        else:
+            raise TypeError('callback must be callable or str')
+
+    def _set_errback(self, errback):
+        if callable(errback):
+            self.errback = errback.__name__
+        elif isinstance(errback, str):
+            self.errback = errback
+        else:
+            raise TypeError('callback must be callable or str')

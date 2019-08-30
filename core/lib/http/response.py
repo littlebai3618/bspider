@@ -23,13 +23,15 @@ class Response(BaseHttp):
     def __init__(self,
                  url,
                  status,
+                 callback=None,
                  sign='',
                  headers=None,
                  cookies=None,
                  text=None,
                  request=None,
                  meta=None,
-                 method='GET'):
+                 method='GET',
+                 errback=None):
         self.url = self._set_url(url)
         self.headers = self._set_headers(headers)
         self.status = status
@@ -42,6 +44,8 @@ class Response(BaseHttp):
             self.request = None
         self.meta = meta or {}
         self.method = method
+        self.callback = self._set_callback(callback)
+        self.errback = self._set_errback(errback)
 
     def dumps(self):
         """解决序列化的嵌套问题"""

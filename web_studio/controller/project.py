@@ -5,7 +5,6 @@
 from flask import Blueprint
 
 from core.api import auth
-from core.api.exception import ParameterException
 from web_studio.controller.validators.project_form import UpdateForm, AddForm
 from web_studio.service.project import ProjectService
 

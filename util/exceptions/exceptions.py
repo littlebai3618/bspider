@@ -31,13 +31,19 @@ class MonitorError(Exception):
 
 
 class MysqlConfigError(Exception):
-    """mysql config error"""
     pass
 
 
 class RemoteOPError(Exception):
-    """mysql config error"""
 
     def __init__(self, err, fmt):
         err = err.format(fmt)
+        super().__init__(err)
+
+
+class ExtractorCallbackError(Exception):
+    """mysql config error"""
+
+    def __init__(self, err, **fmt):
+        err = err.format(**fmt)
         super().__init__(err)
