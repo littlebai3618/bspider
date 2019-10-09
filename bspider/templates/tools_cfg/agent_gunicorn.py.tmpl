@@ -1,0 +1,9 @@
+import gevent.monkey
+gevent.monkey.patch_all()
+loglevel = '${log_level}'
+bind = '127.0.0.1:${agent_port}'
+pidfile = '${platform_path}/cache/agent_gunicorn.pid'
+workers = 1
+worker_connections = 2000
+worker_class = 'gevent'
+x_forwarded_for_header = 'X-FORWARDED-FOR'

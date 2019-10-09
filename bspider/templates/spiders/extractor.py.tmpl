@@ -1,0 +1,34 @@
+"""a extractor templates"""
+from bspider.core.parser.base_extractor import BaseExtractor
+from bspider.http import Request
+
+
+class DemoExtractor(BaseExtractor):
+
+    # with constructed function
+    # def __init__(self, settings, log):
+    #     super().__init__(settings, log)
+    #     your code
+
+    def parser(self, response):
+        """
+        解析逻辑 如果request对象未指定callback 默认执行parser方法
+        :param response: bspider response instance
+        :return:
+        """
+        # html = response.text
+        # json_obj = response.json()
+        # xpath_selector_obj = response.xpath()
+        # item = xpath_selector_obj.xpath('//div[@class="demo"]/text()')
+        # self.log.info('i am a log')
+        # self.settings # this spider's pipeline settings
+        yield Request('http://xxxxx', callback=self.callback_demo)
+        # yield generate item
+
+    def callback_demo(self, response):
+        """
+        解析逻辑
+        :param response: bspider response instance
+        :return:
+        """
+        pass

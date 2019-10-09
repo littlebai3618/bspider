@@ -1,0 +1,7 @@
+include INSTALL
+include LICENSE
+include MANIFEST.in
+
+include bspider/VERSION
+include bspider/config/rbac_model.conf
+recursive-include bspider/templates *

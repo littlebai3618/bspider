@@ -1,0 +1,77 @@
+# process model development | produce
+GLOBAL_PATTERN = 'development'
+# master service config
+MASTER = {
+    'ip': '',
+    'port': 5000,
+    'name': 'default_master',
+    'description': 'default desc'
+}
+# agent node service addr
+AGENT = {
+    'ip': '',
+    'port': 5000,
+    'name': 'default_agent',
+    'description': 'default desc'
+}
+# master service mysql config
+WEB_STUDIO_DB = {
+    'MYSQL_HOST': '',
+    'MYSQL_PORT': 3306,
+    'MYSQL_USER': '',
+    'MYSQL_PASSWD': '',
+    'MYSQL_CHARSET': '',
+    'MYSQL_DB': '',
+}
+# time zone
+TZ = 'Asia/Shanghai'  # utc +8
+# a key to make safe JWT token
+WEB_SECRET_KEY = ''
+WEB_TOKEN_LIVE_TIME = 3600 * 5
+
+RABBITMQ_CONFIG = {
+    'host': '',
+    'port': 5672,
+    'username': '',
+    'password': '',
+    'virtual_host': '',
+}
+
+#################
+# 节点监控相关配置 #
+#################
+# supervisor rpc server
+SUPERVISOR_RPC = {
+    'username': '',
+    'password': '',
+    'port': 9010
+}
+
+#################
+# 定时任务相关配置 #
+#################
+CRON_JOB_THREAD_NUM = 20
+CRON_JOB_PROCESS_NUM = 1
+CRON_JOB_REFRESH_TIME = 3
+
+#################
+# 代码加载模块配置 #
+#################
+
+
+#################
+# 消息通知模块配置 #
+#################
+# 重要配置不可为空
+DING = ''
+
+#################
+# 下载器配置 #
+#################
+
+#################
+# 日志模块配置 #
+#################
+LOGGER_EXCHANGE_NAME = 'logger'
+LOGGER_QUEUE_NAME = 'bspider_logger'
+LOGGER_LEVEL = 'DEBUG'

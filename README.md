@@ -1,23 +1,28 @@
 # bspider
 
-#### 介绍 -v0.1 beta
+#### 介绍 -v 0.1.23 beta
 分布式、高可用的抓取框架
 
 #### 软件架构
 参考scrapy、pyspider、k8s设计的一款高可用抓取框架
-依赖于 rabbitmq、mysql
+依赖如下组件: rabbitmq、mysql、sqlite
 
 
 #### 安装教程
 
-1. python install py
-2. sh start.sh agent/master
+1. pip install bspider
+2. 修改config.frame_settings.py 配置
+3. 在projects文件夹下进行开发、调试
+5. bspider master start|stop 启动停止master节点
+6. bspider agent start|stop 启动停止work节点
+7. 登录web ui 启动停止 parser、downloader进程
 
 #### 使用说明
 
-1. xxxx
-2. xxxx
-3. xxxx
+1. bspider startplatform xxx 创建工作台
+2. 本框架可在win/mac/linux 下进行开发
+3. 本框架只可在mac/linux 下进行部署，不支持在win下进行部署
+***
 
 #### 参与贡献
 
@@ -27,11 +32,3 @@
 4. 新建 Pull Request
 
 
-#### 码云特技
-
-1. 使用 Readme\_XXX.md 来支持不同的语言，例如 Readme\_en.md, Readme\_zh.md
-2. 码云官方博客 [blog.gitee.com](https://blog.gitee.com)
-3. 你可以 [https://gitee.com/explore](https://gitee.com/explore) 这个地址来了解码云上的优秀开源项目
-4. [GVP](https://gitee.com/gvp) 全称是码云最有价值开源项目，是码云综合评定出的优秀开源项目
-5. 码云官方提供的使用手册 [https://gitee.com/help](https://gitee.com/help)
-6. 码云封面人物是一档用来展示码云会员风采的栏目 [https://gitee.com/gitee-stars/](https://gitee.com/gitee-stars/)

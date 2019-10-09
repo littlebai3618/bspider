@@ -1,0 +1,16 @@
+{
+  "downloader_config": {
+    "middleware": ["DemoMiddleware"],
+    "settings": {
+      "PROJECT_NAME": "${project_name}",
+      "RETRY_TIMES": 3,
+      "ACCEPT_RESPONSE_CODE": []
+    }
+  },
+  "parser_config": {
+    "pipeline": ["DemoExtractor", "DemoPipeline"],
+    "settings": {
+      "PROJECT_NAME": "${project_name}"
+    }
+  }
+}

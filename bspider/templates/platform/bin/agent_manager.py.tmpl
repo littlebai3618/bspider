@@ -1,0 +1,12 @@
+"""
+ A agent to manage worker node by Flask
+ *** agent can't run in Windows
+ * BSpider use gunicorn and supervisor
+ *** in Unix, use 'bspider agent start' to run a agent process
+"""
+from bspider.agent.server import CreateApp
+
+app = CreateApp().app()
+
+if __name__ == '__main__':
+    app.run(debug=True, port=5001)
