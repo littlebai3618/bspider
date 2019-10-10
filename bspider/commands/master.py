@@ -39,18 +39,6 @@ class Command(BSpiderCommand):
         """查看supervisor是否已经启动"""
         platform_path = os.environ[PLATFORM_PATH_ENV]
         platform_name = os.environ[PLATFORM_NAME_ENV]
-        if os.path.exists(os.path.join(platform_path, 'cache', 'supervisord.pid')):
-            return True
-        tplfile = os.path.join(self.templates_dir, 'tools_cfg', 'supervisor.conf.tmpl')
-        config_path = os.path.join(platform_path, 'cache', 'supervisor.conf')
-        copy2(tplfile, config_path)
-        render_templatefile(config_path,
-            platform_path=platform_path,
-            bin_path=os.path.join(platform_path, 'bin'),
-            master_ip=self.settings['MASTER']['ip'],
-            supervisor_rpc_port=self.settings['SUPERVISOR_RPC']['port'],
-            supervisor_rpc_username=self.settings['SUPERVISOR_RPC']['username'],
-            supervisor_rpc_password=self.settings['SUPERVISOR_RPC']['password'])
 
         tplfile = os.path.join(self.templates_dir, 'tools_cfg', 'master_gunicorn.py.tmpl')
         copy2(tplfile, os.path.join(platform_path, 'cache', 'master_gunicorn.py.tmpl'))
@@ -60,6 +48,19 @@ class Command(BSpiderCommand):
                             log_level=self.settings['LOGGER_LEVEL'].lower(),
                             platform_name=platform_name,
                             platform_path=platform_path)
+
+        if os.path.exists(os.path.join(platform_path, 'cache', 'supervisord.pid')):
+            return True
+        tplfile = os.path.join(self.templates_dir, 'tools_cfg', 'supervisor.conf.tmpl')
+        config_path = os.path.join(platform_path, 'cache', 'supervisor.conf')
+        copy2(tplfile, config_path)
+        render_templatefile(config_path,
+                            platform_path=platform_path,
+                            bin_path=os.path.join(platform_path, 'bin'),
+                            master_ip=self.settings['MASTER']['ip'],
+                            supervisor_rpc_port=self.settings['SUPERVISOR_RPC']['port'],
+                            supervisor_rpc_username=self.settings['SUPERVISOR_RPC']['username'],
+                            supervisor_rpc_password=self.settings['SUPERVISOR_RPC']['password'])
 
         cmd = 'supervisord -c {}'.format(os.path.join(platform_path, 'cache', 'supervisor.conf'))
         print(os.popen(cmd).read().strip())
@@ -82,4 +83,4 @@ class Command(BSpiderCommand):
 
 
 if __name__ == '__main__':
-     Command().run(['hello_project'])
+    Command().run(['hello_project'])

@@ -34,6 +34,16 @@ class Command(BSpiderCommand):
         """查看supervisor是否已经启动"""
         platform_path = os.environ[PLATFORM_PATH_ENV]
         platform_name = os.environ[PLATFORM_NAME_ENV]
+
+        tplfile = os.path.join(self.templates_dir, 'tools_cfg', 'agent_gunicorn.py.tmpl')
+        copy2(tplfile, os.path.join(platform_path, 'cache', 'agent_gunicorn.py.tmpl'))
+        render_templatefile(os.path.join(platform_path, 'cache', 'agent_gunicorn.py.tmpl'),
+                            agent_port=self.settings['AGENT']['port'],
+                            agent_ip=self.settings['AGENT']['ip'],
+                            log_level=self.settings['LOGGER_LEVEL'].lower(),
+                            platform_name=platform_name,
+                            platform_path=platform_path)
+
         if os.path.exists(os.path.join(platform_path, 'cache', 'supervisord.pid')):
             return True
         tplfile = os.path.join(self.templates_dir, 'tools_cfg', 'supervisor.conf.tmpl')
@@ -46,15 +56,6 @@ class Command(BSpiderCommand):
                             supervisor_rpc_port=self.settings['SUPERVISOR_RPC']['port'],
                             supervisor_rpc_username=self.settings['SUPERVISOR_RPC']['username'],
                             supervisor_rpc_password=self.settings['SUPERVISOR_RPC']['password'])
-
-        tplfile = os.path.join(self.templates_dir, 'tools_cfg', 'agent_gunicorn.py.tmpl')
-        copy2(tplfile, os.path.join(platform_path, 'cache', 'agent_gunicorn.py.tmpl'))
-        render_templatefile(os.path.join(platform_path, 'cache', 'agent_gunicorn.py.tmpl'),
-                            agent_port=self.settings['AGENT']['port'],
-                            agent_ip=self.settings['AGENT']['ip'],
-                            log_level=self.settings['LOGGER_LEVEL'].lower(),
-                            platform_name=platform_name,
-                            platform_path=platform_path)
 
         cmd = 'supervisord -c {}'.format(os.path.join(platform_path, 'cache', 'supervisor.conf'))
         print(os.popen(cmd).read().strip())
