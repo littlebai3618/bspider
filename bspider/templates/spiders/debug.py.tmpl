@@ -9,7 +9,7 @@ class Debug(Debuger):
     # 最大下载次数 下载超过此数量个 Request 调试进程会终止
     max_follow_url_num = 10
 
-    debug_request = Request(
+    start_request = Request(
         url='debug_url',
         method='GET|POST|PUT...',
     )
