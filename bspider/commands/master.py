@@ -53,8 +53,8 @@ class Command(BSpiderCommand):
             supervisor_rpc_password=self.settings['SUPERVISOR_RPC']['password'])
 
         tplfile = os.path.join(self.templates_dir, 'tools_cfg', 'master_gunicorn.py.tmpl')
-        copy2(tplfile, os.path.join(self.templates_dir, 'cache', 'master_gunicorn.py.tmpl'))
-        render_templatefile(os.path.join(self.templates_dir, 'cache', 'master_gunicorn.py.tmpl'),
+        copy2(tplfile, os.path.join(platform_path, 'cache', 'master_gunicorn.py.tmpl'))
+        render_templatefile(os.path.join(platform_path, 'cache', 'master_gunicorn.py.tmpl'),
                             master_port=self.settings['MASTER']['ip'],
                             log_level=self.settings['LOGGER_LEVEL'].lower(),
                             platform_name=platform_name,

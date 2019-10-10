@@ -31,4 +31,10 @@
 3. 提交代码
 4. 新建 Pull Request
 
+#### TODO
+* 初次启动自动建表
+* frame_settings supervisor注释优化
+
+
+
 

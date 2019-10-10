@@ -10,7 +10,7 @@ from shutil import ignore_patterns, copy2, copystat
 
 import bspider
 
-IGNORE = ignore_patterns('*.pyc', '.svn')
+IGNORE = ignore_patterns('*.pyc', '.svn', '__pycache__')
 
 class BSpiderCommand(object):
     # default settings to be used for this command instead of global defaults
