@@ -55,7 +55,8 @@ class Command(BSpiderCommand):
         tplfile = os.path.join(self.templates_dir, 'tools_cfg', 'master_gunicorn.py.tmpl')
         copy2(tplfile, os.path.join(platform_path, 'cache', 'master_gunicorn.py.tmpl'))
         render_templatefile(os.path.join(platform_path, 'cache', 'master_gunicorn.py.tmpl'),
-                            master_port=self.settings['MASTER']['ip'],
+                            master_port=self.settings['MASTER']['port'],
+                            master_ip=self.settings['MASTER']['ip'],
                             log_level=self.settings['LOGGER_LEVEL'].lower(),
                             platform_name=platform_name,
                             platform_path=os.path.abspath(platform_name))

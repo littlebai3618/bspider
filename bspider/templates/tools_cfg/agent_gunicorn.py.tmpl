@@ -1,7 +1,7 @@
 import gevent.monkey
 gevent.monkey.patch_all()
 loglevel = '${log_level}'
-bind = '127.0.0.1:${agent_port}'
+bind = '${agent_ip}:${agent_port}'
 pidfile = '${platform_path}/cache/agent_gunicorn.pid'
 workers = 1
 worker_connections = 2000
