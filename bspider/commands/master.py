@@ -59,7 +59,7 @@ class Command(BSpiderCommand):
                             master_ip=self.settings['MASTER']['ip'],
                             log_level=self.settings['LOGGER_LEVEL'].lower(),
                             platform_name=platform_name,
-                            platform_path=os.path.abspath(platform_name))
+                            platform_path=platform_path)
 
         cmd = 'supervisord -c {}'.format(os.path.join(platform_path, 'cache', 'supervisor.conf'))
         print(os.popen(cmd).read().strip())
