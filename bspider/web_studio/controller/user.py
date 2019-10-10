@@ -18,7 +18,6 @@ user_service = UserService()
 def login():
     form = LoginForm()
     client = form.client_type.data
-    print(client)
     if client == 'identity':
         return user_service.login(form.identity.data, form.password.data)
     else:

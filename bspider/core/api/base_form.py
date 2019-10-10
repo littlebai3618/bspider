@@ -16,6 +16,9 @@ class BaseForm(Form):
         if request.json:
             for key, values in request.json.items():
                 tmp[key] = values
+        if request.form:
+            for key, values in request.form.items():
+                tmp[key] = values
         super().__init__(data=tmp)
         self.__validate_for_api()
 

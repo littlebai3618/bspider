@@ -6,7 +6,7 @@ from functools import wraps
 
 import pika
 
-from bspider.config.default_settings import QUEUE_ARG
+from bspider.config import FrameSettings
 from bspider.utils import singleton
 
 
@@ -45,7 +45,7 @@ class RabbitMQHandler(object):
             )
         )
         self.channel = self.connection.channel()
-        self.queue_arg = QUEUE_ARG
+        self.queue_arg = FrameSettings()['QUEUE_ARG']
 
     def close(self):
         try:

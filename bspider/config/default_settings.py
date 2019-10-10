@@ -64,4 +64,4 @@ EXCHANGE_NAME = ('candidate', 'download', 'parse')
 # order key
 OREDR_KEY = 'order'
 # queue arg
-QUEUE_ARG = {"x-max-priority": 10, "x-queue-mode": 'lazy'}
+QUEUE_ARG = {"x-max-priority": 5, "x-queue-mode": 'lazy'}

@@ -1,7 +1,7 @@
 # @Time    : 2019/9/27 5:37 下午
 # @Author  : baii
 # @File    : debuger
-# @Use     : 开发时的调试模块
+# @Use     : 开发时的调试模块，使用优先队列来模拟rabbitMQ
 import asyncio
 import inspect
 import json
@@ -28,7 +28,9 @@ class Debuger(object):
     # 最大下载次数 下载超过此数量个 Request 调试进程会终止
     max_follow_url_num = 10
     # 调试的url链接
-    debug_request = Request('http://127.0.0.1')
+    start_request = Request('http://127.0.0.1')
+
+    # proority fix rabbitmq 数字越大优先级越高，使用Python优先队列模拟的时候需要进行优先级翻转
 
     def __init__(self):
         self.log = LoggerPool().get_logger(key=self.project_name, module='debuger',
@@ -42,9 +44,11 @@ class Debuger(object):
 
         self.local_project_class = self.__find_local_class()
         self.mysql_handler = MysqlHandler.from_settings(self.frame_settings.get('WEB_STUDIO_DB'))
+        self.max_priority = self.frame_settings['QUEUE_ARG'].get('x-max-priority', 5)
+        self.priority_queue = [Queue() for _ in range(self.max_priority)]
 
-        self.queue: Queue[Request] = Queue()
-        self.queue.put(self.debug_request)
+        self.set(self.start_request)
+
         self.__cur_download_num = 1
         self.parser = self.parser()
         self.downloader = self.downloader()
@@ -53,24 +57,37 @@ class Debuger(object):
     def project_name(self):
         return os.path.basename(os.getcwd())
 
+    def put(self, request: Request):
+        """向优先队列中存入req"""
+        try:
+            self.priority_queue[self.max_priority - request.priority].put(request)
+        except KeyError as e:
+            self.log.error(
+                f'At req:{request.url}, requests.priority={request.priority} must between 1~{self.max_priority}')
+            raise e
+
+    def get(self):
+        """从优先队列中取出req，若空则返回None"""
+        for i in range(self.max_priority - 1, -1, -1):
+            if self.priority_queue[i].empty():
+                continue
+            return self.priority_queue[i].get()
+
     def start(self):
-        """开始调试"""
+        """调试入口"""
         tasks = [asyncio.ensure_future(self.__debug())]
         loop = asyncio.get_event_loop()
         loop.run_until_complete(asyncio.wait(tasks))
 
         self.log.info('debuger finished')
 
-    def set_debug_request(self, request: Request):
-        self.queue.put(request)
-
     async def __debug(self):
         while True:
-            if self.queue.empty():
+            request = self.get()
+            if request is None:
                 self.log.debug('candidate queue is empty')
                 break
 
-            request = self.queue.get()
             self.log.info(f'start download url:{request.url}')
             resp = await self.downloader.download(request)
             self.__cur_download_num += 1
@@ -78,7 +95,7 @@ class Debuger(object):
                 self.log.info(f'start parser url:{resp.url} status:{resp.status}')
                 reqs = await self.parser.parse(resp)
                 for req in reqs:
-                    self.queue.put(req)
+                    self.put(req)
 
             if self.__cur_download_num > self.max_follow_url_num:
                 self.log.info(f'debuger follow url {self.max_follow_url_num} second')
@@ -92,7 +109,7 @@ class Debuger(object):
                 if inspect.isclass(obj):
                     if issubclass(obj, BasePipeline) and not obj in (BasePipeline, BaseExtractor):
                         local_project_class[obj.__name__] = mod.__file__
-                    if issubclass(obj, BaseMiddleware) and not obj in (BaseMiddleware, ):
+                    if issubclass(obj, BaseMiddleware) and not obj in (BaseMiddleware,):
                         local_project_class[obj.__name__] = mod.__file__
         return local_project_class
 
@@ -132,3 +149,8 @@ class Debuger(object):
                 self.settings['downloader_config']['middleware'][i] = (pipeline, self.load_remote_module_str(pipeline))
 
         return AsyncDownloader(self.project_name, self.settings['downloader_config'], 'debug')
+
+
+if __name__ == '__main__':
+    for i in range(10, 0):
+        print(i)

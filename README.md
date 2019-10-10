@@ -33,8 +33,9 @@
 
 #### TODO
 * 初次启动自动建表
-* frame_settings supervisor注释优化
-
+* frame_settings supervisor注释优化 done
+* debug队列改为优先队列 done
+* 接口支持表单
 
 
 
