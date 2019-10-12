@@ -3,6 +3,7 @@
 # @File    : user_impl
 # @Use     :
 from bspider.core.api import BaseImpl
+from bspider.web_studio import log
 
 
 class UserImpl(BaseImpl):
@@ -46,6 +47,7 @@ class UserImpl(BaseImpl):
         else:
             sql = f'select `id`, `identity`, `username`, `password`, `role`, `email`, `phone`, `status` ' \
                   f'from {self.table_name} order by `id` limit {start},{limit};'
+        log.debug(f'SQL:{sql}')
         return self.handler.select(sql)
 
     @property
