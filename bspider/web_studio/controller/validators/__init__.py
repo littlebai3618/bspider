@@ -2,9 +2,9 @@
 # @Author  : 白尚林
 # @File    : __init__
 # @Use     :
-from wtforms import StringField
+from wtforms import StringField, IntegerField
 
-from bspider.core.api import BaseForm, IntegerField
+from bspider.core.api import BaseForm
 
 
 class PageForm(BaseForm):
