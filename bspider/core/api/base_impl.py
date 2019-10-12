@@ -25,21 +25,18 @@ class BaseImpl(object):
         return fields, tuple(values)
 
     @staticmethod
-    def make_search(search: str) -> tuple:
+    def make_search(search: str) -> str:
         """
         给定字典，返回fields 和 values
         :param info: dict
         :return:
         """
         field = list()
-        values = list()
         if len(search):
             for kv in search.split(','):
                 k, v = kv.split('=')
-                field.append('`{}` like \'%%%s%%\' '.format(k))
-                values.append(v)
-        where = ','.join(field)
-        return where, tuple(values)
+                field.append('`{}` like \'%%{}%%\' '.format(k, v))
+        return ','.join(field)
 
 
 # def remove(self, unique_value, unique_key='id'):

@@ -40,15 +40,15 @@ class UserImpl(BaseImpl):
 
     def get_users(self, page, limit, search):
         start = (page - 1) * limit
-        fields, values = self.make_search(search)
-        if len(values):
+        fields = self.make_search(search)
+        if len(fields):
             sql = f'select `id`, `identity`, `username`, `password`, `role`, `email`, `phone`, `status` ' \
                   f'from {self.table_name} where {fields} order by `id` limit {start},{limit};'
         else:
             sql = f'select `id`, `identity`, `username`, `password`, `role`, `email`, `phone`, `status` ' \
                   f'from {self.table_name} order by `id` limit {start},{limit};'
-        log.debug(f'SQL:{sql}', values)
-        return self.handler.select(sql, values)
+        log.debug(f'SQL:{sql}')
+        return self.handler.select(sql)
 
     @property
     def total_user_num(self):
