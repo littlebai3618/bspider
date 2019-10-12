@@ -47,7 +47,7 @@ class UserImpl(BaseImpl):
         else:
             sql = f'select `id`, `identity`, `username`, `password`, `role`, `email`, `phone`, `status` ' \
                   f'from {self.table_name} order by `id` limit {start},{limit};'
-        log.debug(f'SQL:{sql}')
+        log.debug(f'SQL:{sql}', values)
         return self.handler.select(sql, values)
 
     @property
