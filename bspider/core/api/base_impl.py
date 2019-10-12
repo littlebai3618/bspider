@@ -33,11 +33,11 @@ class BaseImpl(object):
         """
         field = list()
         values = list()
-        print(search)
-        for kv in search.split(','):
-            k, v = kv.split('=')
-            field.append('`{}` like \'%%%s%%\' '.format(k))
-            values.append(v)
+        if len(search):
+            for kv in search.split(','):
+                k, v = kv.split('=')
+                field.append('`{}` like \'%%%s%%\' '.format(k))
+                values.append(v)
         where = ','.join(field)
         return where, tuple(values)
 
