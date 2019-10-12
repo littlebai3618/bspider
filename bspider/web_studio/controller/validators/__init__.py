@@ -9,6 +9,6 @@ from bspider.core.api import BaseForm, IntegerField
 
 class PageForm(BaseForm):
     """分页参数"""
-    page = IntegerField(default=0)
+    page = IntegerField(default=1)
     limit = IntegerField(default=8)
     search = StringField(default='')
