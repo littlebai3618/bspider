@@ -36,7 +36,7 @@ class BaseImpl(object):
             for kv in search.split(','):
                 k, v = kv.split('=')
                 field.append('`{}` like \'%%{}%%\' '.format(k, v))
-        return ','.join(field)
+        return ' and '.join(field)
 
 
 # def remove(self, unique_value, unique_key='id'):
