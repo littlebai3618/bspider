@@ -48,7 +48,7 @@ class UserImpl(BaseImpl):
             sql = f'select `id`, `identity`, `username`, `password`, `role`, `email`, `phone`, `status` ' \
                   f'from {self.table_name} order by `id` limit {start},{limit};'
         log.debug(f'SQL:{sql}')
-        return self.handler.select(sql)
+        return self.handler.select(sql, values)
 
     @property
     def total_user_num(self):
