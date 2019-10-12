@@ -24,6 +24,22 @@ class BaseImpl(object):
         values = [data[key] for key in data.keys()]
         return fields, tuple(values)
 
+    @staticmethod
+    def make_search(search: str) -> tuple:
+        """
+        给定字典，返回fields 和 values
+        :param info: dict
+        :return:
+        """
+        field = list()
+        values = list()
+        for kv in search.split(','):
+            k, v = kv.split('=')
+            field.append('`{}` like \'%%%s%%\' '.format(k))
+            values.append(v)
+        where = ','.join(field)
+        return where, tuple(values)
+
 
 # def remove(self, unique_value, unique_key='id'):
     #     sql = f"update {self.table_name} set `status`=%s where `{unique_key}` = '{unique_value}';"

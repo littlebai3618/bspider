@@ -71,11 +71,18 @@ class UserService(BaseService):
         log.info(f'user:{user_id} update success with:{update_info}')
         return PatchSuccess(msg='update user success!')
 
-    def get_users(self):
-        infos = self.impl.get_users()
+    def get_users(self, page, limit, search):
+        infos = self.impl.get_users(page, limit, search)
         for info in infos:
             info.pop('password')
-        return GetSuccess(msg='get user list success!', data=infos)
+        return GetSuccess(
+            msg='get user list success!',
+            data={
+                'items': infos,
+                'total': self.impl.total_user_num,
+                'page': page,
+                'limit': limit
+            })
 
     def get_user(self, user_id):
         info = self.impl.get_user_by_id(user_id)

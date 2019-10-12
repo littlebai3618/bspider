@@ -37,7 +37,18 @@ class UserImpl(BaseImpl):
         sql = f"update {self.table_name} set {fields} where `id` = '{user_id}';"
         return self.handler.update(sql, values)
 
-    def get_users(self):
-        sql = f'select `id`, `identity`, `username`, `password`, `role`, `email`, `phone`, `status` ' \
-            f'from {self.table_name};'
+    def get_users(self, page, limit, search):
+        start = (page - 1) * limit
+        fields, values = self.make_search(search)
+        if len(values):
+            sql = f'select `id`, `identity`, `username`, `password`, `role`, `email`, `phone`, `status` ' \
+                  f'from {self.table_name} where {fields} order by `id` limit {start},{limit};'
+        else:
+            sql = f'select `id`, `identity`, `username`, `password`, `role`, `email`, `phone`, `status` ' \
+                  f'from {self.table_name} order by `id` limit {start},{limit};'
         return self.handler.select(sql)
+
+    @property
+    def total_user_num(self):
+        sql = f"select count(1) as total from `{self.table_name}`; "
+        return self.handler.select(sql)[0]['total']

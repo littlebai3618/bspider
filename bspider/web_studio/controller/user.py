@@ -6,6 +6,7 @@ from flask import Blueprint, g
 
 from bspider.core.api import auth
 from bspider.core.api import NotFound
+from .validators import PageForm
 from .validators.user_forms import LoginForm, RegisterForm, UpdateForm
 from bspider.web_studio.service.user import UserService
 
@@ -55,7 +56,8 @@ def update_user(user_id):
 @user.route('/user', methods=['GET'])
 @auth.login_required
 def get_users():
-    return user_service.get_users()
+    form = PageForm()
+    return user_service.get_users(form.page.data, form.limit.data, form.search.data)
 
 
 @user.route('/user/<int:user_id>', methods=['GET'])
