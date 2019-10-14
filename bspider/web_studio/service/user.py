@@ -18,9 +18,13 @@ class UserService(BaseService):
         self.impl = UserImpl()
 
     def login(self, identity, password):
-        info = self.impl.get_user(identity)
-        if len(info) == 1:
-            info = info[0]
+        infos = self.impl.get_user(identity)
+
+        for info in infos:
+            self.datetime_to_str(info)
+
+        if len(infos) == 1:
+            info = infos[0]
             if check_password_hash(info.pop('password'), password):
                 info['token'] = make_token(info['id'], info['role'])
                 info.pop('identity')
@@ -29,9 +33,11 @@ class UserService(BaseService):
             else:
                 log.info(f'user:{identity} login failed:invalid password')
                 return ParameterException(errno=10005, msg='invalid password')
-        elif len(info) == 0:
+        elif len(infos) == 0:
             log.info(f'user:{identity} login failed:invalid user')
             return NotFound(errno=10006, msg='invalid user')
+        else:
+            return Conflict(errno=10008, msg='query exceptions')
 
     def add_user(self, identity, username, password, role, email, phone):
         data = {
