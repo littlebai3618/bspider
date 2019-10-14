@@ -3,6 +3,7 @@
 # @File    : base_service
 # @Use     :
 import json
+from datetime import datetime
 
 from bspider.config import FrameSettings
 from bspider.core.downloader.async_downloader import AsyncDownloader
@@ -73,5 +74,12 @@ class BaseService(object):
                 'config': json.dumps(project_config)
             })
         return result
+
+    def datetime_to_str(self, d: dict) -> None:
+        for key, value in d.items():
+            if isinstance(value, datetime):
+                d[key] = value.strftime("%Y-%m-%d %H:%M:%S")
+
+
 
 

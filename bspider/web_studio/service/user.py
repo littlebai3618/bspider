@@ -73,8 +73,11 @@ class UserService(BaseService):
 
     def get_users(self, page, limit, search):
         infos = self.impl.get_users(page, limit, search)
+
         for info in infos:
             info.pop('password')
+            self.datetime_to_str(info)
+
         return GetSuccess(
             msg='get user list success!',
             data={
@@ -85,8 +88,12 @@ class UserService(BaseService):
             })
 
     def get_user(self, user_id):
-        info = self.impl.get_user_by_id(user_id)
-        log.debug(type(info[0]['create_time']))
-        if len(info):
-            return GetSuccess(msg='get user success', data=info[0])
+        infos = self.impl.get_user_by_id(user_id)
+
+        for info in infos:
+            self.datetime_to_str(info)
+
+        log.debug(infos[0]['create_time'])
+        if len(infos):
+            return GetSuccess(msg='get user success', data=infos[0])
         return NotFound(errno=10006, msg='invalid user')
