@@ -57,7 +57,7 @@ def update_user(user_id):
 @auth.login_required
 def get_users():
     form = PageForm()
-    return user_service.get_users(int(form.page.data), int(form.limit.data), form.search.data)
+    return user_service.get_users(int(form.page.data), int(form.limit.data), form.search.data, form.sort.data)
 
 
 @user.route('/user/<int:user_id>', methods=['GET'])

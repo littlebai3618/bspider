@@ -71,8 +71,11 @@ class UserService(BaseService):
         log.info(f'user:{user_id} update success with:{update_info}')
         return PatchSuccess(msg='update user success!')
 
-    def get_users(self, page, limit, search):
-        infos = self.impl.get_users(page, limit, search)
+    def get_users(self, page, limit, search, sort):
+        if sort.upper() not in ['ASC', 'DESC']:
+            return ParameterException(msg='sort must `asc` or `desc`')
+
+        infos = self.impl.get_users(page, limit, search, sort)
 
         for info in infos:
             info.pop('password')
@@ -93,7 +96,6 @@ class UserService(BaseService):
         for info in infos:
             self.datetime_to_str(info)
 
-        log.debug(infos[0]['create_time'])
         if len(infos):
             return GetSuccess(msg='get user success', data=infos[0])
         return NotFound(errno=10006, msg='invalid user')

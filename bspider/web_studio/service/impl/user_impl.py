@@ -20,7 +20,7 @@ class UserImpl(BaseImpl):
 
     def get_user_by_id(self, id):
         """暂时先这样，后面增加复杂密码验证"""
-        sql = f'select `id`, `username`, `role`, `email`, `phone`, `create_time`, `update_time`  ' \
+        sql = f'select `id`, `identity`, `username`, `role`, `email`, `phone`, `create_time`, `update_time`  ' \
             f'from {self.table_name} where `id`=%s and `status`=1;'
         return self.handler.select(sql, id)
 
@@ -38,15 +38,15 @@ class UserImpl(BaseImpl):
         sql = f"update {self.table_name} set {fields} where `id` = '{user_id}';"
         return self.handler.update(sql, values)
 
-    def get_users(self, page, limit, search):
+    def get_users(self, page, limit, search, sort):
         start = (page - 1) * limit
         fields = self.make_search(search)
         if len(fields):
             sql = f'select `id`, `identity`, `username`, `password`, `role`, `email`, `phone`, `status`, `create_time`, `update_time` ' \
-                  f'from {self.table_name} where {fields} order by `id` limit {start},{limit};'
+                  f'from {self.table_name} where {fields} order by `id` {sort} limit {start},{limit};'
         else:
             sql = f'select `id`, `identity`, `username`, `password`, `role`, `email`, `phone`, `status`, `create_time`, `update_time` ' \
-                  f'from {self.table_name} order by `id` limit {start},{limit};'
+                  f'from {self.table_name} order by `id` {sort} limit {start},{limit};'
         log.debug(f'SQL:{sql}')
         return self.handler.select(sql)
 

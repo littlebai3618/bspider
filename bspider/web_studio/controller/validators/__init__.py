@@ -12,3 +12,4 @@ class PageForm(BaseForm):
     page = IntegerField(default=1)
     limit = IntegerField(default=8)
     search = StringField(default='')
+    sort = StringField(default='DESC')
