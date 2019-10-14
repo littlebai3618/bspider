@@ -14,8 +14,8 @@ class UserImpl(BaseImpl):
 
     def get_user(self, id):
         """暂时先这样，后面增加复杂密码验证"""
-        sql = f'select `id`, `identity`, `username`, `password`, `role`, `email`, `phone` ' \
-            f'from {self.table_name} where `identity`=%s and `status`=1;'
+        sql = f'select `id`, `identity`, `username`, `password`, `role`, `email`, `phone`, `create_time`, `update_time` ' \
+            f'from {self.table_name} where `identity`=%s;'
         return self.handler.select(sql, id)
 
     def get_user_by_id(self, id):
@@ -42,15 +42,19 @@ class UserImpl(BaseImpl):
         start = (page - 1) * limit
         fields = self.make_search(search)
         if len(fields):
-            sql = f'select `id`, `identity`, `username`, `password`, `role`, `email`, `phone`, `status` ' \
+            sql = f'select `id`, `identity`, `username`, `password`, `role`, `email`, `phone`, `status`, `create_time`, `update_time` ' \
                   f'from {self.table_name} where {fields} order by `id` limit {start},{limit};'
         else:
-            sql = f'select `id`, `identity`, `username`, `password`, `role`, `email`, `phone`, `status` ' \
+            sql = f'select `id`, `identity`, `username`, `password`, `role`, `email`, `phone`, `status`, `create_time`, `update_time` ' \
                   f'from {self.table_name} order by `id` limit {start},{limit};'
         log.debug(f'SQL:{sql}')
         return self.handler.select(sql)
 
-    @property
-    def total_user_num(self):
-        sql = f"select count(1) as total from `{self.table_name}`; "
+    def total_user_num(self, search):
+        fields = self.make_search(search)
+        if len(fields):
+            sql = f"select count(1) as total from `{self.table_name}` where {fields}; "
+        else:
+            sql = f"select count(1) as total from `{self.table_name}`; "
+        log.debug(f'SQL:{sql}')
         return self.handler.select(sql)[0]['total']

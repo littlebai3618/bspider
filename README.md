@@ -25,18 +25,18 @@
 ***
 
 #### 参与贡献
-
 1. Fork 本仓库
 2. 新建 Feat_xxx 分支
 3. 提交代码
 4. 新建 Pull Request
 
 #### TODO
-* 初次启动自动建表
+* 初次安装自动建表
 * frame_settings supervisor注释优化 done
 * debug队列改为优先队列 done
 * 接口支持表单 done
-* 每个资源增加分页、搜索接口
+* 每个资源增加分页、搜索接口 doing user done
+* User 增加创建时间、修改时间返回、修复total参数显示不正确bug done
 
 
 

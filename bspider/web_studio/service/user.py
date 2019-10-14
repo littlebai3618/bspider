@@ -72,7 +72,6 @@ class UserService(BaseService):
         return PatchSuccess(msg='update user success!')
 
     def get_users(self, page, limit, search):
-        log.debug(f'{type(page)}, {type(limit)}, {type(search)}, {page}, {limit}, {search}')
         infos = self.impl.get_users(page, limit, search)
         for info in infos:
             info.pop('password')
@@ -80,7 +79,7 @@ class UserService(BaseService):
             msg='get user list success!',
             data={
                 'items': infos,
-                'total': self.impl.total_user_num,
+                'total': self.impl.total_user_num(search),
                 'page': page,
                 'limit': limit
             })
