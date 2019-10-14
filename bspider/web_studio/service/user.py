@@ -86,6 +86,7 @@ class UserService(BaseService):
 
     def get_user(self, user_id):
         info = self.impl.get_user_by_id(user_id)
+        log.debug(info[0]['create_time'])
         if len(info):
             return GetSuccess(msg='get user success', data=info[0])
         return NotFound(errno=10006, msg='invalid user')
