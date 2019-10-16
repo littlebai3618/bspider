@@ -20,8 +20,8 @@ class UserImpl(BaseImpl):
 
     def get_user_by_id(self, id):
         """暂时先这样，后面增加复杂密码验证"""
-        sql = f'select `id`, `identity`, `username`, `role`, `email`, `phone`, `create_time`, `update_time`  ' \
-            f'from {self.table_name} where `id`=%s and `status`=1;'
+        sql = f'select `id`, `identity`, `username`, `role`, `email`, `phone`, `status`, `create_time`, `update_time`  ' \
+            f'from {self.table_name} where `id`=%s;'
         return self.handler.select(sql, id)
 
     def add_user(self, data):
