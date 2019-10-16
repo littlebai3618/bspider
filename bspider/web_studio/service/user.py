@@ -25,6 +25,9 @@ class UserService(BaseService):
 
         if len(infos) == 1:
             info = infos[0]
+            if info['status'] == 0:
+                return Conflict(errno=10009, msg='this identity was closed, please call admin!')
+
             if check_password_hash(info.pop('password'), password):
                 info['token'] = make_token(info['id'], info['role'])
                 info.pop('identity')
