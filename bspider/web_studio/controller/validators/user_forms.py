@@ -23,8 +23,8 @@ class LoginForm(BaseForm):
 
 class RegisterForm(BaseForm):
     identity = StringField(validators=[DataRequired(), length(max=32, min=5)])
-    username = StringField(validators=[DataRequired(), length(max=10, min=1)])
-    password = StringField(validators=[length(max=20, min=5)])
+    username = StringField(validators=[DataRequired(), length(max=32, min=1)])
+    password = StringField(validators=[length(max=32, min=5)])
     role = StringField(validators=[DataRequired()])
     email = StringField()
     phone = StringField()
