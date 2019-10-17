@@ -39,6 +39,14 @@ class BaseImpl(object):
         return ' and '.join(field)
 
 
+    def total_num(self, search):
+        fields = self.make_search(search)
+        if len(fields):
+            sql = f"select count(1) as total from `{self.table_name}` where {fields}; "
+        else:
+            sql = f"select count(1) as total from `{self.table_name}`; "
+        return self.handler.select(sql)[0]['total']
+
 # def remove(self, unique_value, unique_key='id'):
     #     sql = f"update {self.table_name} set `status`=%s where `{unique_key}` = '{unique_value}';"
     #     return self.handler.update(sql, (-1))

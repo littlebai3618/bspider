@@ -95,7 +95,7 @@ class UserService(BaseService):
             msg='get user list success!',
             data={
                 'items': infos,
-                'total': self.impl.total_user_num(search),
+                'total': self.impl.total_num(search),
                 'page': page,
                 'limit': limit
             })

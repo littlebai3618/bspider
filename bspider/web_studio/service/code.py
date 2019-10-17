@@ -5,7 +5,7 @@
 from pymysql import IntegrityError
 
 from bspider.core.api import BaseService, Conflict, NotFound, PostSuccess, PatchSuccess, PartialSuccess, DeleteSuccess, \
-    GetSuccess
+    GetSuccess, ParameterException
 from bspider.core.lib import RemoteMixIn
 from bspider.utils.tools import change_dict_key
 from bspider.web_studio.server import log
@@ -93,13 +93,24 @@ class CodeService(BaseService, RemoteMixIn):
             infos[0].pop('project_id')
             infos[0].pop('project_name')
             infos[0]['project'] = project
-            print(infos)
             return GetSuccess(msg='get code success', data=[infos[0]])
         else:
             return NotFound(msg='code is not exist', errno=40001)
 
-    def get_codes(self, **param):
-        param = change_dict_key('code_type', 'type', param)
-        print(param)
-        info = self.impl.get_codes(**param)
-        return GetSuccess(msg='get code success', data=info)
+    def get_codes(self, page, limit, search, sort):
+        if sort.upper() not in ['ASC', 'DESC']:
+            return ParameterException(msg='sort must `asc` or `desc`')
+
+        infos = self.impl.get_codes(page, limit, search, sort)
+
+        for info in infos:
+            self.datetime_to_str(info)
+
+        return GetSuccess(
+            msg='get user list success!',
+            data={
+                'items': infos,
+                'total': self.impl.total_num(search),
+                'page': page,
+                'limit': limit
+            })

@@ -5,8 +5,9 @@
 from flask import Blueprint
 
 from bspider.core.api import auth
+from .validators.user_forms import RegisterForm
 from bspider.web_studio.service.code import CodeService
-from .validators.code_forms import GetForm, AddForm, UpdateForm
+from .validators.code_forms import AddForm, UpdateForm
 
 
 code = Blueprint('code_bp', __name__)
@@ -21,12 +22,8 @@ def get(code_id):
 @code.route('/code', methods=['GET'])
 @auth.login_required
 def gets():
-    form = GetForm()
-    param = form.get_dict()
-    print(param)
-    if form.code_type.data:
-        return code_service.get_codes(**param)
-    return code_service.get_codes()
+    form = RegisterForm()
+    return code_service.get_codes(**form.get_dict())
 
 @code.route('/code', methods=['POST'])
 @auth.login_required

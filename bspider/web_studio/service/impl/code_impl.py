@@ -3,6 +3,7 @@
 # @File    : code_impl
 # @Use     :
 from bspider.core.api import BaseImpl
+from bspider.web_studio import log
 
 
 class CodeImpl(BaseImpl):
@@ -63,17 +64,21 @@ class CodeImpl(BaseImpl):
             f'WHERE `code`.`id`={code_id}'
         return self.handler.select(sql)
 
-    def get_codes(self, **param):
-        if len(param):
-            fields, values = self.make_fv(param)
-            fields = fields.replace(',', ' and ')
-            sql = f'select `id`, `name`, `description`, `type`, `editor` from {self.code_table} where {fields}'
-            return self.handler.select(sql, values)
-        sql = f'select `id`, `name`, `description`, `type`, `editor` from {self.code_table} '
-        return self.handler.select(sql)
-
     def get_code_by_type(self, code_type):
         sql = f'select `id`, `name`, `description`, `type`, `editor`, `content` ' \
             f'from {self.code_table} ' \
             f'where `type` = "{code_type}";'
+        return self.handler.select(sql)
+
+
+    def get_codes(self, page, limit, search, sort):
+        start = (page - 1) * limit
+        fields = self.make_search(search)
+        if len(fields):
+            sql = f'select `id`, `name`, `description`, `type`, `editor`, `create_time`, `update_time` ' \
+                  f'from {self.table_name} where {fields} order by `id` {sort} limit {start},{limit};'
+        else:
+            sql = f'select `id`, `name`, `description`, `type`, `editor`, `create_time`, `update_time` ' \
+                  f'from {self.table_name} order by `id` {sort} limit {start},{limit};'
+        log.debug(f'SQL:{sql}')
         return self.handler.select(sql)

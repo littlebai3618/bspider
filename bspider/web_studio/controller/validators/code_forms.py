@@ -8,11 +8,6 @@ from wtforms.validators import DataRequired
 from bspider.core.api import BaseForm
 
 
-class GetForm(BaseForm):
-    code_type = StringField()
-    editor = StringField()
-
-
 class AddForm(BaseForm):
     name = StringField(validators=[DataRequired()])
     description = StringField(validators=[DataRequired()])

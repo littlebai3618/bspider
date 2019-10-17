@@ -29,8 +29,7 @@ def login():
 @auth.login_required
 def add_user():
     form = RegisterForm()
-    return user_service.add_user(form.identity.data, form.username.data, form.password.data,
-                                 form.role.data, form.email.data, form.phone.data, form.status.data)
+    return user_service.add_user(**form.get_dict())
 
 
 @user.route('/user/<int:user_id>', methods=['DELETE'])

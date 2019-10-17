@@ -49,12 +49,3 @@ class UserImpl(BaseImpl):
                   f'from {self.table_name} order by `id` {sort} limit {start},{limit};'
         log.debug(f'SQL:{sql}')
         return self.handler.select(sql)
-
-    def total_user_num(self, search):
-        fields = self.make_search(search)
-        if len(fields):
-            sql = f"select count(1) as total from `{self.table_name}` where {fields}; "
-        else:
-            sql = f"select count(1) as total from `{self.table_name}`; "
-        log.debug(f'SQL:{sql}')
-        return self.handler.select(sql)[0]['total']
