@@ -13,3 +13,16 @@ class PageForm(BaseForm):
     limit = IntegerField(default=8)
     search = StringField(default='')
     sort = StringField(default='DESC')
+
+    def validate_page(self, value):
+        self.__to_int(value)
+
+    def validate_limit(self, value):
+        self.__to_int(value)
+
+    def __to_int(self, value):
+        try:
+            value.data = int(value.data)
+        except ValueError as e:
+            raise e
+
