@@ -76,9 +76,9 @@ class CodeImpl(BaseImpl):
         fields = self.make_search(search)
         if len(fields):
             sql = f'select `id`, `name`, `description`, `type`, `editor`, `create_time`, `update_time` ' \
-                  f'from {self.table_name} where {fields} order by `id` {sort} limit {start},{limit};'
+                  f'from {self.code_table} where {fields} order by `id` {sort} limit {start},{limit};'
         else:
             sql = f'select `id`, `name`, `description`, `type`, `editor`, `create_time`, `update_time` ' \
-                  f'from {self.table_name} order by `id` {sort} limit {start},{limit};'
+                  f'from {self.code_table} order by `id` {sort} limit {start},{limit};'
         log.debug(f'SQL:{sql}')
-        return self.handler.select(sql)
+        return self.handler.select(sql), self.total_num(search, self.code_table)

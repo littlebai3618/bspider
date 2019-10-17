@@ -39,12 +39,12 @@ class BaseImpl(object):
         return ' and '.join(field)
 
 
-    def total_num(self, search):
+    def total_num(self, search, table_name):
         fields = self.make_search(search)
         if len(fields):
-            sql = f"select count(1) as total from `{self.table_name}` where {fields}; "
+            sql = f"select count(1) as total from `{table_name}` where {fields}; "
         else:
-            sql = f"select count(1) as total from `{self.table_name}`; "
+            sql = f"select count(1) as total from `{table_name}`; "
         return self.handler.select(sql)[0]['total']
 
 # def remove(self, unique_value, unique_key='id'):

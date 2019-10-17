@@ -101,7 +101,7 @@ class CodeService(BaseService, RemoteMixIn):
         if sort.upper() not in ['ASC', 'DESC']:
             return ParameterException(msg='sort must `asc` or `desc`')
 
-        infos = self.impl.get_codes(page, limit, search, sort)
+        infos, total = self.impl.get_codes(page, limit, search, sort)
 
         for info in infos:
             self.datetime_to_str(info)
@@ -110,7 +110,7 @@ class CodeService(BaseService, RemoteMixIn):
             msg='get user list success!',
             data={
                 'items': infos,
-                'total': self.impl.total_num(search),
+                'total': total,
                 'page': page,
                 'limit': limit
             })

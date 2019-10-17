@@ -85,7 +85,7 @@ class UserService(BaseService):
         if sort.upper() not in ['ASC', 'DESC']:
             return ParameterException(msg='sort must `asc` or `desc`')
 
-        infos = self.impl.get_users(page, limit, search, sort)
+        infos, total = self.impl.get_users(page, limit, search, sort)
 
         for info in infos:
             info.pop('password')
@@ -95,7 +95,7 @@ class UserService(BaseService):
             msg='get user list success!',
             data={
                 'items': infos,
-                'total': self.impl.total_num(search),
+                'total': total,
                 'page': page,
                 'limit': limit
             })

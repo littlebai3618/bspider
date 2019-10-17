@@ -48,4 +48,4 @@ class UserImpl(BaseImpl):
             sql = f'select `id`, `identity`, `username`, `password`, `role`, `email`, `phone`, `status`, `create_time`, `update_time` ' \
                   f'from {self.table_name} order by `id` {sort} limit {start},{limit};'
         log.debug(f'SQL:{sql}')
-        return self.handler.select(sql)
+        return self.handler.select(sql),  self.total_num(search, self.table_name)
