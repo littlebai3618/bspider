@@ -30,7 +30,7 @@ def login():
 def add_user():
     form = RegisterForm()
     return user_service.add_user(form.identity.data, form.username.data, form.password.data,
-                                 form.role.data, form.email.data, form.phone.data)
+                                 form.role.data, form.email.data, form.phone.data, form.status.data)
 
 
 @user.route('/user/<int:user_id>', methods=['DELETE'])
@@ -48,7 +48,8 @@ def update_user(user_id):
         'password': form.password.data,
         'phone': form.phone.data,
         'email': form.email.data,
-        'role': form.role.data
+        'role': form.role.data,
+        'status': int(form.status.data)
     }
     return user_service.update_user(user_id, **data)
 

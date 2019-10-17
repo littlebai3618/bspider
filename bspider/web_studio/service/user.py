@@ -42,14 +42,15 @@ class UserService(BaseService):
         else:
             return Conflict(errno=10008, msg='query exceptions')
 
-    def add_user(self, identity, username, password, role, email, phone):
+    def add_user(self, identity, username, password, role, email, phone, status):
         data = {
             'identity': identity,
             'username': username,
             'password': generate_password_hash(password),
             'role': role,
             'email': email,
-            'phone': phone
+            'phone': phone,
+            'status': status
         }
         try:
             user_id = self.impl.add_user(data)

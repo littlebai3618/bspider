@@ -28,6 +28,7 @@ class RegisterForm(BaseForm):
     role = StringField(validators=[DataRequired()])
     email = StringField()
     phone = StringField()
+    status = IntegerField(default=1)
 
 
 class UpdateForm(BaseForm):
@@ -36,3 +37,4 @@ class UpdateForm(BaseForm):
     role = StringField()
     email = StringField()
     phone = StringField()
+    status = IntegerField()
