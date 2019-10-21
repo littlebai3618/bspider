@@ -1,0 +1,9 @@
+"""a task template"""
+from bspider.core.bcron.base_task import BaseTask
+
+
+class DemoTask(BaseTask):
+
+    def execute_task(self):
+        """do you work to produce start urls"""
+        print('i am task')

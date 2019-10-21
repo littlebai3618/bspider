@@ -16,7 +16,8 @@ TEMPLATES_TO_RENDER = (
     ('middleware.py.tmpl', ),
     ('pipeline.py.tmpl', ),
     ('settings.json.tmpl', ),
-    ('debug.py.tmpl', )
+    ('debug.py.tmpl', ),
+    ('task.py.tmpl', )
 )
 
 class Command(BSpiderCommand):
