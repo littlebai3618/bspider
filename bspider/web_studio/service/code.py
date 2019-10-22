@@ -36,24 +36,24 @@ class CodeService(BaseService, RemoteMixIn):
 
     def update(self, code_id, name, **kwargs):
         if 'content' in kwargs:
-            return self.__update_with_content(code_id, name, **kwargs)
+            return self.__update_with_content(code_id=code_id, code_name=name, **kwargs)
         else:
             with self.impl.handler.session() as session:
                 session.update(*self.impl.update_code(code_id, **kwargs))
             log.info('update code success')
             return PatchSuccess(msg='update code success')
 
-    def __update_with_content(self, code_id, code_name, changes):
+    def __update_with_content(self, code_id, code_name, **kwargs):
         project_list = self.impl.get_project_by_code_id(code_id)
         if len(project_list):
             with self.impl.handler.session() as session:
-                session.update(*self.impl.update_code(code_id, changes))
+                session.update(*self.impl.update_code(code_id, **kwargs))
                 node_list = self.impl.get_nodes()
                 data = {
                     'project_ids': ','.join([str(info['id']) for info in project_list]),
                     'code_name': code_name,
-                    'code_type': changes['type'],
-                    'content': changes['content']
+                    'code_type': kwargs['type'],
+                    'content': kwargs['content']
                 }
                 result = self.op_update_code(node_list, data)
                 if len(result):
