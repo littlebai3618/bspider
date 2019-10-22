@@ -21,7 +21,7 @@ from flask import Blueprint
 from bspider.core.api import auth
 from bspider.core.api import ParameterException
 from .validators import PageForm
-from .validators.node_forms import AddNodeForm, DeleteNodeForm, ChangeNodeForm, AddWorkerForm, \
+from .validators.node_forms import AddNodeForm, DeleteNodeForm, UpdateNodeForm, AddWorkerForm, \
     DeleteWorkerForm, ChangeWorkerForm, GetWorkerForm
 from bspider.web_studio.service.node import Node
 
@@ -44,17 +44,11 @@ def delete_node():
     return node_service.delete_node(form.node_ip.data)
 
 
-@node.route('/node', methods=['PATCH'])
+@node.route('/node/<string:node_ip>', methods=['PATCH'])
 @auth.login_required
-def change_node():
-    form = ChangeNodeForm()
-    print(form.get_dict())
-    if form.op.data == 'start':
-        return node_service.start_node(form.node_ip.data)
-    elif form.op.data == 'stop':
-        return node_service.stop_node(form.node_ip.data)
-    else:
-        return ParameterException(msg=f'unknow op:{form.op.data}')
+def update_node(node_ip):
+    form = UpdateNodeForm()
+    return node_service.update_node(node_ip, form.name.data, form.status.data)
 
 
 @node.route('/node', methods=['GET'])

@@ -38,19 +38,21 @@ class Node(BaseService, RemoteMixIn):
             log.error(f'delete node:{node_ip} failed {e}')
             return Conflict(msg=f'delete node:{node_ip} failed {e}', errno=20005)
 
-    def stop_node(self, node_ip):
-        if self.op_stop_node(node_ip):
-            log.info(f'stop node:{node_ip} success')
-            return PatchSuccess(msg=f'stop node:{node_ip} success')
-        log.error(f'supervisor try stop node:{node_ip} failed')
-        return Conflict(msg=f'supervisor try stop node:{node_ip} failed', errno=20006)
+    def update_node(self, ip, name, status):
+        try:
+            if name is not None:
+                self.impl.update_node(ip, {'name': name}, 'ip', get_sql=True)
+            if status == 'start':
+                return self.__start_node(ip)
+            elif status == 'stop':
+                return self.__stop_node(ip)
+            return PatchSuccess(f'update node:{ip} name success')
+        except Exception as e:
+            log.error(f'update node:{ip} failed {e}')
+            return Conflict(msg=f'update node:{ip} failed {e}', errno=20005)
 
-    def start_node(self, node_ip):
-        if self.op_start_node(node_ip):
-            log.info(f'stop update:{node_ip} success')
-            return PatchSuccess(msg=f'start node:{node_ip} success')
-        log.error(f'supervisor try start node:{node_ip} failed')
-        return Conflict(msg=f'supervisor try start node:{node_ip} failed', errno=20007)
+
+
 
     def get_node(self, node_ip):
         """得到node列表，查询rpc获取supervisor进程状态，整合，返回"""
@@ -154,3 +156,19 @@ class Node(BaseService, RemoteMixIn):
             worker_info['name'] = worker['name']
             result.append(worker_info)
         return GetSuccess(msg='get all worker status success', data=result)
+
+    # Inner func
+    def __stop_node(self, node_ip):
+        if self.op_stop_node(node_ip):
+            log.info(f'stop node:{node_ip} success')
+            return PatchSuccess(msg=f'stop node:{node_ip} success')
+        log.error(f'supervisor try stop node:{node_ip} failed')
+        return Conflict(msg=f'supervisor try stop node:{node_ip} failed', errno=20006)
+
+    def __start_node(self, node_ip):
+        if self.op_start_node(node_ip):
+            log.info(f'stop update:{node_ip} success')
+            return PatchSuccess(msg=f'start node:{node_ip} success')
+        log.error(f'supervisor try start node:{node_ip} failed')
+        return
+        return Conflict(msg=f'supervisor try start node:{node_ip} failed', errno=20007)

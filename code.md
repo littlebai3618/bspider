@@ -24,6 +24,7 @@
 20007 启动一个node失败
 20008 node 不存在
 20009 worker 停止异常
+20010 node 信息更新失败
 
 30001 project不存在
 30002 project已经存在

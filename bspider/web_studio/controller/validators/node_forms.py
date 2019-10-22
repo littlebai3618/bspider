@@ -24,14 +24,13 @@ class GetNodeForm(BaseForm):
     node_ip = StringField()
 
 
-class ChangeNodeForm(BaseForm):
-    node_ip = StringField(validators=[ParamRequired(), length(min=7, max=15)])
-    op = IntegerField(validators=[ParamRequired()])
+class UpdateNodeForm(BaseForm):
+    name = StringField()
+    status = IntegerField()
 
-    def validate_op(self, value):
+    def validate_status(self, value):
         try:
             value.data = OpTypeEnum(value.data).name
-            print(value.data)
         except ValueError as e:
             raise e
 
