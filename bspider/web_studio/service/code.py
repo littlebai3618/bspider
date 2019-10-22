@@ -44,6 +44,7 @@ class CodeService(BaseService, RemoteMixIn):
             return PatchSuccess(msg='update code success')
 
     def __update_with_content(self, code_id, code_name, **kwargs):
+        log.debug('code update param: {}'.format(kwargs))
         project_list = self.impl.get_project_by_code_id(code_id)
         if len(project_list):
             with self.impl.handler.session() as session:
@@ -66,7 +67,7 @@ class CodeService(BaseService, RemoteMixIn):
                 return PostSuccess(msg=f'update code:{code_name} success')
         else:
             with self.impl.handler.session() as session:
-                session.update(*self.impl.update_code(code_id, changes))
+                session.update(*self.impl.update_code(code_id, **kwargs))
             log.info(f'update code:{code_name} success')
             return PatchSuccess(msg='update code success')
 
