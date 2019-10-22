@@ -48,7 +48,7 @@ class RemoteMixIn(object):
 
     def op_get_node(self, ip) -> dict:
         result = {
-            'desc': 'no process name agent',
+            'description': 'no process name agent',
             'pid': -1,
             'status': -1
         }
