@@ -40,11 +40,9 @@ def delete(code_id):
     return code_service.delete(code_id)
 
 
-@code.route('/code', methods=['PATCH'])
+@code.route('/code/<int:code_id>', methods=['PATCH'])
 @auth.login_required
-def update():
+def update(code_id):
     form = UpdateForm()
-    changes = form.get_dict()
-    code_id = changes.pop('code_id')
-    code_name = changes.pop('name')
-    return code_service.update(code_id, code_name, changes)
+    data = form.get_dict()
+    return code_service.update(code_id=code_id, **data)

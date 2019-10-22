@@ -70,15 +70,10 @@ class UserService(BaseService):
         return DeleteSuccess()
 
     def update_user(self, user_id, **kwargs):
-        update_info = {}
-        for key, value in kwargs.items():
-            if value is None:
-                continue
-            if 'password' == key:
-                value = generate_password_hash(value)
-            update_info[key] = value
-        self.impl.update_user(user_id, **update_info)
-        log.info(f'user:{user_id} update success with:{update_info}')
+        if 'password' in kwargs:
+            kwargs['password'] = generate_password_hash(kwargs['password'])
+        self.impl.update_user(user_id, **kwargs)
+        log.info(f'user:{user_id} update success with:{kwargs}')
         return PatchSuccess(msg='update user success!')
 
     def get_users(self, page, limit, search, sort):

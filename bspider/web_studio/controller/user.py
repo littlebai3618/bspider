@@ -42,14 +42,8 @@ def delete_user(user_id):
 @auth.login_required
 def update_user(user_id):
     form = UpdateForm()
-    data = {
-        'username': form.username.data,
-        'password': form.password.data,
-        'phone': form.phone.data,
-        'email': form.email.data,
-        'role': form.role.data,
-        'status': int(form.status.data)
-    }
+    data = form.get_dict()
+    data['status'] = int(form.status.data)
     return user_service.update_user(user_id, **data)
 
 

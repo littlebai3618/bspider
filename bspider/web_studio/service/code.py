@@ -34,12 +34,12 @@ class CodeService(BaseService, RemoteMixIn):
             log.error(f'add code failed:{name}-{editor} code is already exist')
             return Conflict(msg='code is already exist', errno=40002)
 
-    def update(self, code_id, code_name, changes):
-        if 'content' in changes:
-            return self.__update_with_content(code_id, code_name, changes)
+    def update(self, code_id, name, **kwargs):
+        if 'content' in kwargs:
+            return self.__update_with_content(code_id, name, **kwargs)
         else:
             with self.impl.handler.session() as session:
-                session.update(*self.impl.update_code(code_id, changes))
+                session.update(*self.impl.update_code(code_id, **kwargs))
             log.info('update code success')
             return PatchSuccess(msg='update code success')
 

@@ -17,7 +17,6 @@ class AddForm(BaseForm):
 
 
 class UpdateForm(BaseForm):
-    code_id = IntegerField(validators=[DataRequired()])
     name = StringField(validators=[DataRequired()])
     description = StringField()
     type = StringField()
