@@ -91,9 +91,12 @@ def change_worker():
 
 @node.route('/worker', methods=['GET'])
 @auth.login_required
-def get_worker():
-    form = GetWorkerForm()
-    if form.is_all.data == 1:
-        return node_service.get_worker(form.node_ip.data, form.name.data)
-    else:
-        return node_service.get_workers()
+def get_workers():
+    """获取全部worker信息"""
+    form = PageForm()
+    return node_service.get_workers(int(form.page.data), int(form.limit.data), form.search.data, form.sort.data)
+
+@node.route('/worker/<string:worker_name>', methods=['GET'])
+@auth.login_required
+def get_worker(worker_name):
+    return node_service.get_worker(worker_name)

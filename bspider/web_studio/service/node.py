@@ -135,27 +135,39 @@ class Node(BaseService, RemoteMixIn):
             log.error(f'delete node:{node_ip} failed {e}')
             return Conflict(msg=f'delete node:{node_ip} failed {e}', errno=20009)
 
-    def get_worker(self, node_ip, name, worker_type):
-        worker_info = self.op_get_worker(node_ip, f'{worker_type}:{name}')['data']
-        mysql_node_info = self.impl.get_worker(name)
-        if mysql_node_info:
-            for key, value in mysql_node_info[0].items():
-                worker_info[key] = value
-            return GetSuccess(msg=f'get work:{node_ip}-{name} status success', data=worker_info)
-        return NotFound(msg=f'this work:{node_ip}-{name} is not exist', errno=20008)
+    def get_worker(self, name):
+        infos = self.impl.get_worker(name)
+        if len(infos):
+            for info in infos:
+                self.datetime_to_str(info)
+                try:
+                    worker_status = self.op_get_worker(info['ip'], '{}:{}'.format(info['type'], info['name']))
+                except RemoteOPError:
+                    worker_status = dict(mem=0.0, status=False, pid=None, is_run=False)
+                info.update(worker_status)
+            return GetSuccess(msg=f'get worker:{name} status success', data=infos)
+        return NotFound(msg=f'this worker:{name} is not exist', errno=20008)
 
-    def get_workers(self):
-        result = []
-        worker_infos = self.impl.get_workers()
-        for worker in worker_infos:
+    def get_workers(self, page, limit, search, sort):
+        if sort.upper() not in ['ASC', 'DESC']:
+            return ParameterException(msg='sort must `asc` or `desc`')
+
+        infos, total = self.impl.get_workers(page, limit, search, sort)
+        for info in infos:
+            self.datetime_to_str(info)
             try:
-                worker_info = self.op_get_worker(worker['ip'], '{}:{}'.format(worker['type'], worker['name']))
+                worker_status = self.op_get_worker(info['ip'], '{}:{}'.format(info['type'], info['name']))
             except RemoteOPError:
-                worker_info = dict(mem=0.0, status=False, pid=None, is_run=False)
-            worker_info['ip'] = worker['ip']
-            worker_info['name'] = worker['name']
-            result.append(worker_info)
-        return GetSuccess(msg='get all worker status success', data=result)
+                worker_status = dict(mem=0.0, status=False, pid=None, is_run=False)
+            info.update(worker_status)
+        return GetSuccess(
+            msg='get worker status success!',
+            data={
+                'items': infos,
+                'total': total,
+                'page': page,
+                'limit': limit
+            })
 
     # Inner func
     def __stop_node(self, node_ip):

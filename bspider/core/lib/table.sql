@@ -151,11 +151,9 @@ DROP table if exists bspider_worker;
 CREATE TABLE `bspider_worker` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '自增id',
   `ip` varchar(50) NOT NULL COMMENT 'work 所属节点ip',
-  `pid` varchar(10) NOT NULL COMMENT 'work 的pid',
   `name` varchar(50) NOT NULL COMMENT 'worker 名称',
   `type` varchar(15) NOT NULL COMMENT 'worker 种类 downloader parser',
   `description` text NOT NULL COMMENT 'worker 介绍',
-  `status` int(2) NOT NULL COMMENT '节点状态：0 停止 1 运行',
   `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (`id`),

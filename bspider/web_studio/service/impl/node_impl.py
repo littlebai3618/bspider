@@ -87,9 +87,17 @@ class NodeImpl(BaseImpl):
         return self.handler.update(sql, values)
 
     def get_worker(self, name):
-        sql = f'select `ip`, `name`, `type`, `description` from {self.worker_table} where `name`="{name}";'
+        sql = f'select `id`, `ip`, `name`, `type`, `description`, `create_time`, `update_time` from {self.worker_table} where `name`="{name}";'
         return self.handler.select(sql)
 
-    def get_workers(self):
-        sql = f'select `ip`, `name`, `type`, `description` from {self.worker_table};'
-        return self.handler.select(sql)
+    def get_workers(self, page, limit, search, sort):
+        start = (page - 1) * limit
+        fields = self.make_search(search)
+        if len(fields):
+            sql = f'select `id`, `ip`, `name`, `type`, `description`, `create_time`, `update_time` ' \
+                  f'from {self.worker_table} where {fields} order by `id` {sort} limit {start},{limit};'
+        else:
+            sql = f'select `id`, `ip`, `name`, `type`, `description`, `create_time`, `update_time` ' \
+                  f'from {self.worker_table} order by `id` {sort} limit {start},{limit};'
+        log.debug(f'SQL:{sql}')
+        return self.handler.select(sql), self.total_num(search, self.worker_table)
