@@ -4,6 +4,7 @@
 # @Use     :
 from bspider.core.api import BaseImpl
 from bspider.utils.database.mysql import MysqlOutputStream
+from bspider.web_studio import log
 
 
 class NodeImpl(BaseImpl):
@@ -54,13 +55,21 @@ class NodeImpl(BaseImpl):
         return self.handler.update(sql, values)
 
     def get_node(self, node_ip):
-        sql = f'select `ip`, `name` from {self.node_table} ' \
-            f'where `id`="{node_ip}"'
+        sql = f'select `id`, `ip`, `name`, `description`, `create_time`, `update_time` ' \
+            f'from {self.node_table} where `id`="{node_ip}"'
         return self.handler.select(sql)
 
-    def get_nodes(self):
-        sql = f'select `ip`, `name` from {self.node_table} '
-        return self.handler.select(sql)
+    def get_nodes(self, page, limit, search, sort):
+        start = (page - 1) * limit
+        fields = self.make_search(search)
+        if len(fields):
+            sql = f'select `id`, `ip`, `name`, `description`, `create_time`, `update_time` ' \
+                  f'from {self.node_table} where {fields} order by `id` {sort} limit {start},{limit};'
+        else:
+            sql = f'select `id`, `ip`, `name`, `description`, `create_time`, `update_time` ' \
+                  f'from {self.node_table} order by `id` {sort} limit {start},{limit};'
+        log.debug(f'SQL:{sql}')
+        return self.handler.select(sql), self.total_num(search, self.node_table)
 
     def add_worker(self, data, get_sql=False):
         """注册一个节点"""

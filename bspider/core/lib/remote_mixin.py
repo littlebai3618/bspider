@@ -56,7 +56,7 @@ class RemoteMixIn(object):
         with xmlrpc.client.ServerProxy(self.rpc_url % ip) as rpc_server:
             process = rpc_server.supervisor.getAllProcessInfo()[0]
             if process['name'] == 'agent':
-                result['desc'] = process['description']
+                result['description'] = process['description']
                 result['pid'] = process['pid']
                 if process['state'] == 20:
                     result['status'] = 1

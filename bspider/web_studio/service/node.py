@@ -2,7 +2,8 @@
 # @Author  : 白尚林
 # @File    : node
 # @Use     :
-from bspider.core.api import BaseService, Conflict, NotFound, PostSuccess, DeleteSuccess, PatchSuccess, GetSuccess
+from bspider.core.api import BaseService, Conflict, NotFound, PostSuccess, DeleteSuccess, PatchSuccess, GetSuccess, \
+    ParameterException
 from bspider.core.lib import RemoteMixIn
 from bspider.utils.exceptions import RemoteOPError
 from bspider.web_studio.server import log
@@ -51,27 +52,39 @@ class Node(BaseService, RemoteMixIn):
         log.error(f'supervisor try start node:{node_ip} failed')
         return Conflict(msg=f'supervisor try start node:{node_ip} failed', errno=20007)
 
-
     def get_node(self, node_ip):
         """得到node列表，查询rpc获取supervisor进程状态，整合，返回"""
-        supervisor_node_info = self.op_get_node(node_ip)
-        mysql_node_info = self.impl.get_node(node_ip)
-        if mysql_node_info:
-            for key, value in mysql_node_info[0].items():
-                supervisor_node_info[key] = value
-            return GetSuccess(msg='get node:{} status success', data=supervisor_node_info)
+        infos = self.impl.get_node(node_ip)
+        if infos:
+            for info in infos:
+                self.datetime_to_str(info)
+                supervisor_node_info = self.op_get_node(info['ip'])
+                info['description'] = '{}->{}'.format(info.pop('description'), supervisor_node_info.pop('description'))
+                info.update(supervisor_node_info)
+            return GetSuccess(msg='get node:{} status success', data=infos)
         log.error(f'this node:{node_ip} is not exist')
         return NotFound(msg=f'this node:{node_ip} is not exist', errno=20008)
 
-    def get_nodes(self):
-        result = []
-        mysql_node_info = self.impl.get_nodes()
-        for node in mysql_node_info:
-            supervisor_node_info = self.op_get_node(node['ip'])
-            supervisor_node_info['ip'] = node['ip']
-            supervisor_node_info['name'] = node['name']
-            result.append(supervisor_node_info)
-        return GetSuccess(msg='get all node status success', data=result)
+    def get_nodes(self, page, limit, search, sort):
+        if sort.upper() not in ['ASC', 'DESC']:
+            return ParameterException(msg='sort must `asc` or `desc`')
+
+        infos, total = self.impl.get_nodes(page, limit, search, sort)
+
+        for info in infos:
+            self.datetime_to_str(info)
+            supervisor_node_info = self.op_get_node(info['ip'])
+            info['description'] = '{}->{}'.format(info.pop('description'), supervisor_node_info.pop('description'))
+            info.update(supervisor_node_info)
+
+        return GetSuccess(
+            msg='get nodes list success!',
+            data={
+                'items': infos,
+                'total': total,
+                'page': page,
+                'limit': limit
+            })
 
     # worker API
     def add_worker(self, node_ip, name, worker_type, description):

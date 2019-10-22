@@ -20,6 +20,7 @@ from flask import Blueprint
 
 from bspider.core.api import auth
 from bspider.core.api import ParameterException
+from .validators import PageForm
 from .validators.node_forms import AddNodeForm, DeleteNodeForm, ChangeNodeForm, AddWorkerForm, \
     DeleteWorkerForm, ChangeWorkerForm, GetWorkerForm
 from bspider.web_studio.service.node import Node
@@ -59,8 +60,8 @@ def change_node():
 @node.route('/node', methods=['GET'])
 @auth.login_required
 def get_nodes():
-    return node_service.get_nodes()
-
+    form = PageForm()
+    return node_service.get_nodes(int(form.page.data), int(form.limit.data), form.search.data, form.sort.data)
 
 @node.route('/node/<string:node_ip>', methods=['GET'])
 @auth.login_required
