@@ -25,10 +25,11 @@ class Node(BaseService, RemoteMixIn):
 
     def delete_node(self, node_id):
         """supervisor 停止进程 删除节点信息"""
-        node = self.impl.get_node(node_id)
-        if not len(node):
+        nodes = self.impl.get_node(node_id)
+        if not len(nodes):
             log.error(f'node is not exist')
             return Conflict(msg=f'node is not exist', errno=20008)
+        node = nodes[0]
         try:
             # 整个删除操作是一个事务
             with self.impl.handler.session() as session:
@@ -42,8 +43,8 @@ class Node(BaseService, RemoteMixIn):
             return Conflict(msg='delete node:{} failed {}'.format(node['name'], e), errno=20005)
 
     def update_node(self, node_id, **kwargs):
-        node = self.impl.get_node(node_id)
-        if not len(node):
+        nodes = self.impl.get_node(node_id)
+        if not len(nodes):
             log.error(f'node is not exist')
             return Conflict(msg=f'node is not exist', errno=20008)
         try:
@@ -134,10 +135,12 @@ class Node(BaseService, RemoteMixIn):
         :param kwargs:
         :return:
         """
-        worker = self.impl.get_worker(worker_id)
-        if not len(worker):
+        workers = self.impl.get_worker(worker_id)
+        if not len(workers):
             log.error(f'worker is not exist')
             return Conflict(msg=f'worker is not exist', errno=20004)
+        worker = workers[0]
+
         try:
             remote_change = False
             for key in ('ip', 'type', 'status', 'coroutine_num'):
@@ -168,10 +171,12 @@ class Node(BaseService, RemoteMixIn):
             return Conflict(msg='update worker:{} failed {}'.format(worker['ip'], e), errno=20005)
 
     def delete_worker(self, worker_id):
-        worker = self.impl.get_worker(worker_id)
-        if not len(worker):
+        workers = self.impl.get_worker(worker_id)
+        if not len(workers):
             log.error(f'worker is not exist')
             return Conflict(msg=f'worker is not exist', errno=20004)
+        worker = workers[0]
+
         try:
             # 整个删除操作是一个事务
             with self.impl.handler.session() as session:
