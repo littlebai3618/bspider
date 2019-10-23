@@ -104,3 +104,8 @@ class NodeService(BaseService):
         for name, worker in self.module_list.items():
             result[name] = worker.is_alive
         return GetSuccess(data=result)
+
+    def __del__(self):
+        for name, worker in self.module_list.items():
+            while worker.is_alive():
+                worker.terminate()
