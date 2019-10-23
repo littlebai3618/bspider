@@ -21,7 +21,7 @@ class Node(BaseService, RemoteMixIn):
         workers = self.impl.get_worker_by_ip(ip)
         self.impl.add_node({'ip': ip, 'description': desc, 'name': name})
         log.info(f'add agent from {name}:{ip} success')
-        return PostSuccess(msg=f'add agent from {name}:{ip} success', data={'project': projects, 'workers': workers})
+        return PostSuccess(msg=f'add agent from {name}:{ip} success', data={'projects': projects, 'workers': workers})
 
     def delete_node(self, node_id):
         """supervisor 停止进程 删除节点信息"""
