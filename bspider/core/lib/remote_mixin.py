@@ -21,10 +21,7 @@ class RemoteMixIn(object):
 
     @staticmethod
     def request(url, method, params=None, data=None):
-        if data is None:
-            headers=None
-        else:
-            headers={'Content-Type': 'application/json', 'Authorization': f'Bearer {g.user.token}'}
+        headers={'Content-Type': 'application/json', 'Authorization': f'Bearer {g.user.token}'}
         req = requests.request(method, url, headers=headers, data=data, params=params)
 
         log.debug(f'master->{url}: \n {headers}\n{method} {data} {params}\n{req.json()}')
@@ -109,7 +106,6 @@ class RemoteMixIn(object):
         for ip in ip_list:
             url = self.base_url.format(ip, port, '/project')
             req = self.request(url, method='POST', data=json.dumps(data))
-            print(url, json.dumps(data))
             data = req.json()
             if data['errno'] != 0:
                 result[ip] = data['msg']

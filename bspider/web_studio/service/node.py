@@ -158,7 +158,7 @@ class Node(BaseService, RemoteMixIn):
             try:
                 worker_status = self.op_get_worker(info['ip'], '{}:{}'.format(info['type'], info['name']))
             except RemoteOPError:
-                worker_status = dict(mem=0.0, status=False, pid=None, is_run=False)
+                worker_status = dict(mem=0.0, status=-1, pid=None, is_run=False)
             info.update(worker_status)
         return GetSuccess(
             msg='get worker status success!',
