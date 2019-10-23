@@ -36,9 +36,9 @@ class UpdateNodeForm(BaseForm):
 
 
 class AddWorkerForm(BaseForm):
-    node_ip = StringField(validators=[DataRequired(), length(min=7, max=15)])
+    ip = StringField(validators=[DataRequired(), length(min=7, max=15)])
     name = StringField(validators=[DataRequired(), length(min=3, max=30)])
-    worker_type = StringField(validators=[DataRequired()])
+    type = StringField(validators=[DataRequired()])
     description = StringField(validators=[DataRequired()])
 
 
