@@ -19,10 +19,8 @@
 from flask import Blueprint
 
 from bspider.core.api import auth
-from bspider.core.api import ParameterException
 from .validators import PageForm
-from .validators.node_forms import AddNodeForm, DeleteNodeForm, UpdateNodeForm, AddWorkerForm, \
-    DeleteWorkerForm, ChangeWorkerForm, GetWorkerForm
+from .validators.node_forms import AddNodeForm, UpdateNodeForm, AddWorkerForm, ChangeWorkerForm
 from bspider.web_studio.service.node import Node
 
 node = Blueprint('node_bp', __name__)
@@ -37,18 +35,17 @@ def add_node():
     return node_service.add_node(form.node_ip.data, form.desc.data, form.name.data)
 
 
-@node.route('/node', methods=['DELETE'])
+@node.route('/node/<int:node_id>', methods=['DELETE'])
 @auth.login_required
-def delete_node():
-    form = DeleteNodeForm()
-    return node_service.delete_node(form.node_ip.data)
+def delete_node(node_id):
+    return node_service.delete_node(node_id)
 
 
-@node.route('/node/<string:node_ip>', methods=['PATCH'])
+@node.route('/node/<int:node_id>', methods=['PATCH'])
 @auth.login_required
-def update_node(node_ip):
+def update_node(node_id):
     form = UpdateNodeForm()
-    return node_service.update_node(node_ip, form.name.data, form.status.data)
+    return node_service.update_node(node_id, **form.get_dict())
 
 
 @node.route('/node', methods=['GET'])
@@ -57,10 +54,11 @@ def get_nodes():
     form = PageForm()
     return node_service.get_nodes(int(form.page.data), int(form.limit.data), form.search.data, form.sort.data)
 
-@node.route('/node/<string:node_ip>', methods=['GET'])
+
+@node.route('/node/<int:node_id>', methods=['GET'])
 @auth.login_required
-def get_node(node_ip):
-    return node_service.get_node(node_ip)
+def get_node(node_id):
+    return node_service.get_node(node_id)
 
 
 @node.route('/worker', methods=['POST'])
@@ -70,23 +68,17 @@ def add_worker():
     return node_service.add_worker(form.ip.data, form.name.data, form.type.data, form.description.data)
 
 
-@node.route('/worker', methods=['DELETE'])
+@node.route('/worker/<int:worker_id>', methods=['DELETE'])
 @auth.login_required
-def delete_worker():
-    form = DeleteWorkerForm()
-    return node_service.delete_worker(form.node_ip.data, form.name.data, form.worker_type.data)
+def delete_worker(worker_id):
+    return node_service.delete_worker(worker_id)
 
 
-@node.route('/worker', methods=['PATCH'])
+@node.route('/worker/<int:worker_id>', methods=['PATCH'])
 @auth.login_required
-def change_worker():
+def change_worker(worker_id):
     form = ChangeWorkerForm()
-    if form.op.data == 'start':
-        return node_service.start_worker(form.node_ip.data, form.name.data, form.worker_type.data)
-    elif form.op.data == 'stop':
-        return node_service.stop_worker(form.node_ip.data, form.name.data, form.worker_type.data)
-    else:
-        return ParameterException(msg=f'unknow op:{form.op.data}')
+    return node_service.update_worker(worker_id, **form.get_dict())
 
 
 @node.route('/worker', methods=['GET'])
@@ -96,7 +88,8 @@ def get_workers():
     form = PageForm()
     return node_service.get_workers(int(form.page.data), int(form.limit.data), form.search.data, form.sort.data)
 
-@node.route('/worker/<string:worker_name>', methods=['GET'])
+
+@node.route('/worker/<int:worker_id>', methods=['GET'])
 @auth.login_required
-def get_worker(worker_name):
-    return node_service.get_worker(worker_name)
+def get_worker(worker_id):
+    return node_service.get_worker(worker_id)

@@ -44,7 +44,7 @@ class NodeImpl(BaseImpl):
         return self.handler.delete(sql)
 
     def get_worker_by_ip(self, node_ip):
-        sql = f'select `name`, `type`, `ip`, `status` from {self.worker_table} where `ip`="{node_ip}"'
+        sql = f'select `name`, `type`, `ip`, `status`, `coroutine_num` from {self.worker_table} where `ip`="{node_ip}"'
         return self.handler.select(sql)
 
     def update_node(self, unique_value, data, unique_key='id', get_sql=False):
@@ -54,9 +54,9 @@ class NodeImpl(BaseImpl):
             return sql
         return self.handler.update(sql, values)
 
-    def get_node(self, node_ip):
+    def get_node(self, node_id):
         sql = f'select `id`, `ip`, `name`, `description`, `create_time`, `update_time` ' \
-            f'from {self.node_table} where `id`="{node_ip}"'
+            f'from {self.node_table} where `id`="{node_id}"'
         return self.handler.select(sql)
 
     def get_nodes(self, page, limit, search, sort):
@@ -86,18 +86,18 @@ class NodeImpl(BaseImpl):
             return sql
         return self.handler.update(sql, values)
 
-    def get_worker(self, name):
-        sql = f'select `id`, `ip`, `name`, `type`, `description`, `create_time`, `update_time` from {self.worker_table} where `name`="{name}";'
+    def get_worker(self, worker_id):
+        sql = f'select `id`, `ip`, `name`, `type`, `description`, `coroutine_num`, `create_time`, `update_time` from {self.worker_table} where `id`="{worker_id}";'
         return self.handler.select(sql)
 
     def get_workers(self, page, limit, search, sort):
         start = (page - 1) * limit
         fields = self.make_search(search)
         if len(fields):
-            sql = f'select `id`, `ip`, `name`, `type`, `description`, `create_time`, `update_time` ' \
+            sql = f'select `id`, `ip`, `name`, `type`, `description`, `coroutine_num`, `create_time`, `update_time` ' \
                   f'from {self.worker_table} where {fields} order by `id` {sort} limit {start},{limit};'
         else:
-            sql = f'select `id`, `ip`, `name`, `type`, `description`, `create_time`, `update_time` ' \
+            sql = f'select `id`, `ip`, `name`, `type`, `description`, `create_time`, `coroutine_num`, `update_time` ' \
                   f'from {self.worker_table} order by `id` {sort} limit {start},{limit};'
         log.debug(f'SQL:{sql}')
         return self.handler.select(sql), self.total_num(search, self.worker_table)

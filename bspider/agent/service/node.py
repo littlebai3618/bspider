@@ -51,7 +51,7 @@ class NodeService(BaseService):
         worker = self.__start(func, name, coro_num)
         if worker.is_alive():
             self.module_list[name] = worker
-            log.info(f'start work:{name}-{worker_type}')
+            log.info(f'start work:{name}-{worker_type} success')
             return PostSuccess(msg='worker process start success',
                                data={'pid': worker.pid, 'name': worker.name, 'type': worker_type})
         else:
@@ -59,7 +59,7 @@ class NodeService(BaseService):
             return Conflict(msg=f'worker process start error', code=20003)
 
     def __start(self, func, name, coro_num):
-        worker = self.mp_ctx.Process(name=name, target=func, args=(name,))
+        worker = self.mp_ctx.Process(name=name, target=func, args=(name, coro_num))
         worker.start()
         return worker
 
@@ -79,7 +79,6 @@ class NodeService(BaseService):
         worker = self.module_list.get(name)
         if worker:
             tmp = self.__get_process_info(worker)
-            tmp['name'] = name
             return GetSuccess(data=tmp)
         log.error(f'worker:{name} is not exist')
         return NotFound(msg=f'worker:{name} is not exist', errno=20004)
@@ -88,7 +87,6 @@ class NodeService(BaseService):
         result = []
         for name, worker in self.module_list.items():
             tmp = self.__get_process_info(worker)
-            tmp['name'] = name
             result.append(tmp)
         return GetSuccess(data=result)
 
@@ -96,11 +94,8 @@ class NodeService(BaseService):
     def __get_process_info(worker):
         result = process_info(worker.pid)
         result['pid'] = worker.pid
-        result['name'] = worker.name
-        if worker.is_alive:
-            result['is_run'] = True
-        else:
-            result['is_run'] = False
+        result['unique_key'] = worker.name
+        result['status'] = 1 if worker.is_alive else 0
         return result
 
     def worker_status(self):

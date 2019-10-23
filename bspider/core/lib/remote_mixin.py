@@ -15,8 +15,7 @@ from bspider.web_studio import log
 
 class RemoteMixIn(object):
 
-    base_url = 'http://{}:{}{}'
-    port = 5001
+    base_url = 'http://{}:'+ str(FrameSettings()['AGENT'].get('port', 5001)) +'{}'
     rpc_url = 'http://{username}:{password}@%s:{port}/RPC2'.format(**FrameSettings()['SUPERVISOR_RPC'])
 
     @staticmethod
@@ -71,42 +70,39 @@ class RemoteMixIn(object):
         return result
 
 
-    def op_stop_worker(self, ip: str, unique_sign: str, port: int=5001) -> bool:
-        url = self.base_url.format(ip, port, '/worker')
+    def op_stop_worker(self, ip: str, unique_sign: str) -> bool:
+        url = self.base_url.format(ip, '/worker')
         data = {'name': unique_sign}
         req = self.request(url, method='DELETE', params=data)
         if req.status_code == 204:
             return True
         raise RemoteOPError('stop work error {}', req.json()['msg'])
 
-    def op_start_worker(self, ip: str,unique_sign: str, worker_type: str, port: int=5001) -> dict:
-        url = self.base_url.format(ip, port, '/worker')
+    def op_start_worker(self, ip: str,unique_sign: str, worker_type: str, coroutine_num: int) -> dict:
+        url = self.base_url.format(ip, '/worker')
         data = {
             'name': unique_sign,
-            'worker_type': worker_type
+            'worker_type': worker_type,
+            'coroutine_num': coroutine_num
         }
-        if worker_type == 'downloader':
-            data['coroutine_num'] = 50
-        else:
-            data['coroutine_num'] = 4
         req = self.request(url, method='POST', data=json.dumps(data))
         data = req.json()
         if data['errno'] == 0:
             return data['data']
         raise RemoteOPError('start work error {}', data['msg'])
 
-    def op_get_worker(self, ip: str, worker_name: str, port: int=5001) -> dict:
-        url = self.base_url.format(ip, port, f'/worker')
+    def op_get_worker(self, ip: str, worker_name: str) -> dict:
+        url = self.base_url.format(ip, '/worker')
         req = self.request(url, method='GET', params={'name': worker_name, 'is_all': 1})
         data = req.json()
         if data['errno'] == 0:
             return data['data'] if data.get('data') else {}
         raise RemoteOPError('get worker error {}', data['msg'])
 
-    def op_add_project(self, ip_list: list, data, port: int=5001) -> dict:
+    def op_add_project(self, ip_list: list, data) -> dict:
         result = {}
         for ip in ip_list:
-            url = self.base_url.format(ip, port, '/project')
+            url = self.base_url.format(ip, '/project')
             req = self.request(url, method='POST', data=json.dumps(data))
             print(url, json.dumps(data))
             data = req.json()
@@ -114,29 +110,29 @@ class RemoteMixIn(object):
                 result[ip] = data['msg']
         return result
 
-    def op_update_project(self, ip_list: list, data, port: int=5001) -> dict:
+    def op_update_project(self, ip_list: list, data) -> dict:
         result = {}
         for ip in ip_list:
-            url = self.base_url.format(ip, port, '/project')
+            url = self.base_url.format(ip, '/project')
             req = self.request(url, method='PATCH', data=json.dumps(data))
             data = req.json()
             if data['errno'] != 0:
                 result[ip] = data['msg']
         return result
 
-    def op_delete_project(self, ip_list: list, project_id, port: int=5001) -> dict:
+    def op_delete_project(self, ip_list: list, project_id) -> dict:
         result = {}
         for ip in ip_list:
-            url = self.base_url.format(ip, port, f'/project/{project_id}')
+            url = self.base_url.format(ip, f'/project/{project_id}')
             req = self.request(url, method='DELETE')
             if not (req.status_code >= 200 and req.status_code <=299):
                 result[ip] = req.json()['msg']
         return result
 
-    def op_update_code(self, ip_list: list, data, port: int=5001) -> dict:
+    def op_update_code(self, ip_list: list, data) -> dict:
         result = {}
         for ip in ip_list:
-            url = self.base_url.format(ip, port, f'/project/code')
+            url = self.base_url.format(ip, f'/project/code')
             req = self.request(url, method='PATCH', data=json.dumps(data))
             if not (req.status_code >= 200 and req.status_code <= 299):
                 result[ip] = req.json()['msg']

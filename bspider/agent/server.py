@@ -2,6 +2,11 @@
 # @Author  : 白尚林
 # @File    : server
 # @Use     :
+"""
+1. 初始化cache
+2. 向master查询该节点的worker信息、根据信息启动worker进程
+3. 向master注册该节点的信息
+"""
 import sys
 import traceback
 
@@ -13,7 +18,7 @@ from bspider.core.api import APIException
 from bspider.core.lib import ProjectCache, Connection
 from bspider.config import FrameSettings
 from bspider.agent.controller.project import project
-from bspider.agent.controller.node import node
+from bspider.agent.controller.node import node, node_service
 from bspider.utils import singleton
 
 
@@ -50,12 +55,18 @@ class CreateApp(object):
         if cache.initialization():
             infos = self.client.agent_register(data={'node_ip': ip, 'name': name, 'desc': description, 'port': port})
             if infos['errno'] == 0:
-                for project in infos['data']:
+                log.debug('master\'s message: {}'.format(infos['data']))
+                for project in infos['data']['projects']:
                     if not cache.set_project(**project):
                         log.error('project cache init failed')
                         raise Exception('project cache init failed')
+                for worker in infos['data']['workers']:
+                    if worker['status'] == 1:
+                        if node_service.start_worker(worker['name'], worker['type'],
+                                                     worker['coroutine_num']).errno != 0:
+                            log.error('worker init failed: {name} {type} {coroutine_num}'.format(**worker))
+                            raise Exception('worker init failed: {name} {type} {coroutine_num}'.format(**worker))
             else:
                 log.error('master server error:{}'.format(infos))
                 raise Exception('master server error')
-        del cache
         return True

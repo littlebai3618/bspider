@@ -15,10 +15,6 @@ class AddNodeForm(BaseForm):
     desc = StringField(validators=[DataRequired()])
 
 
-class DeleteNodeForm(BaseForm):
-    node_ip = StringField(validators=[DataRequired(), length(min=7, max=15)])
-
-
 class GetNodeForm(BaseForm):
     is_all = IntegerField(default=0)
     node_ip = StringField()
@@ -27,6 +23,7 @@ class GetNodeForm(BaseForm):
 class UpdateNodeForm(BaseForm):
     name = StringField()
     status = IntegerField()
+    description = StringField()
 
     def validate_status(self, value):
         try:
@@ -42,22 +39,8 @@ class AddWorkerForm(BaseForm):
     description = StringField(validators=[DataRequired()])
 
 
-class DeleteWorkerForm(BaseForm):
-    node_ip = StringField(validators=[DataRequired(), length(min=7, max=15)])
-    worker_type = StringField(validators=[DataRequired()])
-    name = StringField(validators=[DataRequired(), length(min=3, max=30)])
-
-
 class ChangeWorkerForm(BaseForm):
-    node_ip = StringField(validators=[DataRequired(), length(min=7, max=15)])
-    op = StringField(validators=[DataRequired()])
-    worker_type = StringField(validators=[DataRequired()])
-    name = StringField(validators=[DataRequired(), length(min=3, max=30)])
-
-class GetWorkerForm(BaseForm):
-    is_all = IntegerField(default=0)
-    node_ip = StringField()
+    ip = StringField()
     name = StringField()
-
-
-
+    type = StringField()
+    description = StringField()
