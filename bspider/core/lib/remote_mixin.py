@@ -10,6 +10,7 @@ from flask import g
 
 from bspider.config import FrameSettings
 from bspider.utils.exceptions import RemoteOPError
+from bspider.web_studio import log
 
 
 class RemoteMixIn(object):
@@ -25,6 +26,8 @@ class RemoteMixIn(object):
         else:
             headers={'Content-Type': 'application/json', 'Authorization': f'Bearer {g.user.token}'}
         req = requests.request(method, url, headers=headers, data=data, params=params)
+
+        log.debug(f'master->{url}: \n {headers}\n{method} {data} {params}\n{req.json()}')
         return req
 
     def op_stop_node(self, ip) -> bool:
@@ -97,7 +100,6 @@ class RemoteMixIn(object):
         url = self.base_url.format(ip, port, f'/worker')
         req = self.request(url, method='GET', params={'name': worker_name, 'is_all': 1})
         data = req.json()
-        print(data)
         if data['errno'] == 0:
             return data['data'] if data.get('data') else {}
         raise RemoteOPError('get worker error {}', data['msg'])
