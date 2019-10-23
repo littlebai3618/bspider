@@ -49,7 +49,7 @@ class NodeImpl(BaseImpl):
 
     def update_node(self, unique_value, data, unique_key='id', get_sql=False):
         fields, values = BaseImpl.make_fv(data)
-        sql = f"update {self.node_table} set {fields} where `{unique_key}` = '{unique_value}';"
+        sql = f"update {self.node_table} set {fields} where `{unique_key}` = {unique_value};"
         if get_sql:
             return sql, values
         return self.handler.update(sql, values)
