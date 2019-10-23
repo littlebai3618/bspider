@@ -22,11 +22,11 @@ class RemoteMixIn(object):
     @staticmethod
     def request(url, method, params=None, data=None):
         headers = {'Authorization': f'Bearer {g.user.token}'}
-        if not data:
+        if data:
             headers['Content-Type'] =  'application/json'
         req = requests.request(method, url, headers=headers, data=data, params=params)
 
-        log.debug(f'master->{url}: \n {headers}\n{method} {data} {params}\n{req.json()}\n{req.request.url}')
+        log.debug(f'master->{req.request.url}: \n {headers}\n{method} {data} \n{req.json()}')
         return req
 
     def op_stop_node(self, ip) -> bool:
