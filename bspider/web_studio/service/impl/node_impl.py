@@ -51,7 +51,7 @@ class NodeImpl(BaseImpl):
         fields, values = BaseImpl.make_fv(data)
         sql = f"update {self.node_table} set {fields} where `{unique_key}` = '{unique_value}';"
         if get_sql:
-            return sql
+            return sql, values
         return self.handler.update(sql, values)
 
     def get_node(self, node_id):
@@ -83,7 +83,7 @@ class NodeImpl(BaseImpl):
         fields, values = BaseImpl.make_fv(data)
         sql = f"update {self.worker_table} set {fields} where `{unique_key}` = '{unique_value}';"
         if get_sql:
-            return sql
+            return sql, values
         return self.handler.update(sql, values)
 
     def get_worker(self, worker_id):
