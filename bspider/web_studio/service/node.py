@@ -47,9 +47,10 @@ class Node(BaseService, RemoteMixIn):
         if not len(nodes):
             log.error(f'node is not exist')
             return Conflict(msg=f'node is not exist', errno=20008)
+        node = nodes[0]
         try:
             remote_change = False
-            for key in ('status'):
+            for key in ('status', ):
                 if key in kwargs:
                     remote_change = True
                     break
