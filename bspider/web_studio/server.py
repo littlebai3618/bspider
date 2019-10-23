@@ -17,6 +17,7 @@ from bspider.web_studio.controller.code import code
 from bspider.web_studio.controller.project import project
 from bspider.web_studio.controller.node import node
 from bspider.web_studio.controller.user import user
+from bspider.web_studio.controller.tools import tools
 
 
 def create_app():
@@ -34,6 +35,8 @@ def create_app():
     app.register_blueprint(code)
     # cron_job
     app.register_blueprint(cron_job)
+    # tools
+    app.register_blueprint(tools, url_prefix="/tools")
 
     @app.errorhandler(Exception)
     def framework_error(error):
