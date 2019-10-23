@@ -69,7 +69,7 @@ class Node(BaseService, RemoteMixIn):
             return PatchSuccess('update node:{name} success'.format(**node))
 
         except Exception as e:
-            log.error('update node:{} failed {}'.format(node['ip'], e))
+            log.error('update node:{} failed {} {}'.format(node['ip'], e, kwargs))
             return Conflict(msg='update node:{} failed {}'.format(node['ip'], e), errno=20005)
 
     def get_node(self, node_id):
