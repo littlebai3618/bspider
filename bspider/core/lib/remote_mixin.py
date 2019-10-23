@@ -26,7 +26,7 @@ class RemoteMixIn(object):
             headers['Content-Type'] =  'application/json'
         req = requests.request(method, url, headers=headers, data=data, params=params)
 
-        log.debug(f'master->{url}: \n {headers}\n{method} {data} {params}\n{req.json()}\n{req.request}')
+        log.debug(f'master->{url}: \n {headers}\n{method} {data} {params}\n{req.json()}\n{req.request.url}')
         return req
 
     def op_stop_node(self, ip) -> bool:
