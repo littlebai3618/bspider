@@ -3,16 +3,20 @@
 # @File    : log_handler
 # @Use     :
 import logging
+import os
 import sys
 import re
+from logging.handlers import TimedRotatingFileHandler
 
 from bspider.config import FrameSettings
+from bspider.utils.conf import PLATFORM_PATH_ENV
 from bspider.utils.logger.formatter import get_stream_formatter
 from bspider.utils import singleton
 
+
 class RabbitMQLogHandler(logging.Handler):
 
-    def __init__(self,mq_handler, level='INFO'):
+    def __init__(self, mq_handler, level='INFO'):
         super().__init__(level=level)
         self.mq_handler = mq_handler
         # 创建交换机
@@ -80,10 +84,32 @@ class LoggerPool(object):
             log.setLevel(logging.INFO)
         return log
 
+    def __set_file_handler(self, log, level='INFO', key='default_work', **kwargs):
+        log_path = os.path.join(os.environ[PLATFORM_PATH_ENV], 'log', f'{key}.log')
+        log_handler = TimedRotatingFileHandler(log_path, when="midnight", backupCount=10)
+        log_handler.suffix = "%Y%m%d"
+        log_formatter = get_stream_formatter(**kwargs)
+        log_handler.setFormatter(log_formatter)
+        log.addHandler(log_handler)
+        if level == 'INFO':
+            log.setLevel(logging.INFO)
+        elif level == 'WARNING':
+            log.setLevel(logging.WARNING)
+        elif level == 'DEBUG':
+            log.setLevel(logging.DEBUG)
+        else:
+            log.setLevel(logging.INFO)
+        return log
+
     def get_logger(self, key, **kwargs) -> logging.Logger:
+        """如果是downloader、parser模块控制终端输出到指定log文件"""
         key = '{}:{}:{}'.format(key, kwargs.get('module', ''), kwargs.get('project', ''))
         if key in self.__pool:
             return self.__pool[key]
-        log_handler = self.__handle_func(logging.getLogger(key), self.frame_settings['LOGGER_LEVEL'], **kwargs)
+        if kwargs.get('module') in ('parser', 'downloader'):
+            log_handler = self.__set_file_handler(logging.getLogger(key), self.frame_settings['LOGGER_LEVEL'], key=key,
+                                                  **kwargs)
+        else:
+            log_handler = self.__handle_func(logging.getLogger(key), self.frame_settings['LOGGER_LEVEL'], **kwargs)
         self.__pool[key] = log_handler
         return log_handler

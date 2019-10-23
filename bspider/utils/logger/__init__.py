@@ -3,3 +3,16 @@
 # @File    : __init__.py
 # @Use     :
 from .log_handler import LoggerPool
+
+
+# ginicorn logger fix
+from gunicorn.glogging import Logger
+
+class GLogger(Logger):
+
+    log_from_work = f'[%(asctime)s %(filename)s:%(lineno)s] %(levelname)s: %(message)s'
+
+    error_fmt = log_from_work
+    datefmt = r"%Y-%m-%d %H:%M:%S %z"
+    access_fmt = log_from_work
+    syslog_fmt = "[%(process)d] %(message)s"
