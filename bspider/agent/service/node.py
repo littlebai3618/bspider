@@ -46,7 +46,7 @@ class NodeService(BaseService):
             func = run_parser
         else:
             log.error(f'unknow worker type: {worker_type}')
-            return Conflict(msg=f'unknow worker type: {worker_type}', code=20002)
+            return Conflict(msg=f'unknow worker type: {worker_type}', errno=20002)
 
         worker = self.__start(func, name, coro_num)
         if worker.is_alive():
@@ -56,7 +56,7 @@ class NodeService(BaseService):
                                data={'pid': worker.pid, 'name': worker.name, 'type': worker_type})
         else:
             log.error(f'worker process start error. module start exec')
-            return Conflict(msg=f'worker process start error', code=20003)
+            return Conflict(msg=f'worker process start error', errno=20003)
 
     def __start(self, func, name, coro_num):
         worker = self.mp_ctx.Process(name=name, target=func, args=(name, coro_num), daemon=True)
@@ -68,7 +68,7 @@ class NodeService(BaseService):
             worker = self.module_list.pop(name)
         except KeyError:
             log.error(f'worker:{name} is not exist')
-            return NotFound(msg=f'worker:{name} is not exist', code=20004)
+            return NotFound(msg=f'worker:{name} is not exist', errno=20004)
         while worker.is_alive():
             worker.terminate()
             time.sleep(0.5)
