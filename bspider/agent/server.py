@@ -62,7 +62,7 @@ class CreateApp(object):
                         raise Exception('project cache init failed')
                 for worker in infos['data']['workers']:
                     if worker['status'] == 1:
-                        if node_service.start_worker(worker['name'], worker['type'],
+                        if node_service.start_worker('{worker_type}:{name}'.format(**worker), worker['type'],
                                                      worker['coroutine_num']).errno != 0:
                             log.error('worker init failed: {name} {type} {coroutine_num}'.format(**worker))
                             raise Exception('worker init failed: {name} {type} {coroutine_num}'.format(**worker))
