@@ -28,7 +28,7 @@ class RemoteMixIn(object):
             req = requests.request(method, url, headers=headers, data=data, params=params)
         except ConnectionError as e:
             log.error(f'master call agent:{url} failed {e}')
-            raise RemoteOPError(f'master call agent failed')
+            raise RemoteOPError(f'master call agent failed please check!')
 
         log.debug(f'master->{req.request.url}: \n {headers}\n{method} {data} \n{req.text}')
         return req
