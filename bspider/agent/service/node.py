@@ -59,7 +59,7 @@ class NodeService(BaseService):
             return Conflict(msg=f'worker process start error', code=20003)
 
     def __start(self, func, name, coro_num):
-        worker = self.mp_ctx.Process(name=name, target=func, args=(name, coro_num))
+        worker = self.mp_ctx.Process(name=name, target=func, args=(name, coro_num), daemon=True)
         worker.start()
         return worker
 
