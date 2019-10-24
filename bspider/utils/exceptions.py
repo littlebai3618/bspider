@@ -39,8 +39,9 @@ class MysqlConfigError(Exception):
 
 class RemoteOPError(Exception):
 
-    def __init__(self, err, fmt):
-        err = err.format(fmt)
+    def __init__(self, err, fmt=None):
+        if fmt:
+            err = err.format(fmt)
         super().__init__(err)
 
 

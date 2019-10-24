@@ -6,6 +6,7 @@ import json
 import xmlrpc.client
 
 import requests
+from requests.exceptions import ConnectionError
 from flask import g
 
 from bspider.config import FrameSettings
@@ -25,8 +26,10 @@ class RemoteMixIn(object):
             headers['Content-Type'] =  'application/json'
         try:
             req = requests.request(method, url, headers=headers, data=data, params=params)
-        except Exception as e:
-            log.error(f'type:{type(e)} {e}')
+        except ConnectionError:
+            log.error(f'agent:{url} is not run!!!')
+            RemoteOPError(f'agent is not run!!!')
+
 
         log.debug(f'master->{req.request.url}: \n {headers}\n{method} {data} \n{req.json()}')
         return req
