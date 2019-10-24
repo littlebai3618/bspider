@@ -33,8 +33,8 @@ class Node(BaseService, RemoteMixIn):
         try:
             # 整个删除操作是一个事务
             with self.impl.handler.session() as session:
-                session.delete(*self.impl.delete_node('id', node_id, get_sql=True))
-                session.delete(*self.impl.delete_worker('ip', node['ip'], get_sql=True))
+                session.delete(*self.impl.delete_node(node_id, get_sql=True))
+                session.delete(*self.impl.delete_worker_by_ip(node['ip'], get_sql=True))
                 self.op_stop_node(node['ip'])
             log.info(f'delete node success')
             return DeleteSuccess()
@@ -55,17 +55,19 @@ class Node(BaseService, RemoteMixIn):
                     remote_change = True
                     break
 
+            status = kwargs.pop('status')
+
             if remote_change:
                 with self.impl.handler.session() as session:
-                    status = kwargs.pop('status')
-                    session.update(*self.impl.update_node(node_id, kwargs, 'id', get_sql=True))
+                    if len(kwargs):
+                        session.update(*self.impl.update_node(node_id, kwargs, get_sql=True))
                     if status == 'start':
                         self.op_stop_node(node['ip'])
                     elif status == 'stop':
                         self.op_start_node(node['ip'])
 
-            else:
-                self.impl.update_node(node_id, kwargs, 'id')
+            elif len(kwargs):
+                self.impl.update_node(node_id, kwargs)
             return PatchSuccess('update node:{name} success'.format(**node))
 
         except Exception as e:
@@ -151,7 +153,7 @@ class Node(BaseService, RemoteMixIn):
 
             if remote_change:
                 with self.impl.handler.session() as session:
-                    session.update(*self.impl.update_worker(worker_id, kwargs, 'id', get_sql=True))
+                    session.update(*self.impl.update_worker(worker_id, kwargs, get_sql=True))
                     if worker['status'] == 1:
                         self.op_stop_worker(worker['ip'], '{}:{}'.format(worker['type'], worker['name']))
                         if kwargs.get('status') == 1:
@@ -163,8 +165,8 @@ class Node(BaseService, RemoteMixIn):
                                 coroutine_num=kwargs.get('coroutine_num', worker['coroutine_num'])
                             )
 
-            else:
-                self.impl.update_worker(worker_id, kwargs, 'id')
+            elif len(kwargs):
+                self.impl.update_worker(worker_id, kwargs)
             return PatchSuccess('update worker:{name} success'.format(**worker))
 
         except Exception as e:
@@ -181,7 +183,7 @@ class Node(BaseService, RemoteMixIn):
         try:
             # 整个删除操作是一个事务
             with self.impl.handler.session() as session:
-                session.delete(*self.impl.delete_worker('id', worker_id, get_sql=True))
+                session.delete(*self.impl.delete_worker_by_id(worker_id, get_sql=True))
                 self.op_stop_worker(worker['ip'], '{}:{}'.format(worker['type'], worker['name']))
             return DeleteSuccess()
         except Exception as e:

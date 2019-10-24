@@ -25,38 +25,51 @@ class NodeImpl(BaseImpl):
             f"LEFT JOIN `{self.p2c}` AS `p2c` ON p.id=p2c.project_id " \
             f"LEFT JOIN `{self.code_table}` AS `c` ON c.id=p2c.customcode_id " \
             f"WHERE `p`.`status`=1"
+        log.debug(f'SQL:{sql}')
         return self.handler.select(sql)
 
     def add_node(self, data):
         return MysqlOutputStream(self.handler, self.node_table).write(data)
 
-    def delete_node(self, key, value, get_sql=False):
+    def delete_node(self, node_id, get_sql=False):
         """a common delete func"""
-        sql = f"delete from {self.node_table} where `{key}` = '{value}';"
+        sql = f"delete from {self.node_table} where `id`={node_id};"
+        log.debug(f'SQL:{sql}')
         if get_sql:
-            return sql
+            return sql,
         return self.handler.delete(sql)
 
-    def delete_worker(self, key, value, get_sql=False):
-        sql = f"delete from {self.worker_table} where `{key}` = '{value}';"
+    def delete_worker_by_id(self, worker_id, get_sql=False):
+        sql = f"delete from {self.worker_table} where `id` = '{worker_id}';"
+        log.debug(f'SQL:{sql}')
         if get_sql:
-            return sql
+            return sql,
+        return self.handler.delete(sql)
+
+    def delete_worker_by_ip(self, node_ip , get_sql=False):
+        sql = f"delete from {self.worker_table} where `ip` = '{node_ip}';"
+        log.debug(f'SQL:{sql}')
+        if get_sql:
+            return sql,
         return self.handler.delete(sql)
 
     def get_worker_by_ip(self, node_ip):
         sql = f'select `name`, `type`, `ip`, `status`, `coroutine_num` from {self.worker_table} where `ip`="{node_ip}"'
+        log.debug(f'SQL:{sql}')
         return self.handler.select(sql)
 
-    def update_node(self, unique_value, data, unique_key='id', get_sql=False):
+    def update_node(self, node_id, data, get_sql=False):
         fields, values = BaseImpl.make_fv(data)
-        sql = f"update {self.node_table} set {fields} where `{unique_key}` = {unique_value};"
+        sql = f"update {self.node_table} set {fields} where `id` = {node_id};"
+        log.debug(f'SQL:{sql}')
         if get_sql:
             return sql, values
         return self.handler.update(sql, values)
 
     def get_node(self, node_id):
         sql = f'select `id`, `ip`, `name`, `description`, `create_time`, `update_time` ' \
-            f'from {self.node_table} where `id`="{node_id}"'
+              f'from {self.node_table} where `id`={node_id}'
+        log.debug(f'SQL:{sql}')
         return self.handler.select(sql)
 
     def get_nodes(self, page, limit, search, sort):
@@ -75,19 +88,22 @@ class NodeImpl(BaseImpl):
         """注册一个节点"""
         fields, values = BaseImpl.make_fv(data)
         sql = f"insert into {self.worker_table} set {fields};"
+        log.debug(f'SQL:{sql}')
         if get_sql:
             return sql, values
         return self.handler.insert(sql, values)
 
-    def update_worker(self, unique_value, data, unique_key='id', get_sql=False):
+    def update_worker(self, worker_id, data, get_sql=False):
         fields, values = BaseImpl.make_fv(data)
-        sql = f"update {self.worker_table} set {fields} where `{unique_key}` = '{unique_value}';"
+        sql = f"update {self.worker_table} set {fields} where `id` = '{worker_id}';"
+        log.debug(f'SQL:{sql}')
         if get_sql:
             return sql, values
         return self.handler.update(sql, values)
 
     def get_worker(self, worker_id):
-        sql = f'select `id`, `ip`, `name`, `type`, `description`, `coroutine_num`, `create_time`, `update_time` from {self.worker_table} where `id`="{worker_id}";'
+        sql = f'select `id`, `ip`, `name`, `type`, `description`, `coroutine_num`, `create_time`, `update_time` from {self.worker_table} where `id`={worker_id};'
+        log.debug(f'SQL:{sql}')
         return self.handler.select(sql)
 
     def get_workers(self, page, limit, search, sort):
