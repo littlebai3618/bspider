@@ -23,7 +23,10 @@ class RemoteMixIn(object):
         headers = {'Authorization': f'Bearer {g.user.token}'}
         if data:
             headers['Content-Type'] =  'application/json'
-        req = requests.request(method, url, headers=headers, data=data, params=params)
+        try:
+            req = requests.request(method, url, headers=headers, data=data, params=params)
+        except Exception as e:
+            log.error(f'type:{type(e)} {e}')
 
         log.debug(f'master->{req.request.url}: \n {headers}\n{method} {data} \n{req.json()}')
         return req
