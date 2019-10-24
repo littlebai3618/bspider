@@ -109,7 +109,7 @@ class Node(BaseService, RemoteMixIn):
             })
 
     # worker API
-    def add_worker(self, node_ip, name, worker_type, description):
+    def add_worker(self, node_ip, name, worker_type, description, status):
         """携程数量更新很麻烦所以这里写死"""
         try:
             with self.impl.handler.session() as session:
@@ -119,12 +119,16 @@ class Node(BaseService, RemoteMixIn):
                     'name': name,
                     'type': worker_type,
                     'description': description,
-                    'coroutine_num': coroutine_num
+                    'coroutine_num': coroutine_num,
+                    'status': status
                 }
                 session.insert(*self.impl.add_worker(data, get_sql=True))
-                req = self.op_start_worker(node_ip, f'{worker_type}:{name}', worker_type, coroutine_num)
-                data['pid'] = req['pid']
-                data['status'] = 1
+                if status == 1:
+                    req = self.op_start_worker(node_ip, f'{worker_type}:{name}', worker_type, coroutine_num)
+                    data['pid'] = req['pid']
+                else:
+                    data['pid'] = 0
+
             log.info(f'add a new worker:{name} success')
             return PostSuccess(msg='add a new worker success!', data=data)
         except Exception as e:

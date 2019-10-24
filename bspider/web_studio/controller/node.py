@@ -65,7 +65,7 @@ def get_node(node_id):
 @auth.login_required
 def add_worker():
     form = AddWorkerForm()
-    return node_service.add_worker(form.ip.data, form.name.data, form.type.data, form.description.data)
+    return node_service.add_worker(form.ip.data, form.name.data, form.type.data, form.description.data, int(form.status.data))
 
 
 @node.route('/worker/<int:worker_id>', methods=['DELETE'])

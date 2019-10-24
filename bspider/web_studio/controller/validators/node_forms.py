@@ -37,6 +37,7 @@ class AddWorkerForm(BaseForm):
     name = StringField(validators=[DataRequired(), length(min=3, max=30)])
     type = StringField(validators=[DataRequired()])
     description = StringField(validators=[DataRequired()])
+    status = IntegerField(default=1)
 
 
 class ChangeWorkerForm(BaseForm):
