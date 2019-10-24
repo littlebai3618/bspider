@@ -175,7 +175,7 @@ class Node(BaseService, RemoteMixIn):
 
             elif len(kwargs):
                 self.impl.update_worker(worker_id, kwargs)
-            return PatchSuccess('update worker:{name} success'.format(**worker))
+            return PatchSuccess(msg='update worker:{name} success'.format(**worker))
 
         except Exception as e:
             log.error('update worker:{} failed {}'.format(worker['ip'], e))
