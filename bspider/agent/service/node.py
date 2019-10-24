@@ -66,13 +66,13 @@ class NodeService(BaseService):
     def stop_worker(self, name):
         try:
             worker = self.module_list.pop(name)
+            while worker.is_alive():
+                worker.terminate()
+                time.sleep(0.5)
+            log.info(f'delete worker:{name} success')
         except KeyError:
-            log.error(f'worker:{name} is not exist')
-            return NotFound(msg=f'worker:{name} is not exist', errno=20004)
-        while worker.is_alive():
-            worker.terminate()
-            time.sleep(0.5)
-        log.info(f'delete worker:{name} success')
+            log.warning(f'worker:{name} is not exist')
+            # return NotFound(msg=f'worker:{name} is not exist', errno=20004)
         return DeleteSuccess()
 
     def get_worker(self, name):
