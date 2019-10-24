@@ -20,7 +20,7 @@ from flask import Blueprint
 
 from bspider.core.api import auth
 from .validators import PageForm
-from .validators.node_forms import AddNodeForm, UpdateNodeForm, AddWorkerForm, ChangeWorkerForm
+from .validators.node_forms import AddNodeForm, UpdateNodeForm, AddWorkerForm, UpdateWorkerForm
 from bspider.web_studio.service.node import Node
 
 node = Blueprint('node_bp', __name__)
@@ -76,8 +76,8 @@ def delete_worker(worker_id):
 
 @node.route('/worker/<int:worker_id>', methods=['PATCH'])
 @auth.login_required
-def change_worker(worker_id):
-    form = ChangeWorkerForm()
+def update_worker(worker_id):
+    form = UpdateWorkerForm()
     return node_service.update_worker(worker_id, **form.get_dict())
 
 

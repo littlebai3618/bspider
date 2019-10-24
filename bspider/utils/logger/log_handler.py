@@ -103,13 +103,13 @@ class LoggerPool(object):
 
     def get_logger(self, key, **kwargs) -> logging.Logger:
         """如果是downloader、parser模块控制终端输出到指定log文件"""
-        key = '{}:{}:{}'.format(key, kwargs.get('module', ''), kwargs.get('project', ''))
-        if key in self.__pool:
-            return self.__pool[key]
+        unique_key = '{}:{}:{}'.format(key, kwargs.get('module', ''), kwargs.get('project', ''))
+        if unique_key in self.__pool:
+            return self.__pool[unique_key]
         if kwargs.get('module') in ('parser', 'downloader'):
-            log_handler = self.__set_file_handler(logging.getLogger(key), self.frame_settings['LOGGER_LEVEL'], key=key,
+            log_handler = self.__set_file_handler(logging.getLogger(unique_key), self.frame_settings['LOGGER_LEVEL'], key=key,
                                                   **kwargs)
         else:
-            log_handler = self.__handle_func(logging.getLogger(key), self.frame_settings['LOGGER_LEVEL'], **kwargs)
-        self.__pool[key] = log_handler
+            log_handler = self.__handle_func(logging.getLogger(unique_key), self.frame_settings['LOGGER_LEVEL'], **kwargs)
+        self.__pool[unique_key] = log_handler
         return log_handler

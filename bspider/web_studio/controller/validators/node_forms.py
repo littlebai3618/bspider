@@ -40,8 +40,9 @@ class AddWorkerForm(BaseForm):
     status = IntegerField(default=1)
 
 
-class ChangeWorkerForm(BaseForm):
+class UpdateWorkerForm(BaseForm):
     ip = StringField()
     name = StringField()
     type = StringField()
     description = StringField()
+    status = IntegerField()
