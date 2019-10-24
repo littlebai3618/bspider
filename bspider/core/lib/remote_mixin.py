@@ -24,6 +24,7 @@ class RemoteMixIn(object):
         headers = {'Authorization': f'Bearer {g.user.token}'}
         if data:
             headers['Content-Type'] =  'application/json'
+            data = json.dumps(data)
         try:
             req = requests.request(method, url, headers=headers, data=data, params=params)
         except ConnectionError as e:
