@@ -26,9 +26,9 @@ class RemoteMixIn(object):
             headers['Content-Type'] =  'application/json'
         try:
             req = requests.request(method, url, headers=headers, data=data, params=params)
-        except ConnectionError:
-            log.error(f'agent:{url} is not run!!!')
-            raise RemoteOPError(f'agent is not run!!!')
+        except ConnectionError as e:
+            log.error(f'master call agent:{url} failed {e}')
+            raise RemoteOPError(f'master call agent failed')
 
         log.debug(f'master->{req.request.url}: \n {headers}\n{method} {data} \n{req.text}')
         return req
