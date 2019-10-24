@@ -131,7 +131,7 @@ class Node(BaseService, RemoteMixIn):
 
             log.info(f'add a new worker:{name} success')
             return PostSuccess(msg='add a new worker success!', data=data)
-        except Exception as e:
+        except RemoteOPError as e:
             log.error(f'add a new worker:{name} failed: {e}')
             return Conflict(msg=f'add a new worker failed: {e}', errno=20003)
 
@@ -181,7 +181,7 @@ class Node(BaseService, RemoteMixIn):
                 self.impl.update_worker(worker_id, kwargs)
             return PatchSuccess(msg='update worker:{name} success'.format(**worker))
 
-        except Exception as e:
+        except RemoteOPError as e:
             log.error('update worker:{} failed {}'.format(worker['ip'], e))
             return Conflict(msg='update worker:{} failed {}'.format(worker['ip'], e), errno=20005)
 
@@ -198,7 +198,7 @@ class Node(BaseService, RemoteMixIn):
                 session.delete(*self.impl.delete_worker_by_id(worker_id, get_sql=True))
                 self.op_stop_worker(worker['ip'], '{}:{}'.format(worker['type'], worker['name']))
             return DeleteSuccess()
-        except Exception as e:
+        except RemoteOPError as e:
             log.error('delete worker:{} failed {}'.format(worker['ip'], e))
             return Conflict(msg='delete worker:{} failed {}'.format(worker['ip'], e), errno=20009)
 
