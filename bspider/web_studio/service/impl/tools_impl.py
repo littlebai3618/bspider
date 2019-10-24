@@ -12,7 +12,7 @@ class ToolsImpl(BaseImpl):
         self.node_table = self.frame_settings['NODE_TABLE']
 
     def get_node_list(self):
-        sql = f"select `name`, `ip` from `{self.node_table}`;"
+        sql = f"select `id`, `name`, `ip` from `{self.node_table}`;"
         return self.handler.select(sql)
 
 
