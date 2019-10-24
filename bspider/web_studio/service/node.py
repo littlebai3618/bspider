@@ -62,9 +62,9 @@ class Node(BaseService, RemoteMixIn):
                     if len(kwargs):
                         session.update(*self.impl.update_node(node_id, kwargs, get_sql=True))
                     if status == 'start':
-                        self.op_stop_node(node['ip'])
-                    elif status == 'stop':
                         self.op_start_node(node['ip'])
+                    elif status == 'stop':
+                        self.op_stop_node(node['ip'])
 
             elif len(kwargs):
                 self.impl.update_node(node_id, kwargs)
@@ -164,6 +164,14 @@ class Node(BaseService, RemoteMixIn):
                                                            kwargs.get('name', worker['name'])),
                                 coroutine_num=kwargs.get('coroutine_num', worker['coroutine_num'])
                             )
+                    elif worker['status'] == 0 and kwargs.get('status') == 1:
+                        self.op_start_worker(
+                            ip=kwargs.get('ip', worker['ip']),
+                            worker_type=kwargs.get('type', worker['type']),
+                            unique_sign='{}:{}'.format(kwargs.get('type', worker['type']),
+                                                       kwargs.get('name', worker['name'])),
+                            coroutine_num=kwargs.get('coroutine_num', worker['coroutine_num'])
+                        )
 
             elif len(kwargs):
                 self.impl.update_worker(worker_id, kwargs)
