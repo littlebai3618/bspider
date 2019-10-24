@@ -30,8 +30,7 @@ class RemoteMixIn(object):
             log.error(f'agent:{url} is not run!!!')
             raise RemoteOPError(f'agent is not run!!!')
 
-
-        log.debug(f'master->{req.request.url}: \n {headers}\n{method} {data} \n{req.json()}')
+        log.debug(f'master->{req.request.url}: \n {headers}\n{method} {data} \n{req.text}')
         return req
 
     def op_stop_node(self, ip) -> bool:

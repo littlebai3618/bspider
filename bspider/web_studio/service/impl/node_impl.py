@@ -95,7 +95,7 @@ class NodeImpl(BaseImpl):
 
     def update_worker(self, worker_id, data, get_sql=False):
         fields, values = BaseImpl.make_fv(data)
-        sql = f"update {self.worker_table} set {fields} where `id` = '{worker_id}';"
+        sql = f"update {self.worker_table} set {fields} where `id` = {worker_id};"
         log.debug(f'SQL:{sql}')
         if get_sql:
             return sql, values
