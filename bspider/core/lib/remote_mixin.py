@@ -90,7 +90,7 @@ class RemoteMixIn(object):
             'worker_type': worker_type,
             'coroutine_num': coroutine_num
         }
-        req = self.request(url, method='POST', data=json.dumps(data))
+        req = self.request(url, method='POST', data=data)
         data = req.json()
         if data['errno'] == 0:
             return data['data']
@@ -108,7 +108,7 @@ class RemoteMixIn(object):
         result = {}
         for ip in ip_list:
             url = self.base_url.format(ip, '/project')
-            req = self.request(url, method='POST', data=json.dumps(data))
+            req = self.request(url, method='POST', data=data)
             print(url, json.dumps(data))
             data = req.json()
             if data['errno'] != 0:
@@ -119,7 +119,7 @@ class RemoteMixIn(object):
         result = {}
         for ip in ip_list:
             url = self.base_url.format(ip, '/project')
-            req = self.request(url, method='PATCH', data=json.dumps(data))
+            req = self.request(url, method='PATCH', data=data)
             data = req.json()
             if data['errno'] != 0:
                 result[ip] = data['msg']
@@ -138,7 +138,7 @@ class RemoteMixIn(object):
         result = {}
         for ip in ip_list:
             url = self.base_url.format(ip, f'/project/code')
-            req = self.request(url, method='PATCH', data=json.dumps(data))
+            req = self.request(url, method='PATCH', data=data)
             if not (req.status_code >= 200 and req.status_code <= 299):
                 result[ip] = req.json()['msg']
         return result
