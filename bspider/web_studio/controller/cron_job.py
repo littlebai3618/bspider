@@ -22,25 +22,25 @@ def add():
                                     form.description.data)
 
 
-@cron_job.route('/cron/<int:job_id>', methods=['DELETE'])
+@cron_job.route('/cron/<int:cron_id>', methods=['DELETE'])
 @auth.login_required
-def delete(job_id):
-    return cron_job_service.delete_job(job_id)
+def delete(cron_id):
+    return cron_job_service.delete_job(cron_id)
 
 
-@cron_job.route('/cron/<int:job_id>', methods=['PATCH'])
+@cron_job.route('/cron/<int:cron_id>', methods=['PATCH'])
 @auth.login_required
-def update(job_id):
+def update(cron_id):
     form = UpdateForm()
     changes = form.get_dict()
     project_name = changes.pop('project_name')
-    return cron_job_service.update_job(job_id, project_name, **changes)
+    return cron_job_service.update_job(cron_id, project_name, **changes)
 
 
-@cron_job.route('/cron/<int:job_id>', methods=['GET'])
+@cron_job.route('/cron/<int:cron_id>', methods=['GET'])
 @auth.login_required
-def get(job_id):
-    return cron_job_service.get_job(job_id)
+def get(cron_id):
+    return cron_job_service.get_job(cron_id)
 
 @cron_job.route('/cron', methods=['GET'])
 @auth.login_required

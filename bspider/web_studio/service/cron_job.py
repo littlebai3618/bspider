@@ -62,30 +62,30 @@ class CronJobService(BaseService):
             'next_run_time': timestamp,
         }
         try:
-            job_id = self.impl.add_job(data=value)
+            cron_id = self.impl.add_job(data=value)
             log.info(f'add cron_job:{project_name}-{class_name} success')
-            return PostSuccess(msg='add cron job success', data={'job_id': job_id})
+            return PostSuccess(msg='add cron job success', data={'cron_id': cron_id})
         except IntegrityError:
             log.error(f'cron job:{project_name}-{class_name} is already exist')
             return Conflict(msg='cron job is already exist', errno=50001)
 
-    def update_job(self, job_id, project_name, **kwargs):
+    def update_job(self, cron_id, project_name, **kwargs):
         if 'class_name' in kwargs:
             kwargs['kwargs'] = self.make_kwargs(project_name, kwargs.pop('class_name'))
-        self.impl.update_job(job_id, kwargs)
+        self.impl.update_job(cron_id, kwargs)
         if 'trigger' in kwargs:
             timestamp, next_run_time = self.__next_run_time(kwargs['trigger'])
             return PatchSuccess(msg=f'update success next run at:{next_run_time}')
-        log.info(f'update cron_job:{job_id} success')
+        log.info(f'update cron_job:{cron_id} success')
         return PatchSuccess(msg=f'update success')
 
-    def delete_job(self, job_id):
-        self.impl.delete_job(job_id)
-        log.info(f'delete cron_job:{job_id} success')
+    def delete_job(self, cron_id):
+        self.impl.delete_job(cron_id)
+        log.info(f'delete cron_job:{cron_id} success')
         return DeleteSuccess()
 
-    def get_job(self, job_id):
-        infos = self.impl.get_job(job_id)
+    def get_job(self, cron_id):
+        infos = self.impl.get_job(cron_id)
 
         for info in infos:
             self.datetime_to_str(info)

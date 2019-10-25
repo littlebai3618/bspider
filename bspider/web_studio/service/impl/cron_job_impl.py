@@ -37,7 +37,10 @@ class CronJobImpl(BaseImpl):
     def get_jobs(self, page, limit, search, sort):
 
         start = (page - 1) * limit
-        fields = self.make_search(search)
+        fields = self.make_search(search)\
+            .replace('`project_name`', '`cronjob`.`project_name`') \
+            .replace('`class_name`', '`cronjob`.`class_name`') \
+            .replace('`kwargs`', '`cronjob`.`kwargs`')
         if len(fields):
             sql = f'SELECT `cronjob`.`id`,`cronjob`.`project_name`,`project`.`id` AS `project_id`,' \
                   f'`cronjob`.`class_name`,`code`.`id` AS `code_id`,`cronjob`.`trigger`,`cronjob`.`trigger_type`,' \
