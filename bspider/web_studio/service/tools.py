@@ -5,7 +5,9 @@
 """
 1. 获取node ip列表 /tools/nodelist [{name: , ip:}]
 """
-from bspider.core.api import BaseService, GetSuccess
+from apscheduler.triggers.cron import CronTrigger
+
+from bspider.core.api import BaseService, GetSuccess, NotFound
 
 from .impl.tools_impl import ToolsImpl
 
@@ -18,7 +20,20 @@ class ToolsService(BaseService):
     def get_node_list(self):
         """获取节点列表"""
         infos = self.impl.get_node_list()
-        return GetSuccess(msg='get code success', data=[infos[0]])
+        return GetSuccess(msg='get code success', data=infos)
+
+    def get_code_list(self, code_type):
+        infos = self.impl.get_code_list(code_type)
+        return GetSuccess(msg='get code success', data=infos)
+
+    def validate(self, valid_type, data):
+        if valid_type == 'crontab':
+            try:
+                CronTrigger.from_crontab(data)
+                return GetSuccess(msg='validate complete', data={'valid': True})
+            except Exception:
+                return GetSuccess(msg='validate complete', data={'valid': False})
+        return NotFound(msg='unknow validate type', errno=60001)
 
 
 

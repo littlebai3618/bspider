@@ -10,9 +10,17 @@ class ToolsImpl(BaseImpl):
     def __init__(self):
         super().__init__()
         self.node_table = self.frame_settings['NODE_TABLE']
+        self.code_table = self.frame_settings['CODE_STORE_TABLE']
 
     def get_node_list(self):
         sql = f"select `id`, `name`, `ip` from `{self.node_table}`;"
+        return self.handler.select(sql)
+
+    def get_code_list(self, code_type):
+        if code_type:
+            sql = f"select `id`, `name`, `editor` from `{self.code_table}` where `type`='{code_type}';"
+        else:
+            sql = f"select `id`, `name`, `editor` from `{self.code_table}`;"
         return self.handler.select(sql)
 
 
