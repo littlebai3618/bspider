@@ -27,5 +27,5 @@ def get_json_formatter(**kwargs):
 
 def get_stream_formatter(**kwargs):
     arg = ' '.join([f'{value}' for key, value in kwargs.items() if key == 'module'])
-    log_from_work = f'[%(asctime)s {arg} %(filename)s:%(lineno)s] %(levelname)s: %(message)s'
+    log_from_work = f'[%(asctime)s {arg} %(process)d %(processName)s %(filename)s:%(lineno)s] %(levelname)s: %(message)s'
     return logging.Formatter(log_from_work)

@@ -2,7 +2,7 @@
 # @Author  : 白尚林
 # @File    : downloader_monitor
 # @Use     :
-from bspider.core.downloader.async_downloader import AsyncDownloader
+from bspider.downloader import AsyncDownloader
 from bspider.config.default_settings import EXCHANGE_NAME
 from bspider.core.lib import BaseMonitor
 

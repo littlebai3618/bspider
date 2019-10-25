@@ -7,7 +7,7 @@ import traceback
 import asyncio
 
 from bspider.core.lib import BaseManager
-from bspider.core.parser.parser_monitor import ParserMonitor
+from bspider.parser.parser_monitor import ParserMonitor
 
 
 def run_parser(unique_sign, coro_num=3):

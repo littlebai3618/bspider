@@ -106,10 +106,10 @@ class LoggerPool(object):
         unique_key = '{}:{}:{}'.format(key, kwargs.get('module', ''), kwargs.get('project', ''))
         if unique_key in self.__pool:
             return self.__pool[unique_key]
-        if kwargs.get('module') in ('parser', 'downloader'):
-            log_handler = self.__set_file_handler(logging.getLogger(unique_key), self.frame_settings['LOGGER_LEVEL'], key=key,
-                                                  **kwargs)
-        else:
-            log_handler = self.__handle_func(logging.getLogger(unique_key), self.frame_settings['LOGGER_LEVEL'], **kwargs)
+        # if kwargs.get('module') in ('parser', 'downloader'):
+        #     log_handler = self.__set_file_handler(logging.getLogger(unique_key), self.frame_settings['LOGGER_LEVEL'], key=key,
+        #                                           **kwargs)
+        # else:
+        log_handler = self.__handle_func(logging.getLogger(unique_key), self.frame_settings['LOGGER_LEVEL'], **kwargs)
         self.__pool[unique_key] = log_handler
         return log_handler

@@ -9,7 +9,7 @@ import six
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.schedulers.base import STATE_STOPPED
 from apscheduler.util import undefined
-from bspider.core.bcron.job import MySQLJob
+from bspider.bcron.job import MySQLJob
 
 
 class MySQLScheduler(BackgroundScheduler):

@@ -10,10 +10,10 @@ from os.path import abspath
 from queue import Queue
 
 from bspider.config import FrameSettings
-from bspider.core.downloader import BaseMiddleware
-from bspider.core.downloader.async_downloader import AsyncDownloader
-from bspider.core.parser import BasePipeline, BaseExtractor
-from bspider.core.parser.async_parser import AsyncParser
+from bspider.downloader import BaseMiddleware
+from bspider.downloader import AsyncDownloader
+from bspider.parser import BasePipeline, BaseExtractor
+from bspider.parser.async_parser import AsyncParser
 from bspider.http import Request
 from bspider.utils.conf import PLATFORM_NAME_ENV
 from bspider.utils.importer import walk_modules

@@ -6,7 +6,7 @@ import asyncio
 import random
 
 from bspider.config import FrameSettings
-from bspider.core.scheduler.scheduler import Scheduler
+from bspider.scheduler.scheduler import Scheduler
 from bspider.utils.database.mysql import AioMysqlHandler
 
 

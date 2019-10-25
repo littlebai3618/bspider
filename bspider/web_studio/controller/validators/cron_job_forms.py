@@ -18,7 +18,6 @@ class AddForm(BaseForm):
 
 
 class UpdateForm(BaseForm):
-    job_id = IntegerField(validators=[DataRequired()])
     project_name = StringField(validators=[DataRequired()])
     class_name = StringField()
     trigger = StringField()

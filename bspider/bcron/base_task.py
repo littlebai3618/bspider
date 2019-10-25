@@ -15,11 +15,11 @@ from bspider.utils.tools import make_sign
 
 class BaseTask(object):
 
-    def __init__(self, settings, job_name):
+    def __init__(self, settings, project_name):
         """"""
         self.settings = settings
-        self.job_name = job_name
-        self.log = LoggerPool().get_logger(key=job_name, module='bcorn', project=job_name)
+        self.project_name = project_name
+        self.log = LoggerPool().get_logger(key=project_name, module='bcorn', project=project_name)
         self.frame_settings = FrameSettings()
         self.__mq_handler = RabbitMQHandler(self.frame_settings['RABBITMQ_CONFIG'])
 
@@ -32,14 +32,14 @@ class BaseTask(object):
         """发送request 到待下载队列"""
         # 逐条发送到待队列
         if request.method == 'POST':
-            request.sign = make_sign(self.job_name, request.url, json.dumps(request.data))
+            request.sign = make_sign(self.project_name, request.url, json.dumps(request.data))
         else:
-            request.sign = make_sign(self.job_name, request.url)
-        self.__set_request(request, self.job_name)
+            request.sign = make_sign(self.project_name, request.url)
+        self.__set_request(request, self.project_name)
 
-    def __set_request(self, request: Request, job_name):
+    def __set_request(self, request: Request, project_name):
         # 这里dump方法使用了浅拷贝，会影响一部分性能
         data = json.dumps(request.dumps())
-        self.__mq_handler.send_msg(self.frame_settings['EXCHANGE_NAME'][0], job_name, data, request.priority)
+        self.__mq_handler.send_msg(self.frame_settings['EXCHANGE_NAME'][0], project_name, data, request.priority)
         self.log.debug(f'success set a new Request: {data}')
         return True

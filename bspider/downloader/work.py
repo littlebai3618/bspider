@@ -7,7 +7,7 @@ import traceback
 
 import sys
 
-from bspider.core.downloader.downloader_monitor import DownloaderMonitor
+from bspider.downloader.downloader_monitor import DownloaderMonitor
 from bspider.core.lib import BaseManager
 
 

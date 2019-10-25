@@ -10,7 +10,7 @@ from apscheduler.triggers.cron import CronTrigger
 
 from apscheduler.util import utc_timestamp_to_datetime, datetime_to_utc_timestamp
 
-from bspider.core.bcron.job import MySQLJob
+from bspider.bcron.job import MySQLJob
 from bspider.utils.database.mysql import MysqlHandler
 
 

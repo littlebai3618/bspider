@@ -5,7 +5,7 @@
 """解析器监听器"""
 from bspider.config.default_settings import EXCHANGE_NAME
 from bspider.core.lib import BaseMonitor
-from bspider.core.parser.async_parser import AsyncParser
+from bspider.parser.async_parser import AsyncParser
 
 
 class ParserMonitor(BaseMonitor):

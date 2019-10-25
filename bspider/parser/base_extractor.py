@@ -7,7 +7,7 @@ extractor 方法 如果传入Response 匹配到callback 那么执行self.callbac
 extractor 也是Pipeline中的一种，通过执行Response 中的callback方法返回item
 """
 from bspider.http import Response
-from bspider.core.parser.base_pipeline import BasePipeline
+from bspider.parser import BasePipeline
 from bspider.utils.exceptions import ExtractorCallbackError
 
 

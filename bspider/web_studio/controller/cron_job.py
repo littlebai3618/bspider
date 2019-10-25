@@ -27,14 +27,13 @@ def delete(job_id):
     return cron_job_service.delete_job(job_id)
 
 
-@cron_job.route('/cron', methods=['PATCH'])
+@cron_job.route('/cron<int:job_id>', methods=['PATCH'])
 @auth.login_required
-def update():
+def update(job_id):
     form = UpdateForm()
     changes = form.get_dict()
-    job_id = changes.pop('job_id')
     project_name = changes.pop('project_name')
-    return cron_job_service.update_job(job_id, project_name, changes)
+    return cron_job_service.update_job(job_id, project_name, **changes)
 
 
 @cron_job.route('/cron/<int:job_id>', methods=['GET'])

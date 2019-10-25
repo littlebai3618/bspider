@@ -19,7 +19,7 @@ from apscheduler.util import datetime_to_utc_timestamp, obj_to_ref
 from pymysql import IntegrityError
 
 from bspider.core.api import BaseService, Conflict, PostSuccess, PatchSuccess, DeleteSuccess, GetSuccess
-from bspider.core.bcron.todo import do
+from bspider.bcron.todo import do
 from bspider.web_studio import log
 from bspider.web_studio.service.impl.cron_job_impl import CronJobImpl
 
@@ -60,12 +60,12 @@ class CronJobService(BaseService):
             log.error(f'cron job:{project_name}-{class_name} is already exist')
             return Conflict(msg='cron job is already exist', errno=50001)
 
-    def update_job(self, job_id, project_name, changes):
-        if 'class_name' in changes:
-            changes['kwargs'] = json.dumps({'project_name': project_name, 'class_name': changes.pop('class_name')})
-        self.impl.update_job(job_id, changes)
-        if 'trigger' in changes:
-            timestamp, next_run_time = self.__next_run_time(changes['trigger'])
+    def update_job(self, job_id, project_name, **kwargs):
+        if 'class_name' in kwargs:
+            kwargs['kwargs'] = json.dumps({'project_name': project_name, 'class_name': kwargs.pop('class_name')})
+        self.impl.update_job(job_id, kwargs)
+        if 'trigger' in kwargs:
+            timestamp, next_run_time = self.__next_run_time(kwargs['trigger'])
             return PatchSuccess(msg=f'update success next run at:{next_run_time}')
         log.info(f'update cron_job:{job_id} success')
         return PatchSuccess(msg=f'update success')
