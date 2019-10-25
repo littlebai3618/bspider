@@ -5,6 +5,7 @@
 from flask import Blueprint
 
 from bspider.core.api import auth
+from .validators import PageForm
 from bspider.web_studio.service.cron_job import CronJobService
 from .validators.cron_job_forms import AddForm, UpdateForm
 
@@ -27,7 +28,7 @@ def delete(job_id):
     return cron_job_service.delete_job(job_id)
 
 
-@cron_job.route('/cron<int:job_id>', methods=['PATCH'])
+@cron_job.route('/cron/<int:job_id>', methods=['PATCH'])
 @auth.login_required
 def update(job_id):
     form = UpdateForm()
@@ -44,4 +45,5 @@ def get(job_id):
 @cron_job.route('/cron', methods=['GET'])
 @auth.login_required
 def gets():
-    return cron_job_service.get_jobs()
+    form = PageForm()
+    return cron_job_service.get_jobs(**form.get_dict())

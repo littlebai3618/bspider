@@ -18,7 +18,8 @@ from apscheduler.triggers.cron import CronTrigger
 from apscheduler.util import datetime_to_utc_timestamp, obj_to_ref
 from pymysql import IntegrityError
 
-from bspider.core.api import BaseService, Conflict, PostSuccess, PatchSuccess, DeleteSuccess, GetSuccess
+from bspider.core.api import BaseService, Conflict, PostSuccess, PatchSuccess, DeleteSuccess, GetSuccess, NotFound, \
+    ParameterException
 from bspider.bcron.todo import do
 from bspider.web_studio import log
 from bspider.web_studio.service.impl.cron_job_impl import CronJobImpl
@@ -37,6 +38,14 @@ class CronJobService(BaseService):
         next_run_time = crontab.get_next_fire_time(None, now)
         return datetime_to_utc_timestamp(next_run_time), next_run_time
 
+    def make_kwargs(self, project_name, class_name):
+        kwargs = {'project_name': project_name, 'class_name': class_name}
+        if project_name == 'operation':
+            kwargs['pattern'] = project_name
+        return json.dumps(kwargs)
+
+
+
     def add_job(self, project_id, project_name, class_name, trigger, description):
         timestamp, next_run_time = self.__next_run_time(trigger)
         value = {
@@ -44,7 +53,7 @@ class CronJobService(BaseService):
             'project_name': project_name,
             'class_name': class_name,
             'args': '[]',
-            'kwargs': json.dumps({'project_name': project_name, 'class_name': class_name}),
+            'kwargs': self.make_kwargs(project_name, class_name),
             'trigger': trigger,
             'trigger_type': 'cron',
             'func': obj_to_ref(do),
@@ -62,7 +71,7 @@ class CronJobService(BaseService):
 
     def update_job(self, job_id, project_name, **kwargs):
         if 'class_name' in kwargs:
-            kwargs['kwargs'] = json.dumps({'project_name': project_name, 'class_name': kwargs.pop('class_name')})
+            kwargs['kwargs'] = self.make_kwargs(project_name, kwargs.pop('class_name'))
         self.impl.update_job(job_id, kwargs)
         if 'trigger' in kwargs:
             timestamp, next_run_time = self.__next_run_time(kwargs['trigger'])
@@ -76,12 +85,29 @@ class CronJobService(BaseService):
         return DeleteSuccess()
 
     def get_job(self, job_id):
-        info = self.impl.get_job(job_id)
-        if len(info):
-            return GetSuccess(data=info)
-        else:
-            return Conflict(msg='job is not exist', errno=50001)
+        infos = self.impl.get_job(job_id)
 
-    def get_jobs(self):
-        info = self.impl.get_jobs()
-        return GetSuccess(data=info)
+        for info in infos:
+            self.datetime_to_str(info)
+
+        if len(infos):
+            return GetSuccess(msg='get cron job success', data=infos)
+        return NotFound(msg='job is not exist', errno=50001)
+
+    def get_jobs(self, page, limit, search, sort):
+        if sort.upper() not in ['ASC', 'DESC']:
+            return ParameterException(msg='sort must `asc` or `desc`')
+
+        infos, total = self.impl.get_jobs(page, limit, search, sort)
+
+        for info in infos:
+            self.datetime_to_str(info)
+
+        return GetSuccess(
+            msg='get cron job list success!',
+            data={
+                'items': infos,
+                'total': total,
+                'page': page,
+                'limit': limit
+            })

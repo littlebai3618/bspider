@@ -3,6 +3,7 @@
 # @File    : cron_job_impl
 # @Use     :
 from bspider.core.api import BaseImpl
+from bspider.web_studio import log
 
 
 class CronJobImpl(BaseImpl):
@@ -26,21 +27,35 @@ class CronJobImpl(BaseImpl):
     def get_job(self, job_id):
         sql = f'SELECT `cronjob`.`id`,`cronjob`.`project_name`,`project`.`id` AS `project_id`,' \
               f'`cronjob`.`class_name`,`code`.`id` AS `code_id`,`cronjob`.`trigger`,`cronjob`.`trigger_type`,' \
-              f'`cronjob`.`description`,`cronjob`.`next_run_time` ' \
+              f'`cronjob`.`description`,`cronjob`.`next_run_time`,`cronjob`.`create_time`, `cronjob`.`update_time` ' \
               f'FROM {self.table_name} AS `cronjob` ' \
               f'LEFT JOIN bspider_project AS `project` ON `cronjob`.`project_name`=`project`.`name` ' \
               f'LEFT JOIN bspider_customcode AS `code` ON `cronjob`.`class_name`=`code`.`name` ' \
               f'where `cronjob`.`id`={job_id};'
         return self.handler.select(sql)
 
-    def get_jobs(self):
-        sql = f'SELECT `cronjob`.`id`,`cronjob`.`project_name`,`project`.`id` AS `project_id`,' \
-              f'`cronjob`.`class_name`,`code`.`id` AS `code_id`,`cronjob`.`trigger`,`cronjob`.`trigger_type`,' \
-              f'`cronjob`.`description`,`cronjob`.`next_run_time` ' \
-              f'FROM {self.table_name} AS `cronjob` ' \
-              f'LEFT JOIN bspider_project AS `project` ON `cronjob`.`project_name`=`project`.`name` ' \
-              f'LEFT JOIN bspider_customcode AS `code` ON `cronjob`.`class_name`=`code`.`name`;'
-        return self.handler.select(sql)
+    def get_jobs(self, page, limit, search, sort):
+
+        start = (page - 1) * limit
+        fields = self.make_search(search)
+        if len(fields):
+            sql = f'SELECT `cronjob`.`id`,`cronjob`.`project_name`,`project`.`id` AS `project_id`,' \
+                  f'`cronjob`.`class_name`,`code`.`id` AS `code_id`,`cronjob`.`trigger`,`cronjob`.`trigger_type`,' \
+                  f'`cronjob`.`description`,`cronjob`.`next_run_time`,`cronjob`.`create_time`, `cronjob`.`update_time` ' \
+                  f'FROM {self.table_name} AS `cronjob` ' \
+                  f'LEFT JOIN bspider_project AS `project` ON `cronjob`.`project_name`=`project`.`name` ' \
+                  f'LEFT JOIN bspider_customcode AS `code` ON `cronjob`.`class_name`=`code`.`name` ' \
+                  f'where {fields} order by `cronjob`.`id` {sort} limit {start},{limit};'
+        else:
+            sql = f'SELECT `cronjob`.`id`,`cronjob`.`project_name`,`project`.`id` AS `project_id`,' \
+                  f'`cronjob`.`class_name`,`code`.`id` AS `code_id`,`cronjob`.`trigger`,`cronjob`.`trigger_type`,' \
+                  f'`cronjob`.`description`,`cronjob`.`next_run_time`,`cronjob`.`create_time`, `cronjob`.`update_time` ' \
+                  f'FROM {self.table_name} AS `cronjob` ' \
+                  f'LEFT JOIN bspider_project AS `project` ON `cronjob`.`project_name`=`project`.`name` ' \
+                  f'LEFT JOIN bspider_customcode AS `code` ON `cronjob`.`class_name`=`code`.`name` ' \
+                  f'order by `cronjob`.`id` {sort} limit {start},{limit};'
+        log.debug(f'SQL:{sql}')
+        return self.handler.select(sql), self.total_num(search, self.table_name)
 
     def delete_job(self, job_id):
         sql = f"update {self.table_name} set `status`=%s where `id` = '{job_id}';"
