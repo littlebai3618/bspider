@@ -8,7 +8,7 @@ import time
 
 from bspider.agent import log
 from bspider.core.api import BaseService, GetSuccess, PostSuccess, DeleteSuccess, Conflict, NotFound
-from bspider.downloader import run_downloader
+from bspider.downloader.work import run_downloader
 from bspider.parser.work import run_parser
 from bspider.utils.system import cpu_used, mem_used, disk_used, process_info
 
