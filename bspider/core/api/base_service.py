@@ -6,7 +6,7 @@ import json
 from datetime import datetime
 
 from bspider.config import FrameSettings
-from bspider.downloader import AsyncDownloader
+from bspider.downloader.async_downloader import AsyncDownloader
 from bspider.parser.async_parser import AsyncParser
 from bspider.utils.exceptions import ProjectConfigError
 
