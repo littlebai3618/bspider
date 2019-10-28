@@ -70,7 +70,7 @@ def run_operation_project(class_name, project_name):
         ding(run_msg)
 
 
-def run_corn_job_code(class_name, project_name, **kwargs):
+def run_corn_job_code(class_name, project_name, config):
     CODE_STORE_TABLE = __frame_settings['CODE_STORE_TABLE']
     sql = f'select `content` from {CODE_STORE_TABLE} where `name`="{class_name}"'
     tmp = __handler.select(sql)
@@ -80,7 +80,7 @@ def run_corn_job_code(class_name, project_name, **kwargs):
     mod = import_module_by_code(class_name, content, project_name)
     if hasattr(mod, class_name):
         try:
-            instance = getattr(mod, class_name)(json.loads(kwargs.get('config', {})), project_name)
+            instance = getattr(mod, class_name)(json.loads(config), project_name)
             instance.execute_task()
             return True, f'{project_name}:{class_name} run succeed'
         except Exception:
