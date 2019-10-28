@@ -62,7 +62,7 @@ def run_spider_project(class_name, project_name):
 
 def run_operation_project(class_name, project_name):
     log = LoggerPool().get_logger('bcorn', module='bcorn', project=project_name)
-    run_status, run_msg = run_corn_job_code(class_name, project_name, config={'type': 'operation cron job'})
+    run_status, run_msg = run_corn_job_code(class_name, project_name, config={"desc": "operation cron job"})
     if run_status:
         log.info(run_msg)
     else:
@@ -80,7 +80,13 @@ def run_corn_job_code(class_name, project_name, config):
     mod = import_module_by_code(class_name, content, project_name)
     if hasattr(mod, class_name):
         try:
-            instance = getattr(mod, class_name)(json.loads(config), project_name)
+            project_config = json.loads(config)
+        except Exception:
+            tp, msg, tb = sys.exc_info()
+            e_msg = ''.join(traceback.format_exception(tp, msg, tb))
+            return False, f'{project_name}:{class_name} config\'type must json str:\n{e_msg}'
+        try:
+            instance = getattr(mod, class_name)(project_config, project_name)
             instance.execute_task()
             return True, f'{project_name}:{class_name} run succeed'
         except Exception:
