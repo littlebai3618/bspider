@@ -84,7 +84,7 @@ def run_corn_job_code(class_name, project_name, config):
         except Exception:
             tp, msg, tb = sys.exc_info()
             e_msg = ''.join(traceback.format_exception(tp, msg, tb))
-            return False, f'{project_name}:{class_name} config\'type must json str:\n{e_msg}'
+            return False, f'{project_name}:{class_name} config\'s type must json str:\n{e_msg}'
         try:
             instance = getattr(mod, class_name)(project_config, project_name)
             instance.execute_task()
