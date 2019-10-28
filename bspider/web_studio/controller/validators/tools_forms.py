@@ -2,15 +2,13 @@
 # @Author  : 白尚林
 # @File    : forms
 # @Use     :
-from wtforms import StringField, IntegerField
-from wtforms.validators import DataRequired, length
+from wtforms import StringField
 
-from bspider.core.api import BaseForm
-from .enums import ClientTypeEnum
+from bspider.core.api import BaseForm, ParamRequired
 
 
 class GetCodeListForm(BaseForm):
     type = StringField()
 
 class ValidateForm(BaseForm):
-    data = StringField(validators=[DataRequired()])
+    data = StringField(validators=[ParamRequired()])

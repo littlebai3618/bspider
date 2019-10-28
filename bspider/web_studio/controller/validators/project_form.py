@@ -3,23 +3,22 @@
 # @File    : project_form
 # @Use     :
 from wtforms import StringField, IntegerField
-from wtforms.validators import DataRequired
 
-from bspider.core.api import BaseForm
+from bspider.core.api import BaseForm, ParamRequired
 
 class AddForm(BaseForm):
-    name = StringField(validators=[DataRequired()])
+    name = StringField(validators=[ParamRequired()])
     status = IntegerField(default=0)
     type = StringField(default='crawl')
-    group = StringField(validators=[DataRequired()])
-    description = StringField(validators=[DataRequired()])
-    editor = StringField(validators=[DataRequired()])
-    rate = StringField(validators=[DataRequired()])
-    config = StringField(validators=[DataRequired()])
+    group = StringField(validators=[ParamRequired()])
+    description = StringField(validators=[ParamRequired()])
+    editor = StringField(validators=[ParamRequired()])
+    rate = StringField(validators=[ParamRequired()])
+    config = StringField(validators=[ParamRequired()])
 
 class UpdateForm(BaseForm):
-    project_id = StringField(validators=[DataRequired()])
-    name = StringField(validators=[DataRequired()])
+    project_id = StringField(validators=[ParamRequired()])
+    name = StringField(validators=[ParamRequired()])
     status = IntegerField()
     type = StringField()
     group = StringField()

@@ -3,16 +3,16 @@
 # @File    : forms
 # @Use     :
 from wtforms import StringField, IntegerField
-from wtforms.validators import DataRequired, length
+from wtforms.validators import length
 
 from bspider.core.api import BaseForm, ParamRequired
 from .enums import OpTypeEnum
 
 
 class AddNodeForm(BaseForm):
-    node_ip = StringField(validators=[DataRequired(), length(min=7, max=15)])
-    name = StringField(validators=[DataRequired(), length(min=3, max=30)])
-    desc = StringField(validators=[DataRequired()])
+    node_ip = StringField(validators=[ParamRequired(), length(min=7, max=15)])
+    name = StringField(validators=[ParamRequired(), length(min=3, max=30)])
+    desc = StringField(validators=[ParamRequired()])
 
 
 class GetNodeForm(BaseForm):
@@ -33,10 +33,10 @@ class UpdateNodeForm(BaseForm):
 
 
 class AddWorkerForm(BaseForm):
-    ip = StringField(validators=[DataRequired(), length(min=7, max=15)])
-    name = StringField(validators=[DataRequired(), length(min=3, max=30)])
-    type = StringField(validators=[DataRequired()])
-    description = StringField(validators=[DataRequired()])
+    ip = StringField(validators=[ParamRequired(), length(min=7, max=15)])
+    name = StringField(validators=[ParamRequired(), length(min=3, max=30)])
+    type = StringField(validators=[ParamRequired()])
+    description = StringField(validators=[ParamRequired()])
     status = IntegerField(default=1)
 
 

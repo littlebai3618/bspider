@@ -4,21 +4,20 @@
 # @Use     :
 from apscheduler.triggers.cron import CronTrigger
 from wtforms import StringField, IntegerField
-from wtforms.validators import DataRequired
 
-from bspider.core.api import BaseForm
+from bspider.core.api import BaseForm, ParamRequired
 
 
 class AddForm(BaseForm):
-    project_id = IntegerField(validators=[DataRequired()])
-    project_name = StringField(validators=[DataRequired()])
-    class_name = StringField(validators=[DataRequired()])
-    trigger = StringField(validators=[DataRequired()])
-    description = StringField(validators=[DataRequired()])
+    project_id = IntegerField(validators=[ParamRequired()])
+    project_name = StringField(validators=[ParamRequired()])
+    class_name = StringField(validators=[ParamRequired()])
+    trigger = StringField(validators=[ParamRequired()])
+    description = StringField(validators=[ParamRequired()])
 
 
 class UpdateForm(BaseForm):
-    project_name = StringField(validators=[DataRequired()])
+    project_name = StringField(validators=[ParamRequired()])
     class_name = StringField()
     trigger = StringField()
     description = StringField()

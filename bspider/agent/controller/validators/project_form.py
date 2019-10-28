@@ -4,21 +4,20 @@
 # @Use     :
 
 from wtforms import IntegerField, StringField
-from wtforms.validators import DataRequired
 
-from bspider.core.api import ParameterException, BaseForm
+from bspider.core.api import ParameterException, BaseForm, ParamRequired
 
 
 class AddProjectForm(BaseForm):
-    project_id = IntegerField(validators=[DataRequired()])
-    project_name = StringField(validators=[DataRequired()])
-    config = StringField(validators=[DataRequired()])
-    rate = IntegerField(validators=[DataRequired()])
+    project_id = IntegerField(validators=[ParamRequired()])
+    project_name = StringField(validators=[ParamRequired()])
+    config = StringField(validators=[ParamRequired()])
+    rate = IntegerField(validators=[ParamRequired()])
     status = IntegerField(default=0)
 
 
 class UpdateProjectForm(BaseForm):
-    project_id = IntegerField(validators=[DataRequired()])
+    project_id = IntegerField(validators=[ParamRequired()])
     project_name = StringField()
     config = StringField()
     rate = IntegerField()
@@ -26,10 +25,10 @@ class UpdateProjectForm(BaseForm):
 
 
 class UpdateCodeForm(BaseForm):
-    project_ids = StringField(validators=[DataRequired()])
-    code_name = StringField(validators=[DataRequired()])
-    code_type = StringField(validators=[DataRequired()])
-    content = StringField(validators=[DataRequired()])
+    project_ids = StringField(validators=[ParamRequired()])
+    code_name = StringField(validators=[ParamRequired()])
+    code_type = StringField(validators=[ParamRequired()])
+    content = StringField(validators=[ParamRequired()])
 
     def validate_project_ids(self, value):
         try:

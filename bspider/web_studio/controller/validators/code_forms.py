@@ -2,22 +2,21 @@
 # @Author  : 白尚林
 # @File    : code_forms
 # @Use     :
-from wtforms import StringField, IntegerField
-from wtforms.validators import DataRequired
+from wtforms import StringField
 
-from bspider.core.api import BaseForm
+from bspider.core.api import BaseForm, ParamRequired
 
 
 class AddForm(BaseForm):
-    name = StringField(validators=[DataRequired()])
-    description = StringField(validators=[DataRequired()])
-    type = StringField(validators=[DataRequired()])
-    content = StringField(validators=[DataRequired()])
-    editor = StringField(validators=[DataRequired()])
+    name = StringField(validators=[ParamRequired()])
+    description = StringField(validators=[ParamRequired()])
+    type = StringField(validators=[ParamRequired()])
+    content = StringField(validators=[ParamRequired()])
+    editor = StringField(validators=[ParamRequired()])
 
 
 class UpdateForm(BaseForm):
-    name = StringField(validators=[DataRequired()])
+    name = StringField(validators=[ParamRequired()])
     description = StringField()
     type = StringField()
     content = StringField()
