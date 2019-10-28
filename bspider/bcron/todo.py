@@ -62,7 +62,7 @@ def run_spider_project(class_name, project_name):
 
 def run_operation_project(class_name, project_name):
     log = LoggerPool().get_logger('bcorn', module='bcorn', project=project_name)
-    run_status, run_msg = run_corn_job_code(class_name, project_name, config={"desc": "operation cron job"})
+    run_status, run_msg = run_corn_job_code(class_name, project_name, config='{"desc": "operation cron job"}')
     if run_status:
         log.info(run_msg)
     else:
