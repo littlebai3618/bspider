@@ -41,7 +41,7 @@ class BCronManager(object):
         store = MySQLJobStore(self.handler, self.tz, self.log, self.table_name)
 
         executors = {
-            'default': ThreadPoolExecutor(self.frame_settings['CRON_JOB_THREAD_NUM'])
+            'thread_pool': ThreadPoolExecutor(self.frame_settings['CRON_JOB_THREAD_NUM'])
             # 'processpool': ProcessPoolExecutor(frame_settings.CRON_JOB_PROCESS_NUM)
         }
         self.log.debug(
@@ -91,14 +91,14 @@ class BCronManager(object):
         )
 
     def real_add_job(self, info):
-        name = '{project_name}|{class_name}'.format(**info)
+        name = '{project_id}-{code_id}'.format(**info)
         cron = CronTrigger.from_crontab(info['trigger'])
         now = datetime.now(self.tz)
         next_run_time = cron.get_next_fire_time(None, now)
         try:
             self.scheduler.add_job(
                 do, cron, name=name,
-                kwargs={'project_name': info['project_name'], 'class_name': info['class_name']},
+                kwargs={'project_id': info['project_id'], 'code_id': info['code_id'], 'type': info['type']},
                 description=info['description'],
                 next_run_time=next_run_time,
                 id=info['id']

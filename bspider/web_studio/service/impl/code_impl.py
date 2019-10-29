@@ -32,8 +32,8 @@ class CodeImpl(BaseImpl):
             f'WHERE `p2c`.`customcode_id`={cid};'
         return self.handler.select(sql)
 
-    def update_code(self, code_id, **kwargs):
-        fields, values = self.make_fv(kwargs)
+    def update_code(self, code_id, data):
+        fields, values = self.make_fv(data)
         sql = f"update {self.code_table} set {fields} where `id` = {code_id};"
         return sql, values
 

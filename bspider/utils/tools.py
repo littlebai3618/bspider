@@ -53,3 +53,11 @@ def change_dict_key(cur_key, replace_key, d: dict) -> dict:
     if cur_key in d:
         d[replace_key] = d.pop(cur_key)
     return d
+
+def find_class_name_by_content(content):
+    reg = re.compile('class (?P<class_name>.*?)\((?P<sub_class_name>.*?)\):').search(content)
+    if reg:
+        tmp = reg.groupdict()
+        return True, tmp['class_name'], tmp['sub_class_name']
+    return False, None, None
+

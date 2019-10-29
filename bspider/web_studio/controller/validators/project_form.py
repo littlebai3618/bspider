@@ -17,8 +17,6 @@ class AddForm(BaseForm):
     config = StringField(validators=[ParamRequired()])
 
 class UpdateForm(BaseForm):
-    project_id = StringField(validators=[ParamRequired()])
-    name = StringField(validators=[ParamRequired()])
     status = IntegerField()
     type = StringField()
     group = StringField()

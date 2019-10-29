@@ -8,9 +8,8 @@
 提供对定时任务的基本操作
 -- 这里采用额外开启一个线程来控制整个定时任务模块
 -- 考虑到多核cpu和一些 cpu密集型程序，
--- 这里采用 多进程和 + 多线程的方式执行定时任务
+-- 这里采用 多线程的方式执行定时任务
 """
-import json
 from datetime import datetime
 
 import pytz
@@ -22,13 +21,13 @@ from bspider.core.api import BaseService, Conflict, PostSuccess, PatchSuccess, D
     ParameterException
 from bspider.bcron.todo import do
 from bspider.web_studio import log
-from bspider.web_studio.service.impl.cron_job_impl import CronJobImpl
+from bspider.web_studio.service.impl.cron_impl import CronImpl
 
 
-class CronJobService(BaseService):
+class CronService(BaseService):
 
     def __init__(self):
-        self.impl = CronJobImpl()
+        self.impl = CronImpl()
         self.tz = pytz.timezone(self.frame_settings['TIMEZONE'])
 
     def __next_run_time(self, trigger):
@@ -38,50 +37,35 @@ class CronJobService(BaseService):
         next_run_time = crontab.get_next_fire_time(None, now)
         return datetime_to_utc_timestamp(next_run_time), next_run_time
 
-    def make_kwargs(self, project_name, class_name):
-        kwargs = {'project_name': project_name, 'class_name': class_name}
-        if project_name == 'operation':
-            kwargs['pattern'] = project_name
-        return json.dumps(kwargs)
-
-
-
-    def add_job(self, project_id, project_name, class_name, trigger, description):
+    def add_cron(self, project_id, code_id, job_type, trigger, description):
         timestamp, next_run_time = self.__next_run_time(trigger)
         value = {
             'project_id': project_id,
-            'project_name': project_name,
-            'class_name': class_name,
-            'args': '[]',
-            'kwargs': self.make_kwargs(project_name, class_name),
+            'code_id': code_id,
+            'type': job_type,
             'trigger': trigger,
             'trigger_type': 'cron',
             'func': obj_to_ref(do),
-            'executor': 'default',
+            'executor': 'thread_pool',
             'description': description,
             'next_run_time': timestamp,
         }
         try:
             cron_id = self.impl.add_job(data=value)
-            log.info(f'add cron_job:{project_name}-{class_name} success')
+            log.info(f'cron job->project_id:{project_id}-code_id:{code_id} add success')
             return PostSuccess(msg='add cron job success', data={'cron_id': cron_id})
         except IntegrityError:
-            log.error(f'cron job:{project_name}-{class_name} is already exist')
+            log.error(f'cron job->project_id:{project_id}-code_id:{code_id} is already exist')
             return Conflict(msg='cron job is already exist', errno=50001)
 
-    def update_job(self, cron_id, project_name, **kwargs):
-        if 'class_name' in kwargs:
-            kwargs['kwargs'] = self.make_kwargs(project_name, kwargs.pop('class_name'))
-        self.impl.update_job(cron_id, kwargs)
-        if 'trigger' in kwargs:
-            timestamp, next_run_time = self.__next_run_time(kwargs['trigger'])
-            return PatchSuccess(msg=f'update success next run at:{next_run_time}')
-        log.info(f'update cron_job:{cron_id} success')
-        return PatchSuccess(msg=f'update success')
+    def update_job(self, cron_id, changes):
+        self.impl.update_job(cron_id, changes)
+        log.info(f'update cron job->cron_id:{cron_id}->{changes} success')
+        return PatchSuccess(msg=f'cron job update success')
 
     def delete_job(self, cron_id):
         self.impl.delete_job(cron_id)
-        log.info(f'delete cron_job:{cron_id} success')
+        log.info(f'delete cron job->cron_id:{cron_id} success')
         return DeleteSuccess()
 
     def get_job(self, cron_id):

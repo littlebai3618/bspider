@@ -20,7 +20,7 @@ def login():
     form = LoginForm()
     client = form.client_type.data
     if client == 'identity':
-        return user_service.login(form.identity.data, form.password.data)
+        return user_service.login_by_identity(form.identity.data, form.password.data)
     else:
         return NotFound(msg='unknow client type')
 
@@ -42,9 +42,7 @@ def delete_user(user_id):
 @auth.login_required
 def update_user(user_id):
     form = UpdateForm()
-    data = form.get_dict()
-    data['status'] = int(form.status.data)
-    return user_service.update_user(user_id, **data)
+    return user_service.update_user(user_id, **form.get_dict())
 
 
 @user.route('/user', methods=['GET'])

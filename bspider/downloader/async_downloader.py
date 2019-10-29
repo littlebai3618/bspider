@@ -33,8 +33,8 @@ class AsyncDownloader(object):
             self.retry_times = 3
             self.log.debug(f'{project_name} init default retry time: {self.retry_times}')
         self.mws = []
-        for cls_name, code in mws:
-            mod = import_module_by_code(cls_name, code, project_name)
+        for code in mws:
+            mod = import_module_by_code('downloader_middleware', code)
             if mod and hasattr(mod, cls_name):
                 try:
                     # 通过中间件类名实例化，放入中间件list中

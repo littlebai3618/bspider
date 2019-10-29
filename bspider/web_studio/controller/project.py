@@ -31,14 +31,11 @@ def delete_project(project_id):
     return project_service.delete(project_id)
 
 
-@project.route('/project', methods=['PATCH'])
+@project.route('/project/<int:project_id>', methods=['PATCH'])
 @auth.login_required
-def update():
+def update(project_id):
     form = UpdateForm()
-    changes = form.get_dict()
-    project_id = changes.pop('project_id')
-    project_name = changes.pop('name')
-    return project_service.update(project_id, project_name, changes)
+    return project_service.update(project_id, form.get_dict())
 
 
 @project.route('/project', methods=['POST'])

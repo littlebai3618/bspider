@@ -11,7 +11,8 @@ WEB_TOKEN_LIVE_TIME = 3600 * 5
 # 定时任务相关配置 #
 #################
 CRON_JOB_THREAD_NUM = 20
-CRON_JOB_PROCESS_NUM = 1
+# 当前版本弃用
+# CRON_JOB_PROCESS_NUM = 1
 CRON_JOB_REFRESH_TIME = 3
 
 #################
@@ -50,7 +51,7 @@ WORKER_TABLE = 'bspider_worker'
 # 节点状态列表
 NODE_STATUS_TABLE = 'bspider_node_status'
 # 定时任务调度表
-CRON_JOB_STORE_TABLE = 'bspider_cronjob'
+CRON_JOB_STORE_TABLE = 'bspider_cron'
 # 远程代码仓库表
 CODE_STORE_TABLE = 'bspider_customcode'
 # 关联表
@@ -59,7 +60,7 @@ P2C_TABLE = 'bspider_project_customcode'
 DOWNLOADER_STATUS_TABLE = 'bspider_downloader_status'
 # 任务解析状态存储表
 PARSER_STATUS_TABLE = 'bspider_parser_status'
-# rabbitmq - exchange 表
+# rabbitmq - exchange
 EXCHANGE_NAME = ('candidate', 'download', 'parse')
 # order key
 OREDR_KEY = 'order'

@@ -17,80 +17,81 @@ from bspider.utils.notify import ding
 
 __frame_settings = FrameSettings()
 __handler = MysqlHandler.from_settings(__frame_settings['WEB_STUDIO_DB'])
+__log = LoggerPool().get_logger('bcorn', module='bcorn')
 
 
 def do(**kwargs):
     # 模式判断
-    if kwargs.get('pattern') is None:
-        run_spider_project(kwargs['class_name'], kwargs['project_name'])
-    elif kwargs.get('pattern') == 'operation':
-        run_operation_project(kwargs['class_name'], kwargs['project_name'])
+    if kwargs.get('type', 'spider') == 'spider':
+        run_spider_project(**kwargs)
+    elif kwargs.get('type') == 'operation':
+        run_operation_project(**kwargs)
     else:
-        print(f'WARNING: UNKNOW CRON JOB PARAMS: {kwargs}')
+        __log.warning(f'WARNING: UNKNOW CRON JOB PARAMS: {kwargs}')
 
 
-def run_spider_project(class_name, project_name):
+def run_spider_project(project_id, code_id):
     """
     执行自动加载脚本的定时任务
     先检查定时任务状态，如果为1，就执行否则跳出
     :param self:
     :return:
     """
-    log = LoggerPool().get_logger('bcorn', module='bcorn', project=project_name)
-    log.info(f'corn_job: {project_name} run as spider pattern')
+    __log.info(f'corn job: {project_id, code_id} run as spider pattern')
     PROJECT_TABLE = __frame_settings['PROJECT_TABLE']
-    sql = f'select `config`, `status` from {PROJECT_TABLE} where `name`="{project_name}"'
-    log.debug(f'run spider_project cron_job select sql:{sql}')
+    sql = f'select `name`, `config`, `status` from {PROJECT_TABLE} where `id`="{project_id}"'
 
     infos = __handler.select(sql)
+    __log.debug(f'run spider_project cron_job select sql:{sql}')
+
     if not len(infos):
-        log.warning(f'spider project job:{project_name} is not exist')
-        ding(f'cron job error: spider project job:{project_name} is not exist')
+        __log.warning(f'project is not exist project_id:{project_id}, spider project job:{project_id}-{code_id}')
+        ding(f'cron job error: \nproject is not exist project_id:{project_id}')
 
     info = infos[0]
     if info['status'] != 1:
-        log.warning(f'spider project job:{project_name} is not run')
-        ding(f'spider project job:{project_name} is not run')
+        __log.warning(f'project_id:{project_id} is not run')
+        # ding(f'spider project job:{project_name} is not run')
 
-    run_status, run_msg = run_corn_job_code(class_name, project_name, config=info['config'])
+    run_status, run_msg = run_corn_job_code(code_id, **info)
     if run_status:
-        log.info(run_msg)
+        __log.info(run_msg)
     else:
-        log.error(run_msg)
+        __log.error(run_msg)
         ding(run_msg)
 
 
-def run_operation_project(class_name, project_name):
-    log = LoggerPool().get_logger('bcorn', module='bcorn', project=project_name)
-    run_status, run_msg = run_corn_job_code(class_name, project_name, config='{"desc": "operation cron job"}')
+def run_operation_project(code_id):
+    run_status, run_msg = run_corn_job_code(code_id, 'operation', '{"desc": "operation cron job"}')
     if run_status:
-        log.info(run_msg)
+        __log.info(run_msg)
     else:
-        log.error(run_msg)
+        __log.error(run_msg)
         ding(run_msg)
 
 
-def run_corn_job_code(class_name, project_name, config):
+def run_corn_job_code(code_id, name, config):
     CODE_STORE_TABLE = __frame_settings['CODE_STORE_TABLE']
-    sql = f'select `content` from {CODE_STORE_TABLE} where `name`="{class_name}"'
+    sql = f'select `name`, `content` from {CODE_STORE_TABLE} where `id`="{code_id}"'
     tmp = __handler.select(sql)
     if not len(tmp):
-        return False, f'{project_name}:{class_name} is not exist in remote code store'
+        return False, f'{name}-code_id:{code_id} is not exist in remote code store'
     content = tmp[0]['content']
-    mod = import_module_by_code(class_name, content, project_name)
+    class_name = tmp[0]['name']
+    mod = import_module_by_code(class_name, content)
     if hasattr(mod, class_name):
         try:
             project_config = json.loads(config)
         except Exception:
             tp, msg, tb = sys.exc_info()
             e_msg = ''.join(traceback.format_exception(tp, msg, tb))
-            return False, f'{project_name}:{class_name} config\'s type must json str:\n{e_msg}'
+            return False, f'{name}-{class_name} config\'s type must json str:\n{e_msg}'
         try:
-            instance = getattr(mod, class_name)(project_config, project_name)
+            instance = getattr(mod, class_name)(project_config, name)
             instance.execute_task()
-            return True, f'{project_name}:{class_name} run succeed'
+            return True, f'{name}-{class_name} run succeed'
         except Exception:
             tp, msg, tb = sys.exc_info()
             e_msg = ''.join(traceback.format_exception(tp, msg, tb))
-            return False, f'{project_name}:{class_name} cron job run failed:\n{e_msg}'
-    return False, f'{project_name}:{class_name} don\'t have {class_name}'
+            return False, f'{name}-{class_name} cron job run failed:\n{e_msg}'
+    return False, f'{name}-{class_name} don\'t have {class_name}'

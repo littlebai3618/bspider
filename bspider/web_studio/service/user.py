@@ -17,7 +17,7 @@ class UserService(BaseService):
     def __init__(self):
         self.impl = UserImpl()
 
-    def login(self, identity, password):
+    def login_by_identity(self, identity, password):
         infos = self.impl.get_user(identity)
 
         for info in infos:
@@ -31,13 +31,13 @@ class UserService(BaseService):
             if check_password_hash(info.pop('password'), password):
                 info['token'] = make_token(info['id'], info['role'])
                 info.pop('identity')
-                log.info(f'user:{identity} login success')
+                log.info(f'user->identity:{identity} login success')
                 return GetSuccess(msg='login success', data=info)
             else:
-                log.info(f'user:{identity} login failed:invalid password')
+                log.info(f'user->identity:{identity} login failed:invalid password')
                 return ParameterException(errno=10005, msg='invalid password')
         elif len(infos) == 0:
-            log.info(f'user:{identity} login failed:invalid user')
+            log.info(f'user->identity:{identity} login failed:invalid user')
             return NotFound(errno=10006, msg='invalid user')
         else:
             return Conflict(errno=10008, msg='query exceptions')
@@ -56,24 +56,24 @@ class UserService(BaseService):
             user_id = self.impl.add_user(data)
             data['user_id'] = user_id
             data.pop('password')
-            log.info(f'user:{identity} add success')
+            log.info(f'user->identity:{identity} add success')
             return PostSuccess(msg=f'add user {username} success', data=data)
         except IntegrityError as e:
             if e.args[0] == 1062:
-                log.info(f'user:{identity} add failed:user is already exist')
+                log.info(f'user->identity:{identity} add failed:user is already exist')
                 return Conflict(errno=10007, msg='user is already exist')
             raise e
 
     def remove_user(self, user_id):
         self.impl.remove_user(user_id)
-        log.warning(f'user:{user_id} delete success')
+        log.warning(f'user->user_id:{user_id} delete success')
         return DeleteSuccess()
 
-    def update_user(self, user_id, **kwargs):
-        if 'password' in kwargs:
-            kwargs['password'] = generate_password_hash(kwargs['password'])
-        self.impl.update_user(user_id, **kwargs)
-        log.info(f'user:{user_id} update success with:{kwargs}')
+    def update_user(self, user_id, changes):
+        if 'password' in changes:
+            changes['password'] = generate_password_hash(changes['password'])
+        self.impl.update_user(user_id, changes)
+        log.info(f'user->user_id:{user_id}->{changes} update success')
         return PatchSuccess(msg='update user success!')
 
     def get_users(self, page, limit, search, sort):
@@ -102,5 +102,5 @@ class UserService(BaseService):
             self.datetime_to_str(info)
 
         if len(infos):
-            return GetSuccess(msg='get user success', data=infos[0])
+            return GetSuccess(msg='get user success', data=infos)
         return NotFound(errno=10006, msg='invalid user')

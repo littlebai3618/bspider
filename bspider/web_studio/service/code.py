@@ -7,6 +7,7 @@ from pymysql import IntegrityError
 from bspider.core.api import BaseService, Conflict, NotFound, PostSuccess, PatchSuccess, PartialSuccess, DeleteSuccess, \
     GetSuccess, ParameterException
 from bspider.core.lib import RemoteMixIn
+from bspider.core.lib.validate_code import valid_code
 from bspider.web_studio.server import log
 from bspider.web_studio.service.impl.code_impl import CodeImpl
 
@@ -17,6 +18,9 @@ class CodeService(BaseService, RemoteMixIn):
         self.impl = CodeImpl()
 
     def add(self, name, description, code_type, content, editor):
+        sign, msg = valid_code(name, code_type, content)
+        if not sign:
+            return Conflict(msg=msg, errno=40005)
         try:
             with self.impl.handler.session() as session:
                 data = {
@@ -33,27 +37,41 @@ class CodeService(BaseService, RemoteMixIn):
             log.error(f'add code failed:{name}-{editor} code is already exist')
             return Conflict(msg='code is already exist', errno=40002)
 
-    def update(self, code_id, name, **kwargs):
-        if 'content' in kwargs:
-            return self.__update_with_content(code_id=code_id, code_name=name, **kwargs)
+    def update(self, code_id, changes):
+        infos = self.impl.get_code(code_id)
+        if not len(infos):
+            return NotFound(msg='code is not exist', errno=40001)
+
+        info = infos[0]
+
+        if 'content' in changes:
+            sign, msg = valid_code(
+                name=changes.get('name', info['name']),
+                code_type=changes.get('code_type', info['code_type']),
+                content=changes['content']
+            )
+            if not sign:
+                return Conflict(msg=msg, errno=40005)
+            return self.__update_with_content(code_id, changes, info)
         else:
             with self.impl.handler.session() as session:
-                session.update(*self.impl.update_code(code_id, **kwargs))
+                session.update(*self.impl.update_code(code_id, changes))
             log.info('update code success')
             return PatchSuccess(msg='update code success')
 
-    def __update_with_content(self, code_id, code_name, **kwargs):
-        log.debug('code update param: {}'.format(kwargs))
+    def __update_with_content(self, code_id, changes, info):
+        log.debug('code update param->{} start!'.format(changes))
+        code_name = changes.get('name', info['name'])
         project_list = self.impl.get_project_by_code_id(code_id)
         if len(project_list):
             with self.impl.handler.session() as session:
-                session.update(*self.impl.update_code(code_id, **kwargs))
+                session.update(*self.impl.update_code(code_id, changes))
                 node_list = self.impl.get_nodes()
                 data = {
                     'project_ids': ','.join([str(info['id']) for info in project_list]),
-                    'code_name': code_name,
-                    'code_type': kwargs['type'],
-                    'content': kwargs['content']
+                    'code_id': code_id,
+                    'code_type': changes.get('code_type', info['code_type']),
+                    'content': changes['content']
                 }
                 result = self.op_update_code(node_list, data)
                 if len(result):
@@ -66,14 +84,14 @@ class CodeService(BaseService, RemoteMixIn):
                 return PostSuccess(msg=f'update code:{code_name} success')
         else:
             with self.impl.handler.session() as session:
-                session.update(*self.impl.update_code(code_id, **kwargs))
+                session.update(*self.impl.update_code(code_id, changes))
             log.info(f'update code:{code_name} success')
             return PatchSuccess(msg='update code success')
 
     def delete(self, code_id):
         project_list = self.impl.get_project_by_code_id(code_id)
         if len(project_list):
-            data = [{'id': info['id'], 'project_name': info['name']} for info in project_list]
+            data = [{'project_id': info['id'], 'project_name': info['name']} for info in project_list]
             log.error(f'delete code:{code_id} failed: can\'t delete in use code')
             return Conflict(msg='can\'t delete in use code', data=data, errno=40004)
         else:

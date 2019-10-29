@@ -33,8 +33,8 @@ class UserImpl(BaseImpl):
         sql = f"update {self.table_name} set `status`=-1 where `id` = '{user_id}';"
         return self.handler.update(sql)
 
-    def update_user(self, user_id, **kwargs):
-        fields, values = self.make_fv(kwargs)
+    def update_user(self, user_id, data):
+        fields, values = self.make_fv(data)
         sql = f"update {self.table_name} set {fields} where `id` = '{user_id}';"
         return self.handler.update(sql, values)
 

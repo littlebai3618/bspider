@@ -85,7 +85,7 @@ class ProjectService(BaseService, RemoteMixIn):
                 return Conflict(errno=30002, msg='project is already exist')
             raise e
 
-    def update(self, project_id, project_name, changes):
+    def update(self, project_id, changes):
         if 'config' in changes:
             return self.__update_with_config(project_id, project_name, changes)
         elif 'rate' in changes or 'status' in changes:

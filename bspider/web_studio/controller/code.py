@@ -44,5 +44,4 @@ def delete(code_id):
 @auth.login_required
 def update(code_id):
     form = UpdateForm()
-    data = form.get_dict()
-    return code_service.update(code_id=code_id, **data)
+    return code_service.update(code_id, form.get_dict())

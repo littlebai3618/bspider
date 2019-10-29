@@ -9,7 +9,7 @@ from importlib import import_module
 from pkgutil import iter_modules
 
 
-def import_module_by_code(class_name: str, code: str, project_name: str = 'default'):
+def import_module_by_code(module_name: str, code: str):
     """
     通过str加载第三方模块
     :param class_name:
@@ -17,17 +17,21 @@ def import_module_by_code(class_name: str, code: str, project_name: str = 'defau
     :param project_name:
     :return:
     """
-    spec = importlib.machinery.ModuleSpec(class_name.lower(), None)
+
+    spec = importlib.util.spec_from_loader(module_name, None)
     mod = importlib.util.module_from_spec(spec)
-    compiled_code = compile(code, f'<{project_name}:{class_name}>', 'exec')
+    # 模拟exec_module()方法
+    compiled_code = compile(code, f'<{module_name}>', 'exec')
     exec(compiled_code, mod.__dict__)
     return mod
 
-def import_module_by_path(class_name: str, path: str, project_name: str = 'default'):
-    spec = importlib.util.spec_from_file_location(class_name, path)
+
+def import_module_by_path(module_name: str, path: str):
+    spec = importlib.util.spec_from_file_location(module_name, path)
     mod = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(mod)
     return mod
+
 
 def walk_modules(path):
     """

@@ -30,6 +30,8 @@ class BaseForm(Form):
         result = {}
         for name, field in self._fields.items():
             if field is not None and field.data is not None:
+                if isinstance(field, IntegerField):
+                    field.data = int(field.data)
                 result[name] = field.data
         return result
 
