@@ -2,22 +2,19 @@
 # @Author  : 白尚林
 # @File    : project_impl
 # @Use     :
-from bspider.config.default_settings import EXCHANGE_NAME
-from bspider.core.api import BaseImpl
-from bspider.utils.rabbitMQ import RabbitMQHandler
-from bspider.web_studio import log
+import os
+
+from bspider.agent import log
+from bspider.utils.conf import PLATFORM_PATH_ENV
+from bspider.utils.database import SqlLite3Handler
 
 
-class ProjectImpl(BaseImpl):
+class ProjectImpl(object):
 
     def __init__(self):
-        super().__init__()
-        self.project_table = self.frame_settings['PROJECT_TABLE']
-        self.code_table = self.frame_settings['CODE_STORE_TABLE']
-        self.cron_table = self.frame_settings['CRON_JOB_STORE_TABLE']
-        self.node_table = self.frame_settings['NODE_TABLE']
-        self.p2c_table = self.frame_settings['P2C_TABLE']
-        self.__mq_handler = RabbitMQHandler(self.frame_settings['RABBITMQ_CONFIG'])
+        self.handler = SqlLite3Handler(os.path.join(os.environ[PLATFORM_PATH_ENV], 'cache', 'meta.db'))
+        self.project_table = 'bspider_project'
+
 
     def get_project(self, project_id):
         sql = f'select `id`, `name`, `status`, `type`, `group`, `description`, `editor`, `rate`, `config` ' \

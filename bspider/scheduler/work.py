@@ -5,8 +5,8 @@
 import asyncio
 
 from bspider.config import FrameSettings
-from bspider.scheduler.scheduler_monitor import SchedulerMonitor
-from bspider.core.lib import BaseManager
+from bspider.core import BaseManager
+from .scheduler_monitor import SchedulerMonitor
 
 
 def run_scheduler(coro_num=1):

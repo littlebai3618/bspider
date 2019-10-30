@@ -15,25 +15,6 @@ class BaseService(object):
 
     frame_settings = FrameSettings()
 
-    @staticmethod
-    def config_parser(config):
-        """返回涉及到的中间件"""
-        config = json.loads(config)
-        mw = []
-        pipe = []
-        if 'downloader_config' in config:
-            if 'middleware' in config['downloader_config']:
-                mw = config['downloader_config']['middleware']
-        else:
-            raise ProjectConfigError('you project config must have downloader_config')
-
-        if 'parser_config' in config:
-            if 'pipeline' in config['parser_config']:
-                pipe = config['parser_config']['pipeline']
-        else:
-            raise ProjectConfigError('you project config must have parser_config')
-        return mw, pipe, config
-
     def make_remote_config(self, cfg, middlewares, pipelines, project_name) -> dict:
         for i, mw_name in enumerate(cfg['downloader_config']['middleware']):
             cfg['downloader_config']['middleware'][i] = (mw_name, middlewares[mw_name])

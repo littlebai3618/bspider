@@ -2,12 +2,13 @@
 # @Author  : 白尚林
 # @File    : project
 # @Use     :
-import json
 
 from pymysql import IntegrityError
 
-from bspider.core.api import BaseService, Conflict, NotFound, PartialSuccess, PostSuccess, DeleteSuccess, GetSuccess, PatchSuccess
-from bspider.core.lib import RemoteMixIn
+from bspider.core.api import BaseService, Conflict, NotFound, PartialSuccess, PostSuccess, DeleteSuccess, GetSuccess, \
+    PatchSuccess, ParameterException
+from bspider.core import RemoteMixIn, ProjectConfigParser
+from bspider.utils.exceptions import ProjectConfigError
 from bspider.web_studio import log
 from bspider.web_studio.service.impl.project_impl import ProjectImpl
 
@@ -17,44 +18,45 @@ class ProjectService(BaseService, RemoteMixIn):
     def __init__(self):
         self.impl = ProjectImpl()
 
-    def check_config(self, name, config):
-        middleware, pipeline, cfg = self.config_parser(config)
-        cid = []
-        mws_code = {}
-        for info in self.impl.get_middlewares_by_code_name(middleware):
-            cid.append(info['id'])
-            mws_code[info['name']] = info['content']
+    def __get_config_obj(self, config: str) -> ProjectConfigParser:
+        try:
+            pc_obj = ProjectConfigParser.loads(config)
+        except ProjectConfigError as e:
+            raise Conflict(errno=30003, msg=f'{e}')
 
-        if len(middleware) != len(mws_code):
-            result = []
-            for mw in middleware:
-                if mw not in mws_code:
-                    result.append(mw)
-            raise Conflict(msg='lack of necessary middleware!', data=result, errno=30003)
+        # 检测中间件是否存在并将code_name 映射为code_id
+        middleware_dict = {info['name']: info['id'] for info in
+                           self.impl.get_middleware_by_code_name(pc_obj.middleware)}
+        if len(middleware_dict) != len(pc_obj.middleware):
+            raise Conflict(
+                msg='lack of necessary middleware!',
+                data=[code_name for code_name in pc_obj.middleware if code_name not in middleware_dict],
+                errno=30003)
 
-        pipe_code = {}
-        for info in self.impl.get_pipeline_by_code_name(pipeline):
-            cid.append(info['id'])
-            pipe_code[info['name']] = info['content']
-        if len(pipeline) != len(pipe_code):
-            result = []
-            for pipe in pipeline:
-                if pipe not in pipe_code:
-                    result.append(pipe)
-            raise Conflict(msg='lack of necessary pipeline!', data=result, errno=30003)
-        return self.make_remote_config(cfg, mws_code, pipe_code, name), cid
+        pipeline_dict = {info['name']: info['id'] for info in self.impl.get_pipeline_by_code_name(pc_obj.pipeline)}
+        if len(pipeline_dict) != len(pc_obj.pipeline):
+            raise Conflict(
+                msg='lack of necessary pipeline!',
+                data=[code_name for code_name in pc_obj.pipeline if code_name not in pipeline_dict],
+                errno=30003)
 
-    def add_project(self, name, status, project_type, group, description, editor, rate, config):
+        pc_obj.pipeline = [str(pipeline_dict[code_name]) for code_name in pc_obj.pipeline]
+        pc_obj.middleware = [str(middleware_dict[code_name]) for code_name in pc_obj.middleware]
+        return pc_obj
+
+    def add(self, name, status, project_type, group, description, editor, rate, config):
         """
         1. 预执行配置文件方法
         2. 通知节点接收配置文件 调用接口
         2. 持久化project配置
         """
-        cfg, cids = self.check_config(name, config)
-        self.impl.bind_queue(project_name=name)
-        log.info(f'bind now project:{name} queue success!')
+        pc_obj = self.__get_config_obj(config)
+
         try:
             with self.impl.handler.session() as session:
+                self.impl.bind_queue(project_name=name)
+                log.debug(f'bind new project:{name} queue success!')
+
                 data = {
                     'name': name,
                     'status': status,
@@ -66,9 +68,14 @@ class ProjectService(BaseService, RemoteMixIn):
                     'config': config
                 }
                 project_id = session.insert(*self.impl.add_project(data), lastrowid=True)
-                self.impl.add_project_binds(cids, project_id)
-                info = {'project_id': project_id, 'project_name': name, 'rate': rate, 'config': json.dumps(cfg),
-                        'status': status}
+                self.impl.add_project_binds(pc_obj.middleware.extend(pc_obj.pipeline), project_id)
+                info = {
+                    'project_id': project_id,
+                    'name': name,
+                    'rate': rate,
+                    'config': pc_obj.dumps(),
+                    'status': status
+                }
                 node_list = self.impl.get_nodes()
                 result = self.op_add_project(node_list, info)
                 if len(result):
@@ -86,59 +93,30 @@ class ProjectService(BaseService, RemoteMixIn):
             raise e
 
     def update(self, project_id, changes):
-        if 'config' in changes:
-            return self.__update_with_config(project_id, project_name, changes)
-        elif 'rate' in changes or 'status' in changes:
-            return self.__update_with_remote_param(project_id, project_name, changes)
+        remote_param = {}
+        for key in ('config', 'rate', 'status'):
+            if key in changes and key == 'config':
+                remote_param['config'] = self.__get_config_obj(changes['config']).dumps()
+            else:
+                remote_param[key] = changes[key]
+
+        if len(remote_param):
+            with self.impl.handler.session() as session:
+                session.update(*self.impl.update_project(project_id, changes))
+                node_list = self.impl.get_nodes()
+                result = self.op_update_project(node_list, remote_param)
+                if len(result):
+                    if len(result) < len(node_list):
+                        log.warning(f'not all node update project:project_id->{project_id} =>{result}')
+                        return PartialSuccess(msg=f'not all node update this project change', data=result)
+                    log.error(f'all project update failed project:project_id->{project_id} =>{result}')
+                    raise Conflict(msg='all project update failed', data=result, errno=30005)
         else:
-            return self.__update(project_id, project_name, changes)
+            with self.impl.handler.session() as session:
+                session.update(*self.impl.update_project(project_id, changes))
 
-    def __update_with_config(self, project_id, project_name, changes):
-        cfg, cids = self.check_config(project_name, changes['config'])
-        with self.impl.handler.session() as session:
-            session.update(*self.impl.update_project(project_id, changes))
-            session.delete(self.impl.delete_project_binds(project_id))
-            session.insert(self.impl.add_project_binds(cids, project_id))
-            node_list = self.impl.get_nodes()
-            info = {'config': json.dumps(cfg), 'project_id': project_id}
-            if 'rate' in changes:
-                info['rate'] = changes['rate']
-            if 'status' in changes:
-                info['status'] = changes['status']
-            result = self.op_update_project(node_list, info)
-            if len(result):
-                if len(result) < len(node_list):
-                    log.warning(f'not all node update project:{project_name} =>{result}')
-                    return PartialSuccess(msg=f'not all node update project:{project_name}', data=result)
-                log.error(f'all project update failed:{project_name} =>{result}')
-                raise Conflict(msg='all project update failed', data=result, errno=30005)
-            log.info(f'update project:{project_name} success')
-            return PatchSuccess(msg=f'update project:{project_name} success', data={'project_id': project_id})
-
-    def __update_with_remote_param(self, project_id, project_name, changes):
-        with self.impl.handler.session() as session:
-            session.update(*self.impl.update_project(project_id, changes))
-            node_list = self.impl.get_nodes()
-            info = {'project_id': project_id}
-            if 'rate' in changes:
-                info['rate'] = changes['rate']
-            if 'status' in changes:
-                info['status'] = changes['status']
-            result = self.op_update_project(node_list, info)
-            if len(result):
-                if len(result) < len(node_list):
-                    log.warning(f'not all node update project:{project_name} =>{result}')
-                    return PartialSuccess(msg=f'not all node update project:{project_name}', data=result)
-                log.error(f'all project update failed:{project_name} =>{result}')
-                raise Conflict(msg='all project update failed', data=result, errno=30005)
-            log.info(f'update project:{project_name} success')
-            return PatchSuccess(msg=f'update project:{project_name} success', data={'project_id': project_id})
-
-    def __update(self, project_id, project_name, changes):
-        with self.impl.handler.session() as session:
-            session.update(*self.impl.update_project(project_id, changes))
-        log.info(f'update project:{project_name} success')
-        return PatchSuccess(msg=f'update project:{project_name} success')
+        log.info(f'update project:project_id->{project_id} success')
+        return PatchSuccess(msg=f'update project success')
 
     def delete(self, project_id):
         with self.impl.handler.session() as session:
@@ -164,6 +142,20 @@ class ProjectService(BaseService, RemoteMixIn):
         else:
             return NotFound(msg='project not exist', errno=30001)
 
-    def gets(self):
-        info = self.impl.get_projects()
-        return GetSuccess(data=info)
+    def gets(self, page, limit, search, sort):
+        if sort.upper() not in ['ASC', 'DESC']:
+            return ParameterException(msg='sort must `asc` or `desc`')
+
+        infos, total = self.impl.get_projects(page, limit, search, sort)
+
+        for info in infos:
+            self.datetime_to_str(info)
+
+        return GetSuccess(
+            msg='get user list success!',
+            data={
+                'items': infos,
+                'total': total,
+                'page': page,
+                'limit': limit
+            })

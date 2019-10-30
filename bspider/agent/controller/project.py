@@ -5,7 +5,7 @@
 from flask import Blueprint
 
 from bspider.core.api import auth
-from .validators.project_form import AddProjectForm, UpdateProjectForm, UpdateCodeForm
+from .validators.project_form import AddForm, UpdateProjectForm, UpdateCodeForm
 from bspider.agent.service.project import ProjectService
 
 project = Blueprint('project_bp', __name__)
@@ -15,9 +15,8 @@ project_service = ProjectService()
 @project.route('/project', methods=['POST'])
 @auth.login_required
 def add_project():
-    form = AddProjectForm()
-    return project_service.add_project(form.project_id.data, form.project_name.data, form.config.data,
-                                       form.rate.data, form.status.data)
+    form = AddForm()
+    return project_service.add_project(**form.get_dict())
 
 @project.route('/project', methods=['PATCH'])
 @auth.login_required

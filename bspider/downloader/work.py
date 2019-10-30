@@ -7,8 +7,9 @@ import traceback
 
 import sys
 
-from bspider.downloader.downloader_monitor import DownloaderMonitor
-from bspider.core.lib import BaseManager
+from bspider.core import BaseManager
+
+from .downloader_monitor import DownloaderMonitor
 
 
 def run_downloader(unique_sign, coro_num=1):

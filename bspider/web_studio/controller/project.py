@@ -5,7 +5,8 @@
 from flask import Blueprint
 
 from bspider.core.api import auth
-from bspider.web_studio.controller.validators.project_form import UpdateForm, AddForm
+from .validators import PageForm
+from .validators.project_form import UpdateForm, AddForm
 from bspider.web_studio.service.project import ProjectService
 
 project = Blueprint('project_bp', __name__)
@@ -22,7 +23,8 @@ def get_project(project_id):
 @project.route('/project', methods=['GET'])
 @auth.login_required
 def get_projects():
-    return project_service.gets()
+    form = PageForm()
+    return project_service.gets(**form.get_dict())
 
 
 @project.route('/project/<int:project_id>', methods=['DELETE'])
@@ -42,6 +44,4 @@ def update(project_id):
 @auth.login_required
 def add():
     form = AddForm()
-    return project_service.add_project(form.name.data, form.status.data, form.type.data, form.group.data,
-                                       form.description.data, form.editor.data, form.rate.data, form.config.data)
-
+    return project_service.add(**form.get_dict())

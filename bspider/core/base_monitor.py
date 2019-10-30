@@ -3,11 +3,11 @@
 # @File    : base_monitor
 # @Use     :
 import asyncio
-import json
 import random
 
-from bspider.core.broker import RabbitMQBroker
-from bspider.core.lib import ProjectCache
+from bspider.config.default_settings import EXCHANGE_NAME
+from bspider.core import RabbitMQBroker, AgentCache, ProjectConfigParser, Sign
+from bspider.utils.tools import find_class_name_by_content
 
 
 class BaseMonitor(object):
@@ -18,11 +18,12 @@ class BaseMonitor(object):
         :param downloader_tag: 一个下载器的唯一标识，不能和其他下载器一致
         """
         self.log = log
-        self.__cache = ProjectCache()
+        self.__cache = AgentCache()
         self.__mq_handler = RabbitMQBroker(log).mq_handler
         self.projects = dict()
         self.__weight = None
         self.__total_sum = 0
+
 
     async def sync_config(self):
         """从cache 同步任务数据"""
@@ -34,6 +35,11 @@ class BaseMonitor(object):
             await asyncio.sleep(2)
 
     async def __sync_config(self):
+        """
+        如果不是第一次同步
+        获取当前时间戳 -10s
+        :return:
+        """
         tmp_projects = dict()
         tmp_weight = dict()
         projects = self.__cache.get_projects()
@@ -41,17 +47,24 @@ class BaseMonitor(object):
 
         while len(projects):
             info = projects.pop()
-            if await self.__mq_handler.get_queue_message_count(
-                    queue='{}_{}'.format(self.exchange, info['project_name'])):
-                tmp_weight[info['project_name']] = info['rate']
+            if await self.__mq_handler.get_queue_message_count(queue='{}_{}'.format(self.exchange, info['id'])):
+                tmp_weight[info['id']] = info['rate']
                 total_sum += info['rate']
 
-            project_obj = self.projects.get(info['project_name'])
-            if project_obj is None or project_obj.sign != info['timestamp']:
-                tmp_projects[info['project_name']] = self.get_work_obj(info['project_name'], json.loads(info['config']),
-                                                                       sign=info['timestamp'])
+            project_obj = self.projects.get(info['id'])
+            pc_obj = ProjectConfigParser.loads(info['config'])
+            # code_id映射为中间件代码
+            if self.exchange == EXCHANGE_NAME[2]:
+                pc_obj.pipeline = self.code_id_to_content(pc_obj.pipeline)
+                sign = Sign(project_timestamp=info['timestamp'], module=pc_obj.pipeline)
             else:
-                tmp_projects[info['project_name']] = project_obj
+                pc_obj.middleware = self.code_id_to_content(pc_obj.middleware)
+                sign = Sign(project_timestamp=info['timestamp'], module=pc_obj.middleware)
+
+            if project_obj is None or project_obj.sign != sign:
+                tmp_projects[info['id']] = self.get_work_obj(info['project_name'], pc_obj, sign=sign)
+            else:
+                tmp_projects[info['id']] = project_obj
 
         self.projects = tmp_projects
         self.log.info('sync projects success {}'.format(len(self.projects)))
@@ -74,7 +87,16 @@ class BaseMonitor(object):
                     return project_name
         self.log.debug('project weight is empty')
 
-    def get_work_obj(self, project_name: str, config: dict, sign: str):
+    def code_id_to_content(self, code_ids: list):
+        res = list()
+        for code_id in code_ids:
+            content = self.__cache.get_code(code_id)[0]['content']
+            _, cls_name, _ = find_class_name_by_content(content)
+            res.append([cls_name, content])
+
+        return res
+
+    def get_work_obj(self, project_name: str, config: ProjectConfigParser, sign: Sign):
         """继承重写 -> 根据配置返回对象"""
         pass
 

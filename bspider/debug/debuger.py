@@ -11,7 +11,7 @@ from queue import Queue
 
 from bspider.config import FrameSettings
 from bspider.downloader import BaseMiddleware
-from bspider.downloader import AsyncDownloader
+from bspider.downloader.async_downloader import AsyncDownloader
 from bspider.parser import BasePipeline, BaseExtractor
 from bspider.parser.async_parser import AsyncParser
 from bspider.http import Request
@@ -47,7 +47,7 @@ class Debuger(object):
         self.max_priority = self.frame_settings['QUEUE_ARG'].get('x-max-priority', 5)
         self.priority_queue = [Queue() for _ in range(self.max_priority)]
 
-        self.set(self.start_request)
+        self.put(self.start_request)
 
         self.__cur_download_num = 1
         self.parser = self.parser()

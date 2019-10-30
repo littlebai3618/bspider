@@ -11,6 +11,7 @@ import aiohttp
 
 from aiohttp import ClientResponse
 
+from bspider.core import ProjectConfigParser, Sign
 from bspider.http import Request, Response
 from bspider.utils.exceptions import DownloaderError
 from bspider.utils.importer import import_module_by_code
@@ -19,26 +20,25 @@ from bspider.utils.logger import LoggerPool
 
 class AsyncDownloader(object):
 
-    def __init__(self, project_name: str, config: dict, sign: str):
+    def __init__(self, project_name: str, config: ProjectConfigParser, sign: Sign):
         """传入下载器的配置文件"""
         self.sign = sign
+
         self.log = LoggerPool().get_logger(key=project_name, module='downloader', project=project_name)
-        mws = config['middleware']
-        settings = config['settings']
         # 加载重试次数
-        if 'RETRY_TIMES' in settings and isinstance(settings['RETRY_TIMES'], int):
-            self.retry_times = settings['RETRY_TIMES']
+        if 'RETRY_TIMES' in config.downloader_settings and isinstance(config.downloader_settings['RETRY_TIMES'], int):
+            self.retry_times = config.downloader_settings['RETRY_TIMES']
             self.log.debug(f'{project_name} init retry time from settings: {self.retry_times}')
         else:
             self.retry_times = 3
             self.log.debug(f'{project_name} init default retry time: {self.retry_times}')
         self.mws = []
-        for code in mws:
+        for cls_name, code in config.middleware:
             mod = import_module_by_code('downloader_middleware', code)
             if mod and hasattr(mod, cls_name):
                 try:
                     # 通过中间件类名实例化，放入中间件list中
-                    mw_instance = getattr(mod, cls_name)(settings, self.log)
+                    mw_instance = getattr(mod, cls_name)(config.downloader_settings, self.log)
                     self.mws.append(mw_instance)
                     self.log.info(f'success load: <{project_name}:{cls_name}>!')
                 except Exception as e:
@@ -48,8 +48,9 @@ class AsyncDownloader(object):
                 msg = f'<{project_name}:{cls_name}> middleware init failed: middleware is invalid!'
                 raise DownloaderError(msg)
 
-        if 'ACCEPT_RESPONSE_CODE' in settings and isinstance(settings['RETRY_TIMES'], list):
-            self.accept_response_code = set(settings['ACCEPT_RESPONSE_CODE'])
+        if 'ACCEPT_RESPONSE_CODE' in config.downloader_settings and isinstance(
+                config.downloader_settings['ACCEPT_RESPONSE_CODE'], list):
+            self.accept_response_code = set(config.downloader_settings['ACCEPT_RESPONSE_CODE'])
             self.log.debug(f'{project_name} init accept response code from settings: {self.accept_response_code}')
         else:
             self.accept_response_code = set()
@@ -125,7 +126,7 @@ class AsyncDownloader(object):
             status=response.status,
             headers=dict(response.headers),
             request=request.dumps(),
-            cookies={i.key:i.value for i in response.cookies.values()},
+            cookies={i.key: i.value for i in response.cookies.values()},
             text=text,
             meta=request.meta,
             sign=request.sign,
@@ -154,21 +155,22 @@ class AsyncDownloader(object):
         temp_timeout = aiohttp.ClientTimeout(total=req.timeout)
         async with aiohttp.ClientSession() as session:
             async with session.request(
-                method=req.method,
-                url=req.url,
-                headers=req.headers,
-                # post 参数，get时为 None
-                data=req.data,
-                cookies=req.cookies,
-                # 是否允许重定向
-                allow_redirects=req.allow_redirect,
-                timeout=temp_timeout,
-                proxy=req.proxy,
-                # ssl验证
-                ssl=req.verify_ssl,
+                    method=req.method,
+                    url=req.url,
+                    headers=req.headers,
+                    # post 参数，get时为 None
+                    data=req.data,
+                    cookies=req.cookies,
+                    # 是否允许重定向
+                    allow_redirects=req.allow_redirect,
+                    timeout=temp_timeout,
+                    proxy=req.proxy,
+                    # ssl验证
+                    ssl=req.verify_ssl,
             ) as resp:
                 # 挂起等待下载结果
                 return await self.__assemble_response(resp, req)
+
 
 if __name__ == '__main__':
     bd = AsyncDownloader()

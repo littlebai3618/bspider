@@ -4,7 +4,7 @@
 # @Use     :
 from bspider.core.api import BaseService, Conflict, NotFound, PostSuccess, DeleteSuccess, PatchSuccess, GetSuccess, \
     ParameterException
-from bspider.core.lib import RemoteMixIn
+from bspider.core import RemoteMixIn
 from bspider.utils.exceptions import RemoteOPError
 from bspider.web_studio.server import log
 from bspider.web_studio.service.impl.node_impl import NodeImpl

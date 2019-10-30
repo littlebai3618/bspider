@@ -8,9 +8,9 @@ from wtforms import IntegerField, StringField
 from bspider.core.api import ParameterException, BaseForm, ParamRequired
 
 
-class AddProjectForm(BaseForm):
+class AddForm(BaseForm):
     project_id = IntegerField(validators=[ParamRequired()])
-    project_name = StringField(validators=[ParamRequired()])
+    name = StringField(validators=[ParamRequired()])
     config = StringField(validators=[ParamRequired()])
     rate = IntegerField(validators=[ParamRequired()])
     status = IntegerField(default=0)

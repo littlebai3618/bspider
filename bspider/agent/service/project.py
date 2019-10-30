@@ -4,7 +4,7 @@
 # @Use     :
 from bspider.agent import log
 from bspider.core.api import BaseService, GetSuccess, PostSuccess, DeleteSuccess, PatchSuccess
-from bspider.core.lib import ProjectCache
+from bspider.core import AgentCache
 
 
 class ProjectService(BaseService):
@@ -12,7 +12,7 @@ class ProjectService(BaseService):
     def __init__(self):
         self.cache = ProjectCache()
 
-    def add_project(self, project_id, project_name, project, rate, status):
+    def add_project(self, project_id, name, config, rate, status):
         self.cache.set_project(project_id, project_name, project, rate, status)
         log.info(f'add project:{project_name}-{status} success')
         return PostSuccess()

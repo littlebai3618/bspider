@@ -5,7 +5,7 @@
 from bspider.utils.tools import find_class_name_by_content
 
 
-def valid_code(name, code_type, content):
+def valid_code(name: str, code_type: str, content: str) -> (bool, str):
     sign, class_name, sub_class_name = find_class_name_by_content(content)
     if not sign:
         return False, f'can\'t find module class_name'

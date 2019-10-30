@@ -6,8 +6,8 @@ from pymysql import IntegrityError
 
 from bspider.core.api import BaseService, Conflict, NotFound, PostSuccess, PatchSuccess, PartialSuccess, DeleteSuccess, \
     GetSuccess, ParameterException
-from bspider.core.lib import RemoteMixIn
-from bspider.core.lib.validate_code import valid_code
+from bspider.core import RemoteMixIn
+from bspider.utils.validate import valid_code
 from bspider.web_studio.server import log
 from bspider.web_studio.service.impl.code_impl import CodeImpl
 
