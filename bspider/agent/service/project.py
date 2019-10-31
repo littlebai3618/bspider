@@ -13,8 +13,8 @@ class ProjectService(BaseService):
         self.cache = AgentCache()
 
     def add_project(self, project_id, name, config, rate, status):
-        self.cache.set_project(project_id, project_name, project, rate, status)
-        log.info(f'add project:{project_name}-{status} success')
+        self.cache.set_project(project_id, name, config, rate, status)
+        log.info(f'add project:project_id->{project_id} project_name->{name} {status} success')
         return PostSuccess()
 
     def get_projects(self):
@@ -32,16 +32,3 @@ class ProjectService(BaseService):
         self.cache.delete_project(project_id)
         log.info(f'delete project:{project_id} success')
         return DeleteSuccess()
-
-    def get_weight(self):
-        return GetSuccess(data=self.cache.get_weight())
-
-    def set_weight(self, weight):
-        self.cache.set_weight(weight)
-        log.info(f'add weight:{weight}success')
-        return PostSuccess()
-
-    def update_code(self, project_ids, code_name, code_type, content):
-        self.cache.update_code(project_ids, code_name, code_type, content)
-        log.info(f'update project_code:{project_ids}success')
-        return PatchSuccess()

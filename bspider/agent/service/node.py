@@ -2,7 +2,6 @@
 # @Author  : 白尚林
 # @File    : node
 # @Use     :
-"""采集node 信息"""
 import multiprocessing
 import time
 
