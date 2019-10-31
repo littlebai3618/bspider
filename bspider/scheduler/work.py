@@ -20,7 +20,7 @@ class SchedulerManager(BaseManager):
 
     async def do_work(self):
         while True:
-            for project_name, scheduler in self.monitor.projects.items():
+            for _, scheduler in self.monitor.projects.items():
                 scheduler.scheduler()
             await asyncio.sleep(5)
 

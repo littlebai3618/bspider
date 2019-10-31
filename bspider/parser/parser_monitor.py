@@ -11,5 +11,5 @@ from bspider.parser.async_parser import AsyncParser
 class ParserMonitor(BaseMonitor):
     exchange = EXCHANGE_NAME[2]
 
-    def get_work_obj(self, job_name: str, config: ProjectConfigParser, sign: Sign) -> AsyncParser:
-        return AsyncParser(job_name, config, sign)
+    def get_work_obj(self, config: ProjectConfigParser, sign: Sign) -> AsyncParser:
+        return AsyncParser(config, sign)

@@ -31,7 +31,7 @@ class BaseTask(object):
     def send_request(self, request: Request):
         """发送request 到待下载队列"""
         # 逐条发送到待队列
-        if request.method == 'POST':
+        if request.data:
             request.sign = make_sign(self.project_name, request.url, json.dumps(request.data))
         else:
             request.sign = make_sign(self.project_name, request.url)

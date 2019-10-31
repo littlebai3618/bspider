@@ -12,7 +12,7 @@ from werkzeug.exceptions import HTTPException
 from bspider.config import FrameSettings
 from bspider.core.api import APIException
 from bspider.web_studio import log
-from bspider.web_studio.controller.cron_job import cron_job
+from bspider.web_studio.controller.cron import cron
 from bspider.web_studio.controller.code import code
 from bspider.web_studio.controller.project import project
 from bspider.web_studio.controller.node import node
@@ -34,7 +34,7 @@ def create_app():
     # code管理模块
     app.register_blueprint(code)
     # cron_job
-    app.register_blueprint(cron_job)
+    app.register_blueprint(cron)
     # tools
     app.register_blueprint(tools, url_prefix="/tools")
 

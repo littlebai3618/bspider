@@ -32,7 +32,7 @@ class BCronManager(object):
 
     def __init__(self):
         self.frame_settings = FrameSettings()
-        self.log = LoggerPool().get_logger(key='bcorn', module='bcorn')
+        self.log = LoggerPool().get_logger(key='bcorn_manager', module='bcorn')
         self.handler = MysqlHandler.from_settings(self.frame_settings['WEB_STUDIO_DB'])
         self.table_name = self.frame_settings['CRON_JOB_STORE_TABLE']
         self.tz = pytz.timezone(self.frame_settings['TIMEZONE'])

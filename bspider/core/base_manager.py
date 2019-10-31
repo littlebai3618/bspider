@@ -108,8 +108,9 @@ class BaseManager(object):
     #     except Exception as e:
     #         self.log.exception(f'save response status error: {e}')
     #
-    def _save_success_result(self, request, response, project_name, exception=None):
+    def _save_success_result(self, request, response, project_name, project_id, exception=None):
         data = {
+            'project_id': project_id,
             'project_name': project_name,
             'sign': response.sign,
             'method': response.method,
@@ -125,8 +126,9 @@ class BaseManager(object):
         fields, values = BaseImpl.make_fv(data)
         self.log.info('send success info [{}]'.format(fields % values))
 
-    def _save_error_result(self, request, project_name, exception, status=599):
+    def _save_error_result(self, request, project_name, project_id, exception, status=599):
         data = {
+            'project_id': project_id,
             'project_name': project_name,
             'sign': request.sign,
             'method': request.method,

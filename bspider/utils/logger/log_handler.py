@@ -9,6 +9,7 @@ import re
 from logging.handlers import TimedRotatingFileHandler
 
 from bspider.config import FrameSettings
+from bspider.core import Sign
 from bspider.utils.conf import PLATFORM_PATH_ENV
 from bspider.utils.logger.formatter import get_stream_formatter
 from bspider.utils import singleton
@@ -103,13 +104,21 @@ class LoggerPool(object):
 
     def get_logger(self, key, **kwargs) -> logging.Logger:
         """如果是downloader、parser模块控制终端输出到指定log文件"""
-        unique_key = '{}:{}:{}'.format(key, kwargs.get('module', ''), kwargs.get('project', ''))
-        if unique_key in self.__pool:
-            return self.__pool[unique_key]
-        # if kwargs.get('module') in ('parser', 'downloader'):
-        #     log_handler = self.__set_file_handler(logging.getLogger(unique_key), self.frame_settings['LOGGER_LEVEL'], key=key,
-        #                                           **kwargs)
-        # else:
-        log_handler = self.__handle_func(logging.getLogger(unique_key), self.frame_settings['LOGGER_LEVEL'], **kwargs)
-        self.__pool[unique_key] = log_handler
-        return log_handler
+        cur_sign = Sign(**kwargs)
+        if key not in self.__pool:
+            log_handler = self.__handle_func(logging.getLogger(key), self.frame_settings['LOGGER_LEVEL'], **kwargs)
+            self.__pool[key] = (cur_sign, log_handler)
+            return log_handler
+
+        pre_sign, log_handler = self.__pool[key]
+        if pre_sign == cur_sign:
+            return log_handler
+
+        else:
+            for handler in log_handler.handlers:
+                handler.close()
+                log_handler.removeHandler(handler)
+
+            log_handler = self.__handle_func(logging.getLogger(key), self.frame_settings['LOGGER_LEVEL'], **kwargs)
+            self.__pool[key] = (cur_sign, log_handler)
+            return log_handler

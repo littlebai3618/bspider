@@ -12,6 +12,6 @@ class DownloaderMonitor(BaseMonitor):
 
     exchange = EXCHANGE_NAME[1]
 
-    def get_work_obj(self, job_name: str, config: ProjectConfigParser, sign: Sign):
-        return AsyncDownloader(job_name, config, sign)
+    def get_work_obj(self, config: ProjectConfigParser, sign: Sign):
+        return AsyncDownloader(config, sign)
 

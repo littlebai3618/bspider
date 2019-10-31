@@ -10,7 +10,7 @@ from bspider.core import AgentCache
 class ProjectService(BaseService):
 
     def __init__(self):
-        self.cache = ProjectCache()
+        self.cache = AgentCache()
 
     def add_project(self, project_id, name, config, rate, status):
         self.cache.set_project(project_id, project_name, project, rate, status)

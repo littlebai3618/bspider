@@ -6,6 +6,7 @@ import asyncio
 import random
 
 from bspider.config import FrameSettings
+from bspider.core import Sign
 from bspider.scheduler.scheduler import Scheduler
 from bspider.utils.database.mysql import AioMysqlHandler
 
@@ -13,12 +14,15 @@ from bspider.utils.database.mysql import AioMysqlHandler
 class SchedulerMonitor(object):
 
     def __init__(self, log):
-        """一个下载器的唯一标识，不能和其他下载器一致"""
         self.frame_settings = FrameSettings()
         self.project_table = self.frame_settings['PROJECT_TABLE']
         self.__mysql_handler = AioMysqlHandler.from_settings(self.frame_settings['WEB_STUDIO_DB'])
         self.projects = {}
         self.log = log
+
+    async def get_projects(self):
+        sql = f'select `id`, `name`, `rate` from {self.project_table} where `status`=1'
+        return await self.__mysql_handler.select(sql)
 
     async def sync_config(self):
         while True:
@@ -26,35 +30,24 @@ class SchedulerMonitor(object):
             tmp_projects = dict()
             try:
                 for info in await self.get_projects():
-                    project_obj = self.projects.get(info['project_name'])
-                    if project_obj is None or \
-                            project_obj.sign != info['timestamp']:
-                        tmp_projects[info['project_name']] = self.get_work_obj(project_name=info['project_name'],
-                                                                               rate=info['rate'],
-                                                                               sign=info['timestamp'])
+                    project_obj = self.projects.get(info['id'])
+                    cur_sign = Sign(project_name=info['name'], project_id=info['id'], rate=info['rate'])
+                    if project_obj is None or project_obj.sign != cur_sign:
+                        tmp_projects[info['id']] = self.get_work_obj(
+                            info['id'], info['name'], rate=info['rate'], sign=cur_sign)
                     else:
-                        tmp_projects[info['project_name']] = project_obj
+                        tmp_projects[info['id']] = project_obj
                 self.projects = tmp_projects
                 self.log.info('sync project success with {} projects'.format(len(self.projects)))
             except Exception as e:
                 self.log.error(f'sync project rate error:{e}')
             await asyncio.sleep(4)
 
-    async def choice_project(self) -> dict:
-        """根据project的权重值随机选取一个"""
-        if len(self.projects):
-            self.log.info('project is empty')
-            return {}
-        return random.choice(self.projects)
-
     @staticmethod
-    def get_work_obj(project_name: str, rate: int, sign: str):
-        return Scheduler(project_name, rate, sign)
+    def get_work_obj(project_id, project_name: str, rate: int, sign: Sign):
+        return Scheduler(project_id, project_name, rate, sign)
 
-    async def get_projects(self):
-        sql = f'select `name` as `project_name`,`rate`, `update_time` as `timestamp` ' \
-            f'from {self.project_table} where `status`=1'
-        return await self.__mysql_handler.select(sql)
+
 
     def close(self):
         pass

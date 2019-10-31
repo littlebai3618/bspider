@@ -17,7 +17,7 @@ from bspider.utils.notify import ding
 
 __frame_settings = FrameSettings()
 __handler = MysqlHandler.from_settings(__frame_settings['WEB_STUDIO_DB'])
-__log = LoggerPool().get_logger('bcorn', module='bcorn')
+__log = LoggerPool().get_logger(key='bcorn-todo', module='bcorn')
 
 
 def do(**kwargs):

@@ -21,7 +21,6 @@ class Request(BaseHttp):
                  cookies=None,
                  meta=None,
                  priority: int=3,
-                 sign='',
                  proxy=None,
                  allow_redirect: bool=False,
                  timeout: int=10,
@@ -51,7 +50,7 @@ class Request(BaseHttp):
         self.data = data or {}
         self.meta = self._set_meta(meta)
         self.priority = priority
-        self.sign = sign
+        self.sign = 'default_sign'
         self.proxy = proxy # 下载是否需要使用代理
         self.allow_redirect = allow_redirect # 下载是否需要重定向
         self.timeout = timeout

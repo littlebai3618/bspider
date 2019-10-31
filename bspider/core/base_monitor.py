@@ -53,6 +53,9 @@ class BaseMonitor(object):
 
             project_obj = self.projects.get(info['id'])
             pc_obj = ProjectConfigParser.loads(info['config'])
+
+            pc_obj.project_name = info['name']
+            pc_obj.project_id = info['id']
             # code_id映射为中间件代码
             if self.exchange == EXCHANGE_NAME[2]:
                 pc_obj.pipeline = self.code_id_to_content(pc_obj.pipeline)
@@ -62,7 +65,7 @@ class BaseMonitor(object):
                 sign = Sign(project_timestamp=info['timestamp'], module=pc_obj.middleware)
 
             if project_obj is None or project_obj.sign != sign:
-                tmp_projects[info['id']] = self.get_work_obj(info['project_name'], pc_obj, sign=sign)
+                tmp_projects[info['id']] = self.get_work_obj(pc_obj, sign=sign)
             else:
                 tmp_projects[info['id']] = project_obj
 
@@ -80,11 +83,11 @@ class BaseMonitor(object):
         """
         if self.__weight is not None and self.__total_sum:
             seed = random.randint(0, self.__total_sum - 1)
-            for project_name, weight in self.__weight:
+            for project_id, weight in self.__weight:
                 seed -= weight
                 if seed < 0:
-                    self.log.debug(f'choice project {project_name}')
-                    return project_name
+                    self.log.debug(f'choice project:project-:project_id->{project_id}')
+                    return project_id
         self.log.debug('project weight is empty')
 
     def code_id_to_content(self, code_ids: list):
@@ -96,7 +99,7 @@ class BaseMonitor(object):
 
         return res
 
-    def get_work_obj(self, project_name: str, config: ProjectConfigParser, sign: Sign):
+    def get_work_obj(self, config: ProjectConfigParser, sign: Sign):
         """继承重写 -> 根据配置返回对象"""
         pass
 

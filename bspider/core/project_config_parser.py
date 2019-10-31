@@ -15,6 +15,10 @@ class ProjectConfigParser(object):
         except Exception as e:
             raise ProjectConfigError(f'this config is illegal json str:{e}')
 
+        # 设置默认属性
+        self.project_name: str = 'default'
+        self.project_id: int = 0
+
         downloader = self.__valid_key_in_dict('downloader', dict, self.__config)
         middleware = self.__valid_key_in_dict('middleware', list, downloader)
         self.middleware: list = self.__valid_key_in_list('downloader.middleware', str, middleware)

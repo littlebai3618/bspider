@@ -6,6 +6,7 @@ import datetime
 import json
 
 from bspider.config.default_settings import EXCHANGE_NAME
+from bspider.core import Sign
 from bspider.http import Request
 from bspider.utils.logger import LoggerPool
 from bspider.utils.rabbitMQ import RabbitMQHandler
@@ -14,15 +15,18 @@ from bspider.config import FrameSettings
 
 class Scheduler(object):
 
-    def __init__(self, project_name: str, rate: int, sign: str):
-        self.log = LoggerPool().get_logger(key=project_name, module='scheduler', project=project_name)
+    def __init__(self, project_id: int, project_name: str, rate: int, sign: Sign):
+        self.sign = sign
+        self.project_name = project_name
+        self.project_id = project_id
+
+        self.log = LoggerPool().get_logger(key=f'scheduler_parser->{self.project_id}', module='scheduler', project=self.project_name)
+
         # 上一次分钟数
         self.__pre_loop_sign = None
         self.__scheduler_count = 0
-        self.__download_queue = 'download_{}'.format(project_name)
-        self.project_name = project_name
+        self.__download_queue = 'download_{}'.format(self.project_id)
         self.rate = rate
-        self.sign = sign
         self.frame_settings = FrameSettings()
         self.__mq_handler = RabbitMQHandler(self.frame_settings['RABBITMQ_CONFIG'])
 
@@ -51,11 +55,11 @@ class Scheduler(object):
 
     def schedule_task(self) -> bool:
         """调度抓取任务到下载队列"""
-        queue_name = '{}_{}'.format(EXCHANGE_NAME[0], self.project_name)
+        queue_name = '{}_{}'.format(EXCHANGE_NAME[0], self.project_id)
         msg_id, data = self.__mq_handler.recv_msg(queue_name)
         if msg_id is not None:
             request = Request.loads(json.loads(data))
-            if self.__mq_handler.send_msg(EXCHANGE_NAME[1], self.project_name, data, priority=request.priority):
+            if self.__mq_handler.send_msg(EXCHANGE_NAME[1], self.project_id, data, priority=request.priority):
                 self.log.info(f'send a new task success sign->{request.sign}')
                 self.__mq_handler.report_acknowledgment(msg_id)
                 return True
@@ -73,4 +77,4 @@ class Scheduler(object):
         return msg_count > threshold
 
     def __repr__(self):
-        return f'<AsyncScheduler->{self.project_name}:{self._sign}>'
+        return f'<AsyncScheduler->{self.project_name}:{self.sign}>'
