@@ -10,7 +10,7 @@ from requests.exceptions import ConnectionError
 from flask import g
 
 from bspider.config import FrameSettings
-from bspider.core.api.auth.token import make_token, User
+from bspider.core.api.auth.token import make_token
 from bspider.utils.exceptions import RemoteOPError
 
 
