@@ -6,7 +6,6 @@ from wtforms import StringField, IntegerField
 from wtforms.validators import length
 
 from bspider.core.api import BaseForm, ParamRequired
-from .enums import OpTypeEnum
 
 
 class AddNodeForm(BaseForm):
@@ -24,12 +23,6 @@ class UpdateNodeForm(BaseForm):
     name = StringField()
     status = IntegerField()
     description = StringField()
-
-    def validate_status(self, value):
-        try:
-            value.data = OpTypeEnum(value.data).name
-        except ValueError as e:
-            raise e
 
 
 class AddWorkerForm(BaseForm):

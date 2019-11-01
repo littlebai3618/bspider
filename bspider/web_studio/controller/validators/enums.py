@@ -7,9 +7,3 @@ from enum import Enum
 
 class ClientTypeEnum(Enum):
     identity = 101 # 账号登录
-
-
-class OpTypeEnum(Enum):
-    start = 1
-    stop = 0
-    exec = -1

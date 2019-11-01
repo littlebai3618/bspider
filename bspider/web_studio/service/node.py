@@ -65,9 +65,9 @@ class Node(BaseService, AgentMixIn):
                 with self.impl.handler.session() as session:
                     if len(kwargs):
                         session.update(*self.impl.update_node(node_id, kwargs, get_sql=True))
-                    if status == 'start':
+                    if status == 1:
                         self.op_start_node(node['ip'])
-                    elif status == 'stop':
+                    elif status == 0:
                         self.op_stop_node(node['ip'])
 
             elif len(kwargs):
