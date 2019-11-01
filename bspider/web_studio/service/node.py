@@ -239,34 +239,3 @@ class Node(BaseService, AgentMixIn):
                 'page': page,
                 'limit': limit
             })
-
-# # Inner func
-# def __stop_node(self, node_ip):
-#     if self.op_stop_node(node_ip):
-#         log.info(f'stop node:{node_ip} success')
-#         return PatchSuccess(msg=f'stop node:{node_ip} success')
-#     log.error(f'supervisor try stop node:{node_ip} failed')
-#     return Conflict(msg=f'supervisor try stop node:{node_ip} failed', errno=20006)
-#
-#
-# def __start_node(self, node_ip):
-#     if self.op_start_node(node_ip):
-#         log.info(f'stop update:{node_ip} success')
-#         return PatchSuccess(msg=f'start node:{node_ip} success')
-#     log.error(f'supervisor try start node:{node_ip} failed')
-#     return Conflict(msg=f'supervisor try start node:{node_ip} failed', errno=20007)
-
-# def stop_worker(self, node_ip, name, worker_type):
-#     if self.op_stop_worker(node_ip, f'{worker_type}:{name}'):
-#         log.info(f'stop worker:{name} success')
-#         return PostSuccess(msg='stop worker success!')
-#     log.error(f'stop worker:{name} failed')
-#     return Conflict(msg=f'stop worker failed', errno=20009)
-#
-#
-# def start_worker(self, node_ip, name, worker_type):
-#     if self.op_start_worker(node_ip, f'{worker_type}:{name}', worker_type):
-#         log.info(f'start worker:{name} success')
-#         return PostSuccess(msg='start worker success!')
-#     log.error(f'start worker:{name} failed')
-#     return Conflict(msg=f'start worker failed', errno=20003)

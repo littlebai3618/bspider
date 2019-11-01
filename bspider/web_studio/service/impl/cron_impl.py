@@ -46,7 +46,7 @@ class CronImpl(BaseImpl):
             sql = f'select `id`, `project_id`, `code_id`, `type`, `trigger`, `trigger_type`, `next_run_time`, ' \
                   f'`description`, `create_time`, `update_time` ' \
                   f'from `{self.table_name}` ' \
-                  f'order by `cronjob`.`id` {sort} limit {start},{limit};'
+                  f'order by `id` {sort} limit {start},{limit};'
         log.debug(f'SQL:{sql}')
         return self.handler.select(sql), self.total_num(search, self.table_name)
 
