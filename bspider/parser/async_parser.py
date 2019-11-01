@@ -8,11 +8,12 @@
 """
 from types import GeneratorType
 
-from bspider.core import ProjectConfigParser, Sign
+from bspider.core import ProjectConfigParser
 from bspider.http import Response, Request
 from bspider.utils.exceptions import ParserError
 from bspider.utils.logger import LoggerPool
 from bspider.utils.importer import import_module_by_code
+from bspider.utils.sign import Sign
 
 
 class AsyncParser(object):

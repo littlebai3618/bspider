@@ -11,11 +11,12 @@ import aiohttp
 
 from aiohttp import ClientResponse
 
-from bspider.core import ProjectConfigParser, Sign
+from bspider.core import ProjectConfigParser
 from bspider.http import Request, Response
 from bspider.utils.exceptions import DownloaderError
 from bspider.utils.importer import import_module_by_code
 from bspider.utils.logger import LoggerPool
+from bspider.utils.sign import Sign
 
 
 class AsyncDownloader(object):

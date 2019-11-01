@@ -4,8 +4,9 @@
 # @Use     :
 """解析器监听器"""
 from bspider.config.default_settings import EXCHANGE_NAME
-from bspider.core import BaseMonitor, ProjectConfigParser, Sign
+from bspider.core import BaseMonitor, ProjectConfigParser
 from bspider.parser.async_parser import AsyncParser
+from bspider.utils.sign import Sign
 
 
 class ParserMonitor(BaseMonitor):

@@ -6,7 +6,8 @@ import asyncio
 import random
 
 from bspider.config.default_settings import EXCHANGE_NAME
-from bspider.core import RabbitMQBroker, AgentCache, ProjectConfigParser, Sign
+from bspider.core import RabbitMQBroker, AgentCache, ProjectConfigParser
+from bspider.utils.sign import Sign
 from bspider.utils.tools import find_class_name_by_content
 
 

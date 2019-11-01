@@ -3,7 +3,8 @@
 # @File    : downloader_monitor
 # @Use     :
 from bspider.config.default_settings import EXCHANGE_NAME
-from bspider.core import BaseMonitor, ProjectConfigParser, Sign
+from bspider.core import BaseMonitor, ProjectConfigParser
+from bspider.utils.sign import Sign
 
 from .async_downloader import AsyncDownloader
 

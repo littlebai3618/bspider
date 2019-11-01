@@ -6,11 +6,11 @@ import datetime
 import json
 
 from bspider.config.default_settings import EXCHANGE_NAME
-from bspider.core import Sign
 from bspider.http import Request
 from bspider.utils.logger import LoggerPool
 from bspider.utils.rabbitMQ import RabbitMQHandler
 from bspider.config import FrameSettings
+from bspider.utils.sign import Sign
 
 
 class Scheduler(object):

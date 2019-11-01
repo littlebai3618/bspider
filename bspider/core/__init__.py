@@ -7,7 +7,6 @@ from .base_manager import BaseManager
 from .base_monitor import BaseMonitor
 from .project_config_parser import ProjectConfigParser
 from .broker import RabbitMQBroker, AioRabbitMQHandler
-from .sign import Sign
 
 __all__ = [
     'AgentCache',
@@ -16,5 +15,4 @@ __all__ = [
     'AioRabbitMQHandler',
     'BaseMonitor',
     'ProjectConfigParser',
-    'Sign'
 ]

@@ -3,12 +3,11 @@
 # @File    : scheduler_monitor
 # @Use     :
 import asyncio
-import random
 
 from bspider.config import FrameSettings
-from bspider.core import Sign
 from bspider.scheduler.scheduler import Scheduler
 from bspider.utils.database.mysql import AioMysqlHandler
+from bspider.utils.sign import Sign
 
 
 class SchedulerMonitor(object):

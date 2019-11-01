@@ -8,11 +8,12 @@ import sys
 import re
 from logging.handlers import TimedRotatingFileHandler
 
+from bspider.utils import singleton
 from bspider.config import FrameSettings
 from bspider.utils.conf import PLATFORM_PATH_ENV
-from bspider.utils.logger.formatter import get_stream_formatter
-from bspider.utils import singleton
-from bspider.core import Sign
+from bspider.utils.sign import Sign
+
+from .formatter import get_stream_formatter
 
 
 class RabbitMQLogHandler(logging.Handler):
