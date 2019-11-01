@@ -11,10 +11,11 @@ import json
 
 import signal
 
-from bspider.core.broker import RabbitMQBroker
-from bspider.core.api import BaseImpl
 from bspider.utils.exceptions import MethodError
 from bspider.utils.logger import LoggerPool
+
+from .broker import RabbitMQBroker
+from .api import BaseImpl
 
 
 class BaseManager(object):
@@ -143,4 +144,3 @@ class BaseManager(object):
             data['data'] = None
         fields, values = BaseImpl.make_fv(data)
         self.log.info('send error info [{}]'.format(fields % values))
-
