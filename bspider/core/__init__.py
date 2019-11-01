@@ -7,7 +7,6 @@ from .base_manager import BaseManager
 from .base_monitor import BaseMonitor
 from .project_config_parser import ProjectConfigParser
 from .broker import RabbitMQBroker, AioRabbitMQHandler
-from .remote_mixin import RemoteMixIn
 from .sign import Sign
 
 __all__ = [
@@ -17,6 +16,5 @@ __all__ = [
     'AioRabbitMQHandler',
     'BaseMonitor',
     'ProjectConfigParser',
-    'RemoteMixIn',
     'Sign'
 ]

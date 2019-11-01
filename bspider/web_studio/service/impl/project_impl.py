@@ -114,13 +114,8 @@ class ProjectImpl(BaseImpl):
         self.__mq_handler.bind_queue(queue_name, exchange, routing_key)
 
     def unbind_queue(self, project_id):
-        project_name = self.get_project(project_id)
-        if not len(project_name):
-            return False
-        project_name = project_name[0]['name']
         for exchange in EXCHANGE_NAME:
-            queue_name = '{}_{}'.format(exchange, project_name)
-            self.__mq_handler.remove_queue(queue=queue_name)
+            self.__mq_handler.remove_queue(queue='{}_{}'.format(exchange, project_id))
         return True
 
     def get_nodes(self):

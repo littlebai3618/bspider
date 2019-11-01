@@ -13,7 +13,7 @@ class AddForm(BaseForm):
     name = StringField(validators=[ParamRequired()])
     config = StringField(validators=[ParamRequired()])
     rate = IntegerField(validators=[ParamRequired()])
-    status = IntegerField(default=0)
+    status = IntegerField(validators=[ParamRequired()])
 
 
 class UpdateForm(BaseForm):

@@ -6,13 +6,13 @@ from pymysql import IntegrityError
 
 from bspider.core.api import BaseService, Conflict, NotFound, PostSuccess, PatchSuccess, PartialSuccess, DeleteSuccess, \
     GetSuccess, ParameterException
-from bspider.core import RemoteMixIn
+from bspider.core.api import AgentMixIn
 from bspider.utils.validate import valid_code
 from bspider.web_studio.server import log
 from bspider.web_studio.service.impl.code_impl import CodeImpl
 
 
-class CodeService(BaseService, RemoteMixIn):
+class CodeService(BaseService, AgentMixIn):
 
     def __init__(self):
         self.impl = CodeImpl()
@@ -31,6 +31,11 @@ class CodeService(BaseService, RemoteMixIn):
                     'editor': editor
                 }
                 code_id = session.insert(*self.impl.add_code(data=data))
+
+                sign, result = self.op_add_code(self.impl.get_nodes(), {'code_id': code_id, 'content': content})
+                if not sign:
+                    log.warning(f'not all node add cide:{name} =>{msg}')
+                    raise Conflict(msg=f'not all node add code:{name}', data=result, errno=40006)
             log.info(f'add code success:{name}-{editor}')
             return PostSuccess(msg='add code success', data={'code_id': code_id})
         except IntegrityError:
@@ -44,58 +49,36 @@ class CodeService(BaseService, RemoteMixIn):
 
         info = infos[0]
 
-        if 'content' in changes:
-            sign, msg = valid_code(
-                name=changes.get('name', info['name']),
-                code_type=changes.get('code_type', info['code_type']),
-                content=changes['content']
-            )
-            if not sign:
-                return Conflict(msg=msg, errno=40005)
-            return self.__update_with_content(code_id, changes, info)
-        else:
-            with self.impl.handler.session() as session:
-                session.update(*self.impl.update_code(code_id, changes))
-            log.info('update code success')
-            return PatchSuccess(msg='update code success')
-
-    def __update_with_content(self, code_id, changes, info):
-        log.debug('code update param->{} start!'.format(changes))
-        code_name = changes.get('name', info['name'])
-        project_list = self.impl.get_project_by_code_id(code_id)
-        if len(project_list):
-            with self.impl.handler.session() as session:
-                session.update(*self.impl.update_code(code_id, changes))
-                node_list = self.impl.get_nodes()
-                data = {
-                    'project_ids': ','.join([str(info['id']) for info in project_list]),
-                    'code_id': code_id,
-                    'code_type': changes.get('code_type', info['code_type']),
-                    'content': changes['content']
-                }
-                result = self.op_update_code(node_list, data)
-                if len(result):
-                    if len(result) < len(node_list):
-                        log.warning(f'not all node update code:{code_name} change {result}')
-                        return PartialSuccess(msg=f'not all node update code:{code_name} change', data=result)
-                    log.error(f'all node code:{code_name} update failed {result}')
-                    raise Conflict(msg='all node code update failed', errno=40003, data=result)
-                log.info(f'update code:{code_name} success')
-                return PostSuccess(msg=f'update code:{code_name} success')
-        else:
-            with self.impl.handler.session() as session:
-                session.update(*self.impl.update_code(code_id, changes))
-            log.info(f'update code:{code_name} success')
-            return PatchSuccess(msg='update code success')
+        with self.impl.handler.session() as session:
+            if 'content' in changes:
+                sign, msg = valid_code(
+                    name=changes.get('name', info['name']),
+                    code_type=changes.get('code_type', info['code_type']),
+                    content=changes['content']
+                )
+                if not sign:
+                    raise Conflict(msg=msg, errno=40005)
+                sign, result = self.op_update_code(self.impl.get_nodes(), code_id, {'content': changes['content']})
+                if not sign:
+                    log.warning(f'code:code_id->:{code_id} update exec')
+                    raise Conflict(msg=f'not all code:code_id->:{code_id} was update', data=result, errno=40006)
+            session.update(*self.impl.update_code(code_id, changes))
+        log.info(f'update code success: {changes}')
+        return PatchSuccess(msg='update code success')
 
     def delete(self, code_id):
         project_list = self.impl.get_project_by_code_id(code_id)
         if len(project_list):
-            data = [{'project_id': info['id'], 'project_name': info['name']} for info in project_list]
+            data = [{'id': info['id'], 'name': info['name']} for info in project_list]
             log.error(f'delete code:{code_id} failed: can\'t delete in use code')
             return Conflict(msg='can\'t delete in use code', data=data, errno=40004)
         else:
-            self.impl.delete_code(code_id)
+            with self.impl.handler.session() as session:
+                sign, result = self.op_delete_code(self.impl.get_nodes(), code_id)
+                if not sign:
+                    log.warning(f'code:code_id->:{code_id} delete exec')
+                    raise Conflict(msg=f'not all code:code_id->:{code_id} was delete', data=msg, errno=40006)
+                session.delete(*self.impl.delete_code(code_id))
             log.info(f'success delete code:{code_id}')
             return DeleteSuccess()
 

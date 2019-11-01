@@ -39,7 +39,7 @@ class CodeImpl(BaseImpl):
 
     def delete_code(self, code_id):
         sql = f'delete from {self.code_table} where `id`={code_id};'
-        return self.handler.delete(sql)
+        return sql
 
     def add_bind_project_code(self, binds):
         values = ', '.join([f'({pid}, {cid})' for pid, cid in binds])

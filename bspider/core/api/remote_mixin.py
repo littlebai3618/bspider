@@ -10,29 +10,32 @@ from requests.exceptions import ConnectionError
 from flask import g
 
 from bspider.config import FrameSettings
+from bspider.core.api.auth.token import make_token, User
 from bspider.utils.exceptions import RemoteOPError
-from bspider.web_studio import log
 
 
 class RemoteMixIn(object):
-
-    base_url = 'http://{}:'+ str(FrameSettings()['AGENT'].get('port', 5001)) +'{}'
-    rpc_url = 'http://{username}:{password}@%s:{port}/RPC2'.format(**FrameSettings()['SUPERVISOR_RPC'])
+    # 可以优化为协程方式调用
 
     @staticmethod
     def request(url, method, params=None, data=None):
-        headers = {'Authorization': f'Bearer {g.user.token}'}
+        headers = dict(Authorization=f'Bearer {g.user.token}')
         if data:
-            headers['Content-Type'] =  'application/json'
+            headers['Content-Type'] = 'application/json'
             data = json.dumps(data)
         try:
             req = requests.request(method, url, headers=headers, data=data, params=params)
         except ConnectionError as e:
-            log.error(f'master call agent:{url} failed {e}')
-            raise RemoteOPError(f'master call agent failed please check!')
-
-        log.debug(f'master->{req.request.url}: \n {headers}\n{method} {data} \n{req.text}')
+            raise RemoteOPError(f'Call Remote failed please check!, error:{e}')
         return req
+
+
+class AgentMixIn(RemoteMixIn):
+    """
+    master -> agent 主节点向子节点进行通信
+    """
+    base_url = 'http://{}:' + str(FrameSettings()['AGENT'].get('port', 5001)) + '{}'
+    rpc_url = 'http://{username}:{password}@%s:{port}/RPC2'.format(**FrameSettings()['SUPERVISOR_RPC'])
 
     def op_stop_node(self, ip) -> bool:
         with xmlrpc.client.ServerProxy(self.rpc_url % ip) as rpc_server:
@@ -44,13 +47,6 @@ class RemoteMixIn(object):
         with xmlrpc.client.ServerProxy(self.rpc_url % ip) as rpc_server:
             if rpc_server.supervisor.startProcess('agent:agent'):
                 return True
-        return False
-
-    def op_restart(self, ip) -> bool:
-        with xmlrpc.client.ServerProxy(self.rpc_url % ip) as rpc_server:
-            if rpc_server.supervisor.stopProcess('agent:agent'):
-                if rpc_server.supervisor.startProcess('agent:agent'):
-                    return True
         return False
 
     def op_get_node(self, ip) -> dict:
@@ -75,7 +71,6 @@ class RemoteMixIn(object):
                 return result
         return result
 
-
     def op_stop_worker(self, ip: str, unique_sign: str) -> bool:
         url = self.base_url.format(ip, '/worker')
         data = {'name': unique_sign}
@@ -84,7 +79,7 @@ class RemoteMixIn(object):
             return True
         raise RemoteOPError('stop work error {}', req.json()['msg'])
 
-    def op_start_worker(self, ip: str,unique_sign: str, worker_type: str, coroutine_num: int) -> dict:
+    def op_start_worker(self, ip: str, unique_sign: str, worker_type: str, coroutine_num: int) -> dict:
         url = self.base_url.format(ip, '/worker')
         data = {
             'name': unique_sign,
@@ -105,45 +100,53 @@ class RemoteMixIn(object):
             return data['data'] if data.get('data') else {}
         raise RemoteOPError('get worker error {}', data['msg'])
 
-    def op_add_project(self, ip_list: list, data) -> dict:
-        result = {}
-        for ip in ip_list:
-            url = self.base_url.format(ip, '/project')
-            req = self.request(url, method='POST', data=data)
-            print(url, json.dumps(data))
-            data = req.json()
-            if data['errno'] != 0:
-                result[ip] = data['msg']
-        return result
+    def __op_query(self, ip_list: list, method: str, uri: str, data: dict = None) -> (bool, dict):
+        result = dict()
+        if method == 'DELETE':
+            for ip in ip_list:
+                req = self.request(self.base_url.format(ip, uri), method=method, data=data)
+                if not (req.status_code >= 200 and req.status_code <= 299):
+                    result[ip] = req.json()['msg']
+        else:
+            for ip in ip_list:
+                data = self.request(self.base_url.format(ip, uri), method=method, data=data).json()
+                if data['errno'] != 0:
+                    result[ip] = data['msg']
+        return not len(result), result
 
-    def op_update_project(self, ip_list: list, data) -> dict:
-        result = {}
-        for ip in ip_list:
-            url = self.base_url.format(ip, '/project')
-            req = self.request(url, method='PATCH', data=data)
-            data = req.json()
-            if data['errno'] != 0:
-                result[ip] = data['msg']
-        return result
+    def op_add_project(self, ip_list: list, data: dict) -> (bool, dict):
+        # project_id, name, config, rate, status
+        return self.__op_query(ip_list, 'POST', '/project', data)
 
-    def op_delete_project(self, ip_list: list, project_id) -> dict:
-        result = {}
-        for ip in ip_list:
-            url = self.base_url.format(ip, f'/project/{project_id}')
-            req = self.request(url, method='DELETE')
-            if not (req.status_code >= 200 and req.status_code <=299):
-                result[ip] = req.json()['msg']
-        return result
+    def op_update_project(self, ip_list: list, project_id: int, data: dict) -> (bool, dict):
+        return self.__op_query(ip_list, 'PATCH', f'/project/{project_id}', data)
 
-    def op_update_code(self, ip_list: list, data) -> dict:
-        result = {}
-        for ip in ip_list:
-            url = self.base_url.format(ip, f'/project/code')
-            req = self.request(url, method='PATCH', data=data)
-            if not (req.status_code >= 200 and req.status_code <= 299):
-                result[ip] = req.json()['msg']
-        return result
+    def op_delete_project(self, ip_list: list, project_id: int) -> (bool, dict):
+        return self.__op_query(ip_list, 'DELETE', f'/project/{project_id}')
+
+    def op_add_code(self, ip_list: list, data: dict) -> (bool, dict):
+        # code_id, content
+        return self.__op_query(ip_list, 'POST', '/code', data)
+
+    def op_update_code(self, ip_list: list, code_id: int, data: dict) -> (bool, dict):
+        return self.__op_query(ip_list, 'PATCH', f'/code/{code_id}', data)
+
+    def op_delete_code(self, ip_list: list, code_id: int) -> (bool, dict):
+        return self.__op_query(ip_list, 'DELETE', f'/code/{code_id}')
 
 
+class MasterMixIn(RemoteMixIn):
+    """
+    agent -> master 主节点向子节点进行通信
+    """
 
+    base_url = 'http://{ip}:{port}/node'.format(**FrameSettings()['MASTER'])
 
+    def op_add_node(self, data: dict) -> dict:
+        g.user = User(0, 'agent', make_token(0, 'agent->{ip}'.format(**data)))
+
+        data = self.request(self.base_url, method='POST', data=data).json()
+        if data['errno'] == 0:
+            return data['data']
+
+        raise RemoteOPError('Call Master Failed to reg node msg {}', data.json()['msg'])

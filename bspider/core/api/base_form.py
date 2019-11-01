@@ -33,7 +33,10 @@ class BaseForm(Form):
                 if isinstance(field, IntegerField):
                     field.data = int(field.data)
                 result[name] = field.data
-        return result
+
+        if len(result):
+            return result
+        raise ParameterException(msg='all arguments is Invalid')
 
 
 class ParamRequired(DataRequired):

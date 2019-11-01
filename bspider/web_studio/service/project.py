@@ -2,18 +2,17 @@
 # @Author  : 白尚林
 # @File    : project
 # @Use     :
-
 from pymysql import IntegrityError
 
-from bspider.core.api import BaseService, Conflict, NotFound, PartialSuccess, PostSuccess, DeleteSuccess, GetSuccess, \
-    PatchSuccess, ParameterException
-from bspider.core import RemoteMixIn, ProjectConfigParser
+from bspider.core import ProjectConfigParser
 from bspider.utils.exceptions import ProjectConfigError
 from bspider.web_studio import log
 from bspider.web_studio.service.impl.project_impl import ProjectImpl
+from bspider.core.api import BaseService, Conflict, NotFound, PartialSuccess, PostSuccess, DeleteSuccess, GetSuccess, \
+    PatchSuccess, ParameterException, AgentMixIn
 
 
-class ProjectService(BaseService, RemoteMixIn):
+class ProjectService(BaseService, AgentMixIn):
 
     def __init__(self):
         self.impl = ProjectImpl()
@@ -77,13 +76,10 @@ class ProjectService(BaseService, RemoteMixIn):
                     'status': status
                 }
                 node_list = self.impl.get_nodes()
-                result = self.op_add_project(node_list, info)
-                if len(result):
-                    if len(result) < len(node_list):
-                        log.warning(f'not all node add project:{name} =>{result}')
-                        return PartialSuccess(msg=f'not all node add project:{name}', data=result)
-                    log.error(f'all project add failed:{name} =>{result}')
-                    raise Conflict(msg='all project add failed', data=result, errno=30004)
+                sign, result = self.op_add_project(node_list, info)
+                if not sign:
+                    log.error(f'not all node add project:{name} =>{result}')
+                    return Conflict(msg=f'not all node add project:{name}', data=result, errno=30007)
                 log.info(f'add project:{name} success')
                 return PostSuccess(msg=f'add project:{name} success', data={'project_id': project_id})
         except IntegrityError as e:
@@ -94,7 +90,7 @@ class ProjectService(BaseService, RemoteMixIn):
 
     def update(self, project_id, changes):
         remote_param = {}
-        for key in ('config', 'rate', 'status'):
+        for key in ('name', 'config', 'rate', 'status'):
             if key in changes and key == 'config':
                 remote_param['config'] = self.__get_config_obj(changes['config']).dumps()
             else:
@@ -103,14 +99,10 @@ class ProjectService(BaseService, RemoteMixIn):
         if len(remote_param):
             with self.impl.handler.session() as session:
                 session.update(*self.impl.update_project(project_id, changes))
-                node_list = self.impl.get_nodes()
-                result = self.op_update_project(node_list, remote_param)
-                if len(result):
-                    if len(result) < len(node_list):
-                        log.warning(f'not all node update project:project_id->{project_id} =>{result}')
-                        return PartialSuccess(msg=f'not all node update this project change', data=result)
-                    log.error(f'all project update failed project:project_id->{project_id} =>{result}')
-                    raise Conflict(msg='all project update failed', data=result, errno=30005)
+                sign, result = self.op_update_project(self.impl.get_nodes(), project_id, remote_param)
+                if not sign:
+                    log.warning(f'not all node update project:project_id->{project_id} =>{result}')
+                    return Conflict(msg=f'not all node update this project change', data=result, errno=30007)
         else:
             with self.impl.handler.session() as session:
                 session.update(*self.impl.update_project(project_id, changes))
@@ -121,19 +113,15 @@ class ProjectService(BaseService, RemoteMixIn):
     def delete(self, project_id):
         with self.impl.handler.session() as session:
             session.update(*self.impl.delete_project(project_id))
-            node_list = self.impl.get_nodes()
-            result = self.op_delete_project(node_list, project_id)
-            if len(result):
-                if len(result) < len(node_list):
-                    log.warning(f'not all node delete project:{project_id} =>{result}')
-                    return PartialSuccess(msg=f'not all node delete project', data=result)
+            sign, result = self.op_delete_project(self.impl.get_nodes(), project_id)
+            if not sign:
                 log.error(f'all project delete failed:{project_id} =>{result}')
-                raise Conflict(msg='all project delete failed', errno=30006)
+                raise Conflict(msg='project delete failed', data=result, errno=30007)
             log.info(f'delete project:{project_id} success')
             if self.impl.unbind_queue(project_id):
                 return DeleteSuccess()
             else:
-                return Conflict(msg='project is not exist', errno=30001)
+                raise Conflict(msg='project\'s queue is not exist', errno=30001)
 
     def get(self, project_id):
         info = self.impl.get_project(project_id)

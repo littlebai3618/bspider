@@ -100,29 +100,3 @@ class AgentCache(object):
         fields, values = BaseImpl.make_fv(data)
         sql = f"update {self.code_table} set {fields} where `id` = {code_id};".replace('%s', '?')
         return self.handler.update(sql, values)
-
-    # def update_code(self, project_ids, code_name, code_type, content):
-    #     if 'downloader' in code_type:
-    #         key1, key2 = 'downloader_config', 'middlewares'
-    #     else:
-    #         key1, key2 = 'parser_config', 'pipelines'
-    #     for project_id in project_ids:
-    #         info = json.loads(self.get_project(project_id))[0]['content']
-    #         if info[0]:
-    #             mods = info[key1][key2]
-    #             for i, mod in enumerate(mods):
-    #                 if mod[0] == code_name:
-    #                     mods[i] = content
-    #                     break
-    #             self.update_project(project_id, {'project': json.dumps(info)})
-
-    # def get_weight(self):
-    #     sql = 'select `project_weight` from project_weight_cache'
-    #     info = self.handler.select(sql)
-    #     if len(info):
-    #         return json.loads(info[0][0])
-    #
-    # def set_weight(self, weight: dict):
-    #     weight = json.dumps(weight)
-    #     sql = f'insert or replace into project_weight_cache values(1, "{weight}");'
-    #     return self.handler.insert(sql)
