@@ -150,7 +150,7 @@ class MasterMixIn(RemoteMixIn):
             self.base_url,
             method='POST',
             data=data,
-            token=make_token(0, 'agent'.format(**data))
+            token=make_token(0, 'agent')
         ).json()
         if data['errno'] == 0:
             return data['data']
