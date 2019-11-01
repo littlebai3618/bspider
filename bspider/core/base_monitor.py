@@ -6,9 +6,12 @@ import asyncio
 import random
 
 from bspider.config.default_settings import EXCHANGE_NAME
-from bspider.core import RabbitMQBroker, AgentCache, ProjectConfigParser
 from bspider.utils.sign import Sign
 from bspider.utils.tools import find_class_name_by_content
+
+from .broker import RabbitMQBroker
+from .agent_cache import AgentCache
+from .project_config_parser import ProjectConfigParser
 
 
 class BaseMonitor(object):
@@ -24,7 +27,6 @@ class BaseMonitor(object):
         self.projects = dict()
         self.__weight = None
         self.__total_sum = 0
-
 
     async def sync_config(self):
         """从cache 同步任务数据"""
