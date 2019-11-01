@@ -4,7 +4,7 @@
 # @Use     :
 from flask import g
 from flask_httpauth import HTTPTokenAuth
-from bspider.core.api.auth.token import verify_token
+from .token import verify_token
 
 auth = HTTPTokenAuth()
 

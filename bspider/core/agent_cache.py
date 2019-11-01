@@ -2,9 +2,7 @@
 # @Author  : 白尚林
 # @File    : project_cache
 # @Use     :
-import json
 import os
-import zlib
 
 from bspider.core.api import BaseImpl
 from bspider.utils.conf import PLATFORM_PATH_ENV
