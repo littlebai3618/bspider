@@ -18,8 +18,11 @@ class RemoteMixIn(object):
     # 可以优化为协程方式调用
 
     @staticmethod
-    def request(url, method, params=None, data=None):
-        headers = dict(Authorization=f'Bearer {g.user.token}')
+    def request(url, method, params=None, data=None, token=None):
+        if token:
+            headers = dict(Authorization=f'Bearer {token}')
+        else:
+            headers = dict(Authorization=f'Bearer {g.user.token}')
         if data:
             headers['Content-Type'] = 'application/json'
             data = json.dumps(data)
@@ -143,9 +146,12 @@ class MasterMixIn(RemoteMixIn):
     base_url = 'http://{ip}:{port}/node'.format(**FrameSettings()['MASTER'])
 
     def op_add_node(self, data: dict) -> dict:
-        g.user = User(0, 'agent', make_token(0, 'agent->{ip}'.format(**data)))
-
-        data = self.request(self.base_url, method='POST', data=data).json()
+        data = self.request(
+            self.base_url,
+            method='POST',
+            data=data,
+            token=make_token(0, 'agent->{ip}'.format(**data))
+        ).json()
         if data['errno'] == 0:
             return data['data']
 
