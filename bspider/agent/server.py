@@ -27,7 +27,7 @@ from bspider.core.api import MasterMixIn
 from bspider.utils.exceptions import RemoteOPError
 
 
-class CreateApp(object, MasterMixIn):
+class CreateApp(MasterMixIn):
 
     def __init__(self):
         self.frame_settings = FrameSettings()
