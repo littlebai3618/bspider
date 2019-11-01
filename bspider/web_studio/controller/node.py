@@ -32,7 +32,7 @@ node_service = Node()
 @auth.login_required
 def add_node():
     form = AddNodeForm()
-    return node_service.add_node(form.node_ip.data, form.desc.data, form.name.data)
+    return node_service.add_node(**form.get_dict())
 
 
 @node.route('/node/<int:node_id>', methods=['DELETE'])

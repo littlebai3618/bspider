@@ -9,9 +9,9 @@ from bspider.core.api import BaseForm, ParamRequired
 
 
 class AddNodeForm(BaseForm):
-    node_ip = StringField(validators=[ParamRequired(), length(min=7, max=15)])
+    ip = StringField(validators=[ParamRequired(), length(min=7, max=15)])
     name = StringField(validators=[ParamRequired(), length(min=3, max=30)])
-    desc = StringField(validators=[ParamRequired()])
+    description = StringField(validators=[ParamRequired()])
 
 
 class GetNodeForm(BaseForm):

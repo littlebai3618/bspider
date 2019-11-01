@@ -16,8 +16,8 @@ class Node(BaseService, AgentMixIn):
         self.impl = NodeImpl()
 
     # node API
-    def add_node(self, ip, desc, name):
-        self.impl.add_node({'ip': ip, 'description': desc, 'name': name})
+    def add_node(self, ip, description, name):
+        self.impl.add_node({'ip': ip, 'description': description, 'name': name})
         log.info(f'add agent from {name}:{ip} success')
         return PostSuccess(
             msg=f'add agent from {name}:{ip} success',
