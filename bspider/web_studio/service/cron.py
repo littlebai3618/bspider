@@ -75,7 +75,7 @@ class CronService(BaseService):
             self.datetime_to_str(info)
 
         if len(infos):
-            return GetSuccess(msg='get cron job success', data=infos)
+            return GetSuccess(msg='get cron job success', data=infos[0])
         return NotFound(msg='job is not exist', errno=50001)
 
     def get_jobs(self, page, limit, search, sort):

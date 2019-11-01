@@ -216,7 +216,7 @@ class Node(BaseService, AgentMixIn):
                 except RemoteOPError:
                     worker_status = dict(mem=0.0, status=False, pid=None, is_run=False)
                 info.update(worker_status)
-            return GetSuccess(msg=f'get worker status success', data=infos)
+            return GetSuccess(msg=f'get worker status success', data=infos[0])
         return NotFound(msg=f'this worker id={worker_id} is not exist', errno=20008)
 
     def get_workers(self, page, limit, search, sort):

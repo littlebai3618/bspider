@@ -94,7 +94,7 @@ class CodeService(BaseService, AgentMixIn):
             infos[0].pop('project_id')
             infos[0].pop('project_name')
             infos[0]['project'] = project
-            return GetSuccess(msg='get code success', data=[infos[0]])
+            return GetSuccess(msg='get code success', data=infos[0])
         else:
             return NotFound(msg='code is not exist', errno=40001)
 

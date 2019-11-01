@@ -124,9 +124,9 @@ class ProjectService(BaseService, AgentMixIn):
                 raise Conflict(msg='project\'s queue is not exist', errno=30001)
 
     def get(self, project_id):
-        info = self.impl.get_project(project_id)
-        if len(info):
-            return GetSuccess(data=info)
+        infos = self.impl.get_project(project_id)
+        if len(infos):
+            return GetSuccess(data=infos[0])
         else:
             return NotFound(msg='project not exist', errno=30001)
 

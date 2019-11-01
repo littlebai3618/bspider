@@ -102,5 +102,5 @@ class UserService(BaseService):
             self.datetime_to_str(info)
 
         if len(infos):
-            return GetSuccess(msg='get user success', data=infos)
+            return GetSuccess(msg='get user success', data=infos[0])
         return NotFound(errno=10006, msg='invalid user')
