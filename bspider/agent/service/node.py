@@ -35,7 +35,8 @@ class NodeService(BaseService):
         )
 
     def start_worker(self, worker_id, worker_type, coro_num):
-        if worker_id in self.module_list:
+        unique_id = f'worker_{worker_id}'
+        if unique_id in self.module_list:
             log.error(f'worker:worker_id->{worker_id} is already exist in this node')
             return Conflict(msg=f'worker:worker_id->{worker_id} is already exist in this node', errno=20001)
 
@@ -47,9 +48,9 @@ class NodeService(BaseService):
             log.error(f'unknow worker type: {worker_type}')
             return Conflict(msg=f'unknow worker type: {worker_type}', errno=20002)
 
-        worker = self.__start(func, worker_id, coro_num)
+        worker = self.__start(func, unique_id, coro_num)
         if worker.is_alive():
-            self.module_list[worker_id] = worker
+            self.module_list[unique_id] = worker
             log.info(f'start work:{worker_id}-{worker_type} success')
             return PostSuccess(msg='worker process start success',
                                data={'pid': worker.pid, 'name': worker.name, 'type': worker_type})
@@ -57,8 +58,8 @@ class NodeService(BaseService):
             log.error(f'worker process start error. module start exec')
             return Conflict(msg=f'worker process start error', errno=20003)
 
-    def __start(self, func, worker_id, coro_num):
-        worker = self.mp_ctx.Process(name=worker_id, target=func, args=(worker_id, coro_num), daemon=True)
+    def __start(self, func, unique_id, coro_num):
+        worker = self.mp_ctx.Process(name=unique_id, target=func, args=(unique_id, coro_num), daemon=True)
         worker.start()
         return worker
 
