@@ -22,7 +22,7 @@ class MySQLJobStore(BaseJobStore):
     :param str tablename: name of the table to store jobs in
     """
 
-    TABLE_FIELDS = ('`id`', '`project_id`', '`class_id`', '`trigger`', '`trigger_type`',
+    TABLE_FIELDS = ('`id`', '`project_id`', '`code_id`', '`trigger`', '`trigger_type`',
                     '`next_run_time`', '`executor`', '`func`', '`status`', '`description`')
 
     def __init__(self, handler: MysqlHandler, tz, log, tablename='bspider_cronjob'):
@@ -61,7 +61,7 @@ class MySQLJobStore(BaseJobStore):
 
     def __make_fv(self, job: MySQLJob) -> tuple:
         fields = ','.join([' %s=%%s ' % (key) for key in self.TABLE_FIELDS])
-        project_id, class_id = job.name.split('|')
+        project_id, code_id = job.name.split('|')
 
         trigger_type = job.trigger.__str__().split('[')[0]
 
@@ -72,7 +72,7 @@ class MySQLJobStore(BaseJobStore):
         else:
             trigger = ''
 
-        values = (job.id, project_id, class_id, json.dumps(job.args), json.dumps(job.kwargs), trigger, trigger_type,
+        values = (job.id, project_id, code_id, json.dumps(job.args), json.dumps(job.kwargs), trigger, trigger_type,
                   job.next_run_time if isinstance(job.next_run_time, float) else datetime_to_utc_timestamp(
                       job.next_run_time),
                   job.executor, job.func_ref, job.status, job.description)
