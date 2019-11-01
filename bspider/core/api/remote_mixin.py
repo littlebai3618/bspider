@@ -150,9 +150,9 @@ class MasterMixIn(RemoteMixIn):
             self.base_url,
             method='POST',
             data=data,
-            token=make_token(0, 'agent->{ip}'.format(**data))
+            token=make_token(0, 'agent'.format(**data))
         ).json()
         if data['errno'] == 0:
             return data['data']
 
-        raise RemoteOPError('Call Master Failed to reg node msg {}', data.json()['msg'])
+        raise RemoteOPError('Call Master Failed to reg node msg {}', data['msg'])
