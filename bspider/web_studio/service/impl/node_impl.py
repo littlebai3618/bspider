@@ -18,13 +18,20 @@ class NodeImpl(BaseImpl):
         self.code_table = self.frame_settings['CODE_STORE_TABLE']
         self.p2c = self.frame_settings['P2C_TABLE']
 
-    def get_jobs(self):
-        sql = f"SELECT `p`.`status` as `project_status`, `p`.`id` AS `project_id`,`p`.`name` AS `project_name`," \
-            f"`p`.`config` AS `config`, `p`.`rate` AS `rate`,`c`.`name` AS `code_name`," \
-            f"`c`.`content` AS `code`,`c`.`type` AS `code_type` FROM `{self.project_table}` AS `p` " \
-            f"LEFT JOIN `{self.p2c}` AS `p2c` ON p.id=p2c.project_id " \
-            f"LEFT JOIN `{self.code_table}` AS `c` ON c.id=p2c.customcode_id " \
-            f"WHERE `p`.`status`=1"
+    def get_all_projects(self):
+        sql = f'select `id` as `project_id`, `name`, `status`, `config`, `rate` ' \
+              f'from {self.project_table} where `type`= "spider"'
+        log.debug(f'SQL:{sql}')
+        return self.handler.select(sql)
+
+    def get_all_codes(self):
+        sql = f'select `id` as `code_id`, `content` from {self.code_table}'
+        log.debug(f'SQL:{sql}')
+        return self.handler.select(sql)
+
+    def get_all_workers(self, ip):
+        sql = f'select `id` as `worker_id`, `name`, `type`, `coroutine_num` ' \
+              f'from {self.worker_table} where `ip` = "{ip}" and `status` = 1;'
         log.debug(f'SQL:{sql}')
         return self.handler.select(sql)
 
@@ -52,11 +59,6 @@ class NodeImpl(BaseImpl):
         if get_sql:
             return sql,
         return self.handler.delete(sql)
-
-    def get_worker_by_ip(self, node_ip):
-        sql = f'select `name`, `type`, `ip`, `status`, `coroutine_num` from {self.worker_table} where `ip`="{node_ip}"'
-        log.debug(f'SQL:{sql}')
-        return self.handler.select(sql)
 
     def update_node(self, node_id, data, get_sql=False):
         fields, values = BaseImpl.make_fv(data)

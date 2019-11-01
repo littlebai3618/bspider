@@ -80,7 +80,7 @@ class CreateApp(object, MasterMixIn):
             for code in data['codes']:
                 cache.set_code(**code)
 
-            for project in data['project']:
+            for project in data['projects']:
                 cache.set_project(**project)
         except Exception:
             tp, msg, tb = sys.exc_info()
@@ -93,8 +93,8 @@ class CreateApp(object, MasterMixIn):
 
         # 恢复节点下工作的worker
         for worker in data['workers']:
-            if node_service.start_worker(worker['name'], worker['type'], worker['coroutine_num']).errno != 0:
-                log.error('worker init failed: {name} {type} {coroutine_num}'.format(**worker))
+            if node_service.start_worker(worker['worker_id'], worker['type'], worker['coroutine_num']).errno != 0:
+                log.error('worker init failed: {worker_id} {type} {coroutine_num}'.format(**worker))
                 return False
 
         log.info(' Agent\'s worker recover complete !! count->{}'.format(len(data['workers'])))

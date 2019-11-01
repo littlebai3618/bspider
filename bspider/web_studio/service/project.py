@@ -8,7 +8,7 @@ from bspider.core import ProjectConfigParser
 from bspider.utils.exceptions import ProjectConfigError
 from bspider.web_studio import log
 from bspider.web_studio.service.impl.project_impl import ProjectImpl
-from bspider.core.api import BaseService, Conflict, NotFound, PartialSuccess, PostSuccess, DeleteSuccess, GetSuccess, \
+from bspider.core.api import BaseService, Conflict, NotFound, PostSuccess, DeleteSuccess, GetSuccess, \
     PatchSuccess, ParameterException, AgentMixIn
 
 

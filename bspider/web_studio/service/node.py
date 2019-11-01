@@ -4,24 +4,28 @@
 # @Use     :
 from bspider.core.api import BaseService, Conflict, NotFound, PostSuccess, DeleteSuccess, PatchSuccess, GetSuccess, \
     ParameterException
-from bspider.core import RemoteMixIn
+from bspider.core.api import AgentMixIn
 from bspider.utils.exceptions import RemoteOPError
 from bspider.web_studio.server import log
 from bspider.web_studio.service.impl.node_impl import NodeImpl
 
 
-class Node(BaseService, RemoteMixIn):
+class Node(BaseService, AgentMixIn):
 
     def __init__(self):
         self.impl = NodeImpl()
 
     # node API
     def add_node(self, ip, desc, name):
-        projects = self.serializer_project(self.impl.get_jobs())
-        workers = self.impl.get_worker_by_ip(ip)
         self.impl.add_node({'ip': ip, 'description': desc, 'name': name})
         log.info(f'add agent from {name}:{ip} success')
-        return PostSuccess(msg=f'add agent from {name}:{ip} success', data={'projects': projects, 'workers': workers})
+        return PostSuccess(
+            msg=f'add agent from {name}:{ip} success',
+            data={
+                'projects': self.impl.get_all_projects(),
+                'codes': self.impl.get_all_codes(),
+                'workers': self.impl.get_all_workers(ip)
+            })
 
     def delete_node(self, node_id):
         """supervisor 停止进程 删除节点信息"""
@@ -50,7 +54,7 @@ class Node(BaseService, RemoteMixIn):
         node = nodes[0]
         try:
             remote_change = False
-            for key in ('status', ):
+            for key in ('status',):
                 if key in kwargs:
                     remote_change = True
                     break
