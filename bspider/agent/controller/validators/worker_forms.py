@@ -9,10 +9,6 @@ from bspider.core.api import BaseForm, ParamRequired
 
 
 class RegisterForm(BaseForm):
-    name = StringField(validators=[ParamRequired(), length(max=32, min=5)])
+    worker_id = IntegerField(validators=[ParamRequired()])
     coroutine_num = IntegerField(validators=[ParamRequired()])
     worker_type = StringField(validators=[ParamRequired()])
-
-class CommonForm(BaseForm):
-    name = StringField()
-    is_all = IntegerField(default=0)

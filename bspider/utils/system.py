@@ -2,40 +2,62 @@
 # @Author  : 白尚林
 # @File    : system
 # @Use     : 获取系统相关信息
+"""
+这里实例化一个对象，启用单独的线程异步获取CPU\DESK\MEM 使用率、系统配置
+"""
+
 import psutil
 
 from bspider.config import FrameSettings
 
 
-def cpu_used():
-    """获取CPU使用率"""
-    return psutil.cpu_percent(interval=0.1)
+class System(object):
+    """
+    #### 后续增加异步获取CPU等使用率
+    """
+    ip_msg = '{}->{}'.format(FrameSettings()['MASTER']['ip'], FrameSettings()['AGENT']['ip'])
+
+    @property
+    def cpu_percent(self):
+        return psutil.cpu_percent()
+
+    @property
+    def mem_percent(self):
+        return psutil.virtual_memory().percent
+
+    @property
+    def disk_percent(self):
+        return psutil.disk_usage('/').percent
+
+    @property
+    def cpu_num(self):
+        return psutil.cpu_count(logical=True)
+
+    @property
+    def mem_size(self):
+        """返回字节大小"""
+        return psutil.virtual_memory().total
+
+    @property
+    def disk_size(self):
+        return psutil.disk_usage('/').total
 
 
-def mem_used():
-    """获取内存使用率"""
-    memory = psutil.virtual_memory()
-    return memory.percent
-
-
-def disk_used():
-    """获取磁盘使用率"""
-    disk = psutil.disk_usage('/')
-    return disk.percent
-
-__ip_addr = '{}->{}'.format(FrameSettings()['MASTER']['ip'], FrameSettings()['AGENT']['ip'])
-def ip_addr():
-    """获取机器内网ip"""
-    return __ip_addr
-def process_info(pid):
-    p = psutil.Process(pid)
-    status = p.is_running()
-    try:
-        mem = p.memory_percent()
-        return {'mem': mem, 'status': status}
-    except Exception as e:
-        return {'mem': None, 'err': f"{e}", 'status': status}
+class WorkerProcess():
+    pass
 
 
 if __name__ == '__main__':
-    print(ip_addr())
+    print(System().cpu_percent)
+
+    ps_info = {
+        'CPU COUNT': psutil.cpu_count(),
+        'CPU PERCENT': psutil.cpu_percent(),
+        'MEM SIZE': psutil.virtual_memory().total,
+        'MEM PERCENT': psutil.virtual_memory().percent,
+        'DISK SIZE': psutil.disk_usage('/').total,
+        'DISK PERCENT': psutil.disk_usage('/').percent
+    }
+
+    for key, value in ps_info.items():
+        print(f'{key}:{value}')

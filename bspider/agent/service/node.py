@@ -9,7 +9,7 @@ from bspider.agent import log
 from bspider.core.api import BaseService, GetSuccess, PostSuccess, DeleteSuccess, Conflict, NotFound
 from bspider.downloader.work import run_downloader
 from bspider.parser.work import run_parser
-from bspider.utils.system import cpu_used, mem_used, disk_used, process_info
+from bspider.utils.system import System
 
 
 class NodeService(BaseService):
@@ -23,18 +23,23 @@ class NodeService(BaseService):
         self.module_list = {}
         self.mp_ctx = multiprocessing.get_context('spawn')
 
+        self.system = System()
+
     def node_status(self):
         """报告 磁盘、处理器、内存使用状况"""
         return GetSuccess(
             msg='get node status success',
             data={
-                'cpu': cpu_used(),
-                'memory': mem_used(),
-                'disk': disk_used()
+                'cpu_num': self.system.cpu_num,
+                'cpu_percent': self.system.cpu_percent,
+                'mem_size': self.system.mem_size,
+                'mem_percent': self.system.mem_percent,
+                'disk_size': self.system.disk_size,
+                'disk_percent': self.system.disk_percent
             }
         )
 
-    def start_worker(self, worker_id, worker_type, coro_num):
+    def start_worker(self, worker_id, worker_type, coroutine_num):
         unique_id = f'worker_{worker_id}'
         if unique_id in self.module_list:
             log.error(f'worker:worker_id->{worker_id} is already exist in this node')
@@ -48,12 +53,11 @@ class NodeService(BaseService):
             log.error(f'unknow worker type: {worker_type}')
             return Conflict(msg=f'unknow worker type: {worker_type}', errno=20002)
 
-        worker = self.__start(func, unique_id, coro_num)
+        worker = self.__start(func, unique_id, coroutine_num)
         if worker.is_alive():
             self.module_list[unique_id] = worker
             log.info(f'start work:{worker_id}-{worker_type} success')
-            return PostSuccess(msg='worker process start success',
-                               data={'pid': worker.pid, 'name': worker.name, 'type': worker_type})
+            return PostSuccess(msg='worker process start success', data={'pid': worker.pid, 'status': 1})
         else:
             log.error(f'worker process start error. module start exec')
             return Conflict(msg=f'worker process start error', errno=20003)
@@ -63,49 +67,28 @@ class NodeService(BaseService):
         worker.start()
         return worker
 
-    def stop_worker(self, name):
+    def stop_worker(self, worker_id):
+        unique_id = f'worker_{worker_id}'
         try:
-            worker = self.module_list.pop(name)
+            worker = self.module_list.pop(unique_id)
+            log.info(f'delete worker:worker_id->{worker_id} success')
+        except KeyError:
+            log.warning(f'worker:worker_id->{worker_id} is not exist')
+            return NotFound(msg=f'worker is not exist', errno=20004)
+
+        try:
             while worker.is_alive():
                 worker.terminate()
                 time.sleep(0.5)
-            log.info(f'delete worker:{name} success')
-        except KeyError:
-            log.warning(f'worker:{name} is not exist')
-            # return NotFound(msg=f'worker:{name} is not exist', errno=20004)
+        except Exception as e:
+            self.module_list[unique_id] = worker
+            raise Conflict(f'worker stop error:{e}')
         return DeleteSuccess()
 
-    def get_worker(self, name):
-        worker = self.module_list.get(name)
+    def get_worker(self, worker_id):
+        unique_id = f'worker_{worker_id}'
+        worker = self.module_list.get(unique_id)
         if worker:
-            tmp = self.__get_process_info(worker)
-            return GetSuccess(data=tmp)
-        log.error(f'worker:{name} is not exist')
-        return NotFound(msg=f'worker:{name} is not exist', errno=20004)
-
-    def get_workers(self):
-        result = []
-        for name, worker in self.module_list.items():
-            tmp = self.__get_process_info(worker)
-            result.append(tmp)
-        return GetSuccess(data=result)
-
-    @staticmethod
-    def __get_process_info(worker):
-        result = process_info(worker.pid)
-        result['pid'] = worker.pid
-        result['worker_id'] = worker.name
-        result['status'] = 1 if worker.is_alive else 0
-        return result
-
-    def worker_status(self):
-        """返回所有子进程的运行状态"""
-        result = {}
-        for name, worker in self.module_list.items():
-            result[name] = worker.is_alive
-        return GetSuccess(data=result)
-
-    def __del__(self):
-        for name, worker in self.module_list.items():
-            while worker.is_alive():
-                worker.terminate()
+            return GetSuccess(data={'pid': worker.pid, 'status': 1})
+        log.error(f'worker:worker_id->{worker_id} is not run')
+        return GetSuccess(data={'pid': 0, 'status': -1})

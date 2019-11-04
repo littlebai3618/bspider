@@ -6,7 +6,7 @@ from flask import Blueprint
 
 from bspider.agent.service.node import NodeService
 from bspider.core.api import auth
-from .validators.worker_forms import RegisterForm, CommonForm
+from .validators.worker_forms import RegisterForm
 
 node = Blueprint('node_bp', __name__)
 
@@ -21,25 +21,14 @@ def status():
 @auth.login_required
 def start_worker():
     form = RegisterForm()
-    return node_service.start_worker(form.name.data, form.worker_type.data, form.coroutine_num.data)
+    return node_service.start_worker(**form.get_dict())
 
-@node.route('/worker', methods=['DELETE'])
+@node.route('/worker/<int:worker_id>', methods=['DELETE'])
 @auth.login_required
-def stop_worker():
-    form = CommonForm()
-    return node_service.stop_worker(form.name.data)
+def stop_worker(worker_id):
+    return node_service.stop_worker(worker_id)
 
-@node.route('/worker', methods=['GET'])
+@node.route('/worker/<int:worker_id>', methods=['GET'])
 @auth.login_required
-def get_worker():
-    form = CommonForm()
-    if form.is_all.data == 1:
-        return node_service.get_workers()
-    else:
-        return node_service.get_worker(form.name.data)
-
-# part 2 接口
-@node.route('/worker/status', methods=['GET'])
-@auth.login_required
-def get_worker_status():
-    return node_service.worker_status()
+def get_worker(worker_id):
+    return node_service.get_worker(worker_id)

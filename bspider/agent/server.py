@@ -15,7 +15,7 @@ from flask import Flask
 from werkzeug.exceptions import HTTPException
 
 from bspider.agent import log
-from bspider.core.api import APIException
+from bspider.core.api import APIException, MasterMixIn
 from bspider.core import AgentCache
 from bspider.config import FrameSettings
 
@@ -23,7 +23,6 @@ from bspider.agent.controller.project import project
 from bspider.agent.controller.node import node, node_service
 from bspider.agent.controller.code import code
 
-from bspider.core.api import MasterMixIn
 from bspider.utils.exceptions import RemoteOPError
 
 

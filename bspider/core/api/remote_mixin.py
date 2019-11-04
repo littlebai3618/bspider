@@ -95,9 +95,9 @@ class AgentMixIn(RemoteMixIn):
             return data['data']
         raise RemoteOPError('start work error {}', data['msg'])
 
-    def op_get_worker(self, ip: str, worker_name: str) -> dict:
+    def op_get_worker(self, ip: str, worker_id: str) -> dict:
         url = self.base_url.format(ip, '/worker')
-        req = self.request(url, method='GET', params={'name': worker_name, 'is_all': 1})
+        req = self.request(url, method='GET', params={'worker_id': worker_id, 'is_all': 1})
         data = req.json()
         if data['errno'] == 0:
             return data['data'] if data.get('data') else {}

@@ -227,7 +227,7 @@ class Node(BaseService, AgentMixIn):
         for info in infos:
             self.datetime_to_str(info)
             try:
-                worker_status = self.op_get_worker(info['ip'], '{}:{}'.format(info['type'], info['name']))
+                worker_status = self.op_get_worker(info['ip'], info['id'])
             except RemoteOPError:
                 worker_status = dict(mem=0.0, status=-1, pid=None, is_run=False)
             info.update(worker_status)

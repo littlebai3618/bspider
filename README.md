@@ -32,16 +32,17 @@
 
 #### TODO
 * 初次安装自动建表
+* agent.node返回值、逻辑优化。节点状态返回优化 done
+* master.node逻辑优化、mixin方法优化
 * frame_settings supervisor注释优化 done
 * debug队列改为优先队列 done
 * 接口支持表单 done
-* 每个资源增加分页、搜索接口 doing user done
+* 每个资源增加分页、搜索接口 done
 * User 增加创建时间、修改时间返回、修复total参数显示不正确bug done
-* web全线放弃 使用xx_name 全部使用 xx_id进行通信，
+* web全线放弃 使用xx_name 全部使用 xx_id进行通信 done
 * 强化校验 \*Pipeline、\*Task、\*Operation、\*Middleware、\.Extractor
-  1. 取出文档所有类->根据名称校验父类->判断父类合规的数量是否为1->通过校验
-  2. 单独设立校验类放入cron.lib 
-  3. 原有预执行检测也放入校验类、返回 (bool, check_report)
+  1. 取出文档所有类->根据名称校验父类->判断父类合规的数量是否为1->通过校验 done
+  2. 原有预执行检测也放入校验类、返回 (bool, check_report) done
 
 
 
