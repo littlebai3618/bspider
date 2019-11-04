@@ -24,7 +24,7 @@ def get_project(project_id):
 @auth.login_required
 def get_projects():
     form = PageForm()
-    return project_service.gets(**form.get_dict())
+    return project_service.gets(**form.to_dict())
 
 
 @project.route('/project/<int:project_id>', methods=['DELETE'])
@@ -37,11 +37,11 @@ def delete_project(project_id):
 @auth.login_required
 def update(project_id):
     form = UpdateForm()
-    return project_service.update(project_id, form.get_dict())
+    return project_service.update(project_id, form.to_dict())
 
 
 @project.route('/project', methods=['POST'])
 @auth.login_required
 def add():
     form = AddForm()
-    return project_service.add(**form.get_dict())
+    return project_service.add(**form.to_dict())

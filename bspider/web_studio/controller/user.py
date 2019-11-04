@@ -29,7 +29,7 @@ def login():
 @auth.login_required
 def add_user():
     form = RegisterForm()
-    return user_service.add_user(**form.get_dict())
+    return user_service.add_user(**form.to_dict())
 
 
 @user.route('/user/<int:user_id>', methods=['DELETE'])
@@ -42,7 +42,7 @@ def delete_user(user_id):
 @auth.login_required
 def update_user(user_id):
     form = UpdateForm()
-    return user_service.update_user(user_id, **form.get_dict())
+    return user_service.update_user(user_id, **form.to_dict())
 
 
 @user.route('/user', methods=['GET'])

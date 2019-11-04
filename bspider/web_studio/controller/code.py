@@ -24,7 +24,7 @@ def get(code_id):
 @auth.login_required
 def gets():
     form = PageForm()
-    return code_service.get_codes(**form.get_dict())
+    return code_service.get_codes(**form.to_dict())
 
 
 @code.route('/code', methods=['POST'])
@@ -44,4 +44,4 @@ def delete(code_id):
 @auth.login_required
 def update(code_id):
     form = UpdateForm()
-    return code_service.update(code_id, form.get_dict())
+    return code_service.update(code_id, form.to_dict())

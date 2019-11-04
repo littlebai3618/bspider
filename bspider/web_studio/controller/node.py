@@ -32,7 +32,7 @@ node_service = Node()
 @auth.login_required
 def add_node():
     form = AddNodeForm()
-    return node_service.add_node(**form.get_dict())
+    return node_service.add_node(**form.to_dict())
 
 
 @node.route('/node/<int:node_id>', methods=['DELETE'])
@@ -45,14 +45,14 @@ def delete_node(node_id):
 @auth.login_required
 def update_node(node_id):
     form = UpdateNodeForm()
-    return node_service.update_node(node_id, **form.get_dict())
+    return node_service.update_node(node_id, **form.to_dict())
 
 
 @node.route('/node', methods=['GET'])
 @auth.login_required
 def get_nodes():
     form = PageForm()
-    return node_service.get_nodes(int(form.page.data), int(form.limit.data), form.search.data, form.sort.data)
+    return node_service.get_nodes(**form.to_dict())
 
 
 @node.route('/node/<int:node_id>', methods=['GET'])
@@ -78,7 +78,7 @@ def delete_worker(worker_id):
 @auth.login_required
 def update_worker(worker_id):
     form = UpdateWorkerForm()
-    return node_service.update_worker(worker_id, **form.get_dict())
+    return node_service.update_worker(worker_id, **form.to_dict())
 
 
 @node.route('/worker', methods=['GET'])
@@ -86,7 +86,7 @@ def update_worker(worker_id):
 def get_workers():
     """获取全部worker信息"""
     form = PageForm()
-    return node_service.get_workers(int(form.page.data), int(form.limit.data), form.search.data, form.sort.data)
+    return node_service.get_workers(**form.to_dict())
 
 
 @node.route('/worker/<int:worker_id>', methods=['GET'])

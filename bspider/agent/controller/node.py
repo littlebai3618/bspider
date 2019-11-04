@@ -21,7 +21,7 @@ def status():
 @auth.login_required
 def start_worker():
     form = RegisterForm()
-    return node_service.start_worker(**form.get_dict())
+    return node_service.start_worker(**form.to_dict())
 
 @node.route('/worker/<int:worker_id>', methods=['DELETE'])
 @auth.login_required

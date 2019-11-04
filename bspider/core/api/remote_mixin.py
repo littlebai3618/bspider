@@ -54,8 +54,8 @@ class AgentMixIn(RemoteMixIn):
 
     def op_get_node(self, ip) -> dict:
         result = {
-            'description': 'no process name agent',
-            'pid': -1,
+            'description': f'Agent {ip} process is not exist!!!',
+            'pid': 0,
             'status': -1
         }
 
@@ -69,23 +69,22 @@ class AgentMixIn(RemoteMixIn):
                 elif process['state'] == 0:
                     result['status'] = 0
                 else:
-                    result['description'] = 'error in this node log:{}'.format(process['stdout_logfile'])
+                    result['description'] = 'Error see->{}'.format(process['stdout_logfile'])
                     result['pid'] = process['pid']
                 return result
         return result
 
-    def op_stop_worker(self, ip: str, unique_sign: str) -> bool:
-        url = self.base_url.format(ip, '/worker')
-        data = {'name': unique_sign}
-        req = self.request(url, method='DELETE', params=data)
+    def op_stop_worker(self, ip: str, worker_id: int) -> bool:
+        url = self.base_url.format(ip, f'/worker/{worker_id}')
+        req = self.request(url, method='DELETE')
         if req.status_code == 204:
             return True
         raise RemoteOPError('stop work error {}', req.json()['msg'])
 
-    def op_start_worker(self, ip: str, unique_sign: str, worker_type: str, coroutine_num: int) -> dict:
+    def op_start_worker(self, ip: str, worker_id: int, worker_type: str, coroutine_num: int) -> dict:
         url = self.base_url.format(ip, '/worker')
         data = {
-            'name': unique_sign,
+            'worker_id': worker_id,
             'worker_type': worker_type,
             'coroutine_num': coroutine_num
         }
@@ -95,12 +94,12 @@ class AgentMixIn(RemoteMixIn):
             return data['data']
         raise RemoteOPError('start work error {}', data['msg'])
 
-    def op_get_worker(self, ip: str, worker_id: str) -> dict:
-        url = self.base_url.format(ip, '/worker')
-        req = self.request(url, method='GET', params={'worker_id': worker_id, 'is_all': 1})
+    def op_get_worker(self, ip: str, worker_id: int) -> dict:
+        url = self.base_url.format(ip, f'/worker/{worker_id}')
+        req = self.request(url, method='GET')
         data = req.json()
         if data['errno'] == 0:
-            return data['data'] if data.get('data') else {}
+            return data['data']
         raise RemoteOPError('get worker error {}', data['msg'])
 
     def __op_query(self, ip_list: list, method: str, uri: str, data: dict = None) -> (bool, dict):

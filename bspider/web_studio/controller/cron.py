@@ -18,7 +18,7 @@ cron_service = CronService()
 @auth.login_required
 def add():
     form = AddForm()
-    return cron_service.add_cron(**form.get_dict())
+    return cron_service.add_cron(**form.to_dict())
 
 
 @cron.route('/cron/<int:cron_id>', methods=['DELETE'])
@@ -31,7 +31,7 @@ def delete(cron_id):
 @auth.login_required
 def update(cron_id):
     form = UpdateForm()
-    return cron_service.update_job(cron_id, changes=form.get_dict())
+    return cron_service.update_job(cron_id, changes=form.to_dict())
 
 
 @cron.route('/cron/<int:cron_id>', methods=['GET'])
@@ -43,4 +43,4 @@ def get(cron_id):
 @auth.login_required
 def gets():
     form = PageForm()
-    return cron_service.get_jobs(**form.get_dict())
+    return cron_service.get_jobs(**form.to_dict())

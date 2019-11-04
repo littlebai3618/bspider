@@ -26,7 +26,7 @@ class BaseForm(Form):
         if not super().validate():
             raise ParameterException(msg=self.errors)
 
-    def get_dict(self):
+    def to_dict(self):
         result = {}
         for name, field in self._fields.items():
             if field is not None and field.data is not None:

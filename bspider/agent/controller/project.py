@@ -16,13 +16,13 @@ project_service = ProjectService()
 @auth.login_required
 def add_project():
     form = AddForm()
-    return project_service.add_project(**form.get_dict())
+    return project_service.add_project(**form.to_dict())
 
 @project.route('/project/<int:project_id>', methods=['PATCH'])
 @auth.login_required
 def update_project(project_id):
     form = UpdateForm()
-    return project_service.update_project(project_id, form.get_dict())
+    return project_service.update_project(project_id, form.to_dict())
 
 @project.route('/project/<int:project_id>', methods=['DELETE'])
 @auth.login_required

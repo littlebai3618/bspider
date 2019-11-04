@@ -16,14 +16,14 @@ code_service = CodeService()
 @auth.login_required
 def add_code():
     form = AddForm()
-    return code_service.add_code(**form.get_dict())
+    return code_service.add_code(**form.to_dict())
 
 
 @code.route('/code/<int:code_id>', methods=['PATCH'])
 @auth.login_required
 def update_code(code_id):
     form = UpdateForm()
-    return code_service.update_code(code_id, form.get_dict())
+    return code_service.update_code(code_id, form.to_dict())
 
 
 @code.route('/code/<int:code_id>', methods=['DELETE'])
