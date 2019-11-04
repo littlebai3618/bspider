@@ -113,25 +113,24 @@ class Node(BaseService, AgentMixIn):
             })
 
     # worker API
-    def add_worker(self, node_ip, name, worker_type, description, status):
+    def add_worker(self, ip, name, worker_type, description, status):
         """携程数量更新很麻烦所以这里写死"""
         try:
             with self.impl.handler.session() as session:
                 coroutine_num = 50 if worker_type == 'downloader' else 4
                 data = {
-                    'ip': node_ip,
+                    'ip': ip,
                     'name': name,
                     'type': worker_type,
                     'description': description,
                     'coroutine_num': coroutine_num,
                     'status': status
                 }
-                session.insert(*self.impl.add_worker(data, get_sql=True))
+                worker_id = session.insert(*self.impl.add_worker(data, get_sql=True), lastrowid=True)
                 if status == 1:
-                    req = self.op_start_worker(node_ip, f'{worker_type}:{name}', worker_type, coroutine_num)
-                    data['pid'] = req['pid']
+                    data = self.op_start_worker(ip, worker_id, worker_type, coroutine_num)
                 else:
-                    data['pid'] = 0
+                    data = {'pid': 0, 'status': 0}
 
             log.info(f'add a new worker:{name} success')
             return PostSuccess(msg='add a new worker success!', data=data)
@@ -163,21 +162,19 @@ class Node(BaseService, AgentMixIn):
                 with self.impl.handler.session() as session:
                     session.update(*self.impl.update_worker(worker_id, kwargs, get_sql=True))
                     if worker['status'] == 1:
-                        self.op_stop_worker(worker['ip'], '{}:{}'.format(worker['type'], worker['name']))
+                        self.op_stop_worker(worker['ip'], worker_id)
                         if kwargs.get('status') == 1:
                             self.op_start_worker(
                                 ip=kwargs.get('ip', worker['ip']),
                                 worker_type=kwargs.get('type', worker['type']),
-                                unique_sign='{}:{}'.format(kwargs.get('type', worker['type']),
-                                                           kwargs.get('name', worker['name'])),
+                                worker_id=worker_id,
                                 coroutine_num=kwargs.get('coroutine_num', worker['coroutine_num'])
                             )
                     elif worker['status'] == 0 and kwargs.get('status') == 1:
                         self.op_start_worker(
                             ip=kwargs.get('ip', worker['ip']),
                             worker_type=kwargs.get('type', worker['type']),
-                            unique_sign='{}:{}'.format(kwargs.get('type', worker['type']),
-                                                       kwargs.get('name', worker['name'])),
+                            worker_id=worker_id,
                             coroutine_num=kwargs.get('coroutine_num', worker['coroutine_num'])
                         )
 
@@ -200,7 +197,7 @@ class Node(BaseService, AgentMixIn):
             # 整个删除操作是一个事务
             with self.impl.handler.session() as session:
                 session.delete(*self.impl.delete_worker_by_id(worker_id, get_sql=True))
-                self.op_stop_worker(worker['ip'], '{}:{}'.format(worker['type'], worker['name']))
+                self.op_stop_worker(worker['ip'], worker_id)
             return DeleteSuccess()
         except RemoteOPError as e:
             log.error('delete worker:{} failed {}'.format(worker['ip'], e))
@@ -212,9 +209,9 @@ class Node(BaseService, AgentMixIn):
             for info in infos:
                 self.datetime_to_str(info)
                 try:
-                    worker_status = self.op_get_worker(info['ip'], '{}:{}'.format(info['type'], info['name']))
+                    worker_status = self.op_get_worker(info['ip'], worker_id)
                 except RemoteOPError:
-                    worker_status = dict(mem=0.0, status=False, pid=None, is_run=False)
+                    worker_status = dict(status=0, pid=0)
                 info.update(worker_status)
             return GetSuccess(msg=f'get worker status success', data=infos[0])
         return NotFound(msg=f'this worker id={worker_id} is not exist', errno=20008)
@@ -229,7 +226,7 @@ class Node(BaseService, AgentMixIn):
             try:
                 worker_status = self.op_get_worker(info['ip'], info['id'])
             except RemoteOPError:
-                worker_status = dict(mem=0.0, status=-1, pid=None, is_run=False)
+                worker_status = dict(status=0, pid=0)
             info.update(worker_status)
         return GetSuccess(
             msg='get worker status success!',
