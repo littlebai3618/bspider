@@ -39,6 +39,7 @@ class MySQLJobStore(BaseJobStore):
         :param job_state:
         :return:
         """
+        self._logger.info(job_state)
         job_state['jobstore'] = self
         job_state['name'] = '{project_id}-{code_id}'.format(**job_state)
         if job_state['trigger_type'] == 'cron':
