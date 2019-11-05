@@ -6,6 +6,8 @@ import datetime
 import json
 
 import requests
+from urllib3 import disable_warnings
+disable_warnings()
 
 from bspider.config import FrameSettings
 from bspider.utils.system import System
