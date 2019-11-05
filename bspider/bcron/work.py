@@ -80,10 +80,9 @@ class BCronManager(object):
         self.log.info('remove job success!')
 
     def real_update_job(self, info):
+        # 防止报错，先去掉trigger_type
         info.pop('trigger_type')
-        project_name = info.pop('project_name')
-        class_name = info.pop('class_name')
-        info['name'] = f'{project_name}|{class_name}'
+        info['name'] = '{project_id}-{code_id}'.format(**info)
         info['status'] = 0
         self.scheduler.modify_job(
             job_id=info.pop('id'),
