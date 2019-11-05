@@ -61,7 +61,7 @@ class MySQLJobStore(BaseJobStore):
 
     def __make_fv(self, job: MySQLJob) -> tuple:
         fields = ','.join([' %s=%%s ' % (key) for key in self.TABLE_FIELDS])
-        project_id, code_id = job.name.split('|')
+        project_id, code_id = job.name.split('-')
 
         trigger_type = job.trigger.__str__().split('[')[0]
 
