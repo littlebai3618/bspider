@@ -37,12 +37,12 @@ class CronService(BaseService):
         next_run_time = crontab.get_next_fire_time(None, now)
         return datetime_to_utc_timestamp(next_run_time), next_run_time
 
-    def add_cron(self, project_id, code_id, job_type, trigger, description):
+    def add_cron(self, project_id, code_id, cron_type, trigger, description):
         timestamp, next_run_time = self.__next_run_time(trigger)
         value = {
             'project_id': project_id,
             'code_id': code_id,
-            'type': job_type,
+            'type': cron_type,
             'trigger': trigger,
             'trigger_type': 'cron',
             'func': obj_to_ref(do),
