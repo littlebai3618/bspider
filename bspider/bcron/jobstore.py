@@ -52,6 +52,7 @@ class MySQLJobStore(BaseJobStore):
             'code_id': job_state['code_id'],
             'type': job_state['type']
         }
+        job_state['id'] = job_state['id']
         job_state['next_run_time'] = datetime.datetime.fromtimestamp(job_state['next_run_time'], self.tz)
         job = MySQLJob.__new__(MySQLJob)
         job.__setstate__(job_state)
@@ -72,8 +73,7 @@ class MySQLJobStore(BaseJobStore):
         else:
             trigger = ''
 
-        values = (job.id, project_id, code_id, json.dumps(job.args), json.dumps(job.kwargs),
-                  trigger, trigger_type, job.cron_type,
+        values = (job.id, project_id, code_id, trigger, trigger_type, job.cron_type,
                   job.next_run_time if isinstance(job.next_run_time, float) else datetime_to_utc_timestamp(job.next_run_time),
                   job.executor, job.func_ref, job.status, job.description)
 
