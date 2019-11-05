@@ -8,7 +8,7 @@ import json
 import requests
 
 from bspider.config import FrameSettings
-from bspider.utils.system import ip_addr
+from bspider.utils.system import System
 
 
 def ding(msg, at=None):
@@ -19,7 +19,7 @@ def ding(msg, at=None):
     :return: None
     """
     message = 'Msg: 【bspider】{} \nTime: {} \nIP: {}'.format(
-        msg,datetime.datetime.today().strftime('%Y-%m-%d %H:%M:%S'), ip_addr()
+        msg,datetime.datetime.today().strftime('%Y-%m-%d %H:%M:%S'), System.ip_msg
     )
     data = {
         'msgtype': 'text',

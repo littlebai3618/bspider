@@ -5,7 +5,7 @@
 import json
 import logging
 
-from bspider.utils.system import ip_addr
+from bspider.utils.system import System
 
 
 def get_json_formatter(**kwargs):
@@ -15,7 +15,7 @@ def get_json_formatter(**kwargs):
         'pid': '%(process)d',
         'filename': '%(filename)s:%(lineno)d',
         'level': '%(levelname)s',
-        'node': ip_addr(),
+        'node': System.ip_msg,
         'msg': '%(message)s',
     }
     for key, value in kwargs.items():
