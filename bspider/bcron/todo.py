@@ -30,7 +30,7 @@ def do(**kwargs):
         __log.warning(f'WARNING: UNKNOW CRON JOB PARAMS: {kwargs}')
 
 
-def run_spider_project(project_id, code_id):
+def run_spider_project(project_id, code_id, **kwargs):
     """
     执行自动加载脚本的定时任务
     先检查定时任务状态，如果为1，就执行否则跳出
@@ -57,16 +57,16 @@ def run_spider_project(project_id, code_id):
     if run_status:
         __log.info(run_msg)
     else:
-        __log.error(run_msg)
+        __log.error(f'{run_msg}\narg:{kwargs}')
         ding(run_msg)
 
 
-def run_operation_project(code_id):
+def run_operation_project(code_id, **kwargs):
     run_status, run_msg = run_corn_job_code(code_id, 'operation', '{"desc": "operation cron job"}')
     if run_status:
         __log.info(run_msg)
     else:
-        __log.error(run_msg)
+        __log.error(f'{run_msg}\narg:{kwargs}')
         ding(run_msg)
 
 
