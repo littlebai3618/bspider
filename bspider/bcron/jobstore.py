@@ -22,7 +22,7 @@ class MySQLJobStore(BaseJobStore):
     :param str tablename: name of the table to store jobs in
     """
 
-    TABLE_FIELDS = ('`id`', '`project_id`', '`code_id`', '`trigger`', '`trigger_type`',
+    TABLE_FIELDS = ('`id`', '`project_id`', '`code_id`', '`trigger`', '`trigger_type`', '`type`'
                     '`next_run_time`', '`executor`', '`func`', '`status`', '`description`')
 
     def __init__(self, handler: MysqlHandler, tz, log, tablename='bspider_cronjob'):
@@ -39,7 +39,6 @@ class MySQLJobStore(BaseJobStore):
         :param job_state:
         :return:
         """
-        self._logger.info(job_state)
         job_state['jobstore'] = self
         job_state['name'] = '{project_id}-{code_id}'.format(**job_state)
         if job_state['trigger_type'] == 'cron':
