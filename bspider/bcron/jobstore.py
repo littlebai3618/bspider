@@ -72,9 +72,9 @@ class MySQLJobStore(BaseJobStore):
         else:
             trigger = ''
 
-        values = (job.id, project_id, code_id, json.dumps(job.args), json.dumps(job.kwargs), trigger, trigger_type,
-                  job.next_run_time if isinstance(job.next_run_time, float) else datetime_to_utc_timestamp(
-                      job.next_run_time),
+        values = (job.id, project_id, code_id, json.dumps(job.args), json.dumps(job.kwargs),
+                  trigger, trigger_type, job.cron_type,
+                  job.next_run_time if isinstance(job.next_run_time, float) else datetime_to_utc_timestamp(job.next_run_time),
                   job.executor, job.func_ref, job.status, job.description)
 
         return (fields, values)

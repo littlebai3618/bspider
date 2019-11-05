@@ -128,6 +128,12 @@ class MySQLJob(Job):
                 raise TypeError("description must be a nonempty string")
             approved['description'] = value
 
+        if 'type' in changes:
+            value = changes.pop('type')
+            if not value or value not in ('operation', 'spider'):
+                raise TypeError("cron type must be operation or spider")
+            approved['type'] = value
+
         if changes:
             raise AttributeError('The following are not modifiable attributes of Job: %s' %
                                  ', '.join(changes))
@@ -165,7 +171,9 @@ class MySQLJob(Job):
             'next_run_time': self.next_run_time,
             # 新增两个属性 status, description
             'status': self.status,
-            'description': self.description
+            'description': self.description,
+            # 新增属性type
+            'type': self.cron_type
         }
 
     def __setstate__(self, state):
@@ -188,6 +196,8 @@ class MySQLJob(Job):
         # 新增两个属性 status, description
         self.status = state['status']
         self.description = state['description']
+        # 新增属性type
+        self.cron_type = state['type']
 
     def __repr__(self):
         return '<MySQLJob (id=%s name=%s)>' % (self.id, self.name)
