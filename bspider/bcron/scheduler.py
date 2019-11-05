@@ -17,7 +17,7 @@ class MySQLScheduler(BackgroundScheduler):
     def add_job(self, func, trigger=None, args=None, kwargs=None, id=None, name=None,
                 misfire_grace_time=undefined, coalesce=undefined, max_instances=undefined,
                 next_run_time=undefined, jobstore='default', executor='default', status=0,
-                description='', replace_existing=False, **trigger_args):
+                description='', replace_existing=False, cron_type='operation', **trigger_args):
         """
         新增了两个属性：
         :param status: 任务状态
@@ -38,7 +38,8 @@ class MySQLScheduler(BackgroundScheduler):
             'next_run_time': next_run_time,
             # 新增两个属性
             'status': status,
-            'description': description
+            'description': description,
+            'type': cron_type
         }
         job_kwargs = dict((key, value) for key, value in six.iteritems(job_kwargs) if
                           value is not undefined)
