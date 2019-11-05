@@ -3,11 +3,12 @@
 # @File    : base_middleware
 # @Use     :
 from asyncio import iscoroutinefunction
+from logging import Logger
 
 
 class BaseMiddleware(object):
 
-    def __init__(self, settings, log):
+    def __init__(self, settings: dict, log: Logger):
         """
         构造方法
         如果需要设置配置，由各个中间件自己重写
