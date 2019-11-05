@@ -17,8 +17,12 @@ def valid_code(name: str, code_type: str, content: str) -> (bool, str):
         'BasePipeline': 'pipeline',
         'BaseMiddleware': 'middleware'
     }
+
+    module_type = code_type_map.get(sub_class_name)
+    if module_type is None:
+        return False, f'Unknown module type->{sub_class_name}'
     if not code_type_map.get(sub_class_name) == code_type:
-        return False, f'unknow sub class->{sub_class_name}'
+        return False, f'Invalid module type->{module_type}, Please check code'
 
     # pre_exec
     try:
