@@ -104,7 +104,8 @@ class BCronManager(object):
                 id=info['id']
             )
         except Exception as e:
-            self.log.error(f'real add job failed: {name} {e}')
+            self.log.error(f'real add job failed: {name} {e} {info}')
+            return
         self.log.info(f'success add job {name}, it run at {next_run_time}')
 
     def run(self):
