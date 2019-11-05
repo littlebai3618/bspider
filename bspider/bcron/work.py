@@ -7,7 +7,9 @@
 
 这里采用单独进程处理任务调度
 """
+import sys
 import time
+import traceback
 
 import pytz
 from apscheduler.executors.pool import ThreadPoolExecutor
@@ -103,6 +105,9 @@ class BCronManager(object):
                 id=info['id']
             )
         except Exception as e:
+            tp, msg, tb = sys.exc_info()
+            e_msg = ''.join(traceback.format_exception(tp, msg, tb))
+            self.log.exception(e_msg)
             self.log.error(f'real add job failed: {name} {e} {info}')
             return
         self.log.info(f'success add job {name}, it run at {next_run_time}')
