@@ -110,7 +110,7 @@ class MySQLJobStore(BaseJobStore):
     def update_job(self, job: MySQLJob):
         fields, values = self.__make_fv(job)
         update = f"update {self.table_name} set {fields} where `id` = '{job.id}';"
-        self.log.debug(update, fields, values)
+        self.log.debug(update % values)
         result = self.handler.update(update, values)
         if result == 0:
             self.log.debug(f'job: {job.name} is nothing to change！')
