@@ -38,7 +38,7 @@ class Debuger(object):
         self.log = LoggerPool().get_logger(key=self.project_name, module='debuger',
                                            project=self.project_name)
 
-        self.settings = ProjectConfigParser(json.load(open(abspath('settings.json'))))
+        self.settings = ProjectConfigParser(open(abspath('settings.json')).read())
 
         self.local_project_class = self.__find_local_class()
         self.mysql_handler = MysqlHandler.from_settings(self.frame_settings.get('WEB_STUDIO_DB'))
