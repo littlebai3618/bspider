@@ -63,7 +63,7 @@ class BCronManager(object):
 
     def check_change(self):
 
-        sql = f'select `id`, `project_id`, `code_id`, `trigger`, `trigger_type`, `type`' \
+        sql = f'select `id`, `project_id`, `code_id`, `trigger`, `trigger_type`, `type`, ' \
               f'`description`, `next_run_time`, `status` from {self.table_name} ' \
               f'where update_time >= date_sub(now(), interval {self.interval} second)         ' \
               f'and `status` != 0;'
