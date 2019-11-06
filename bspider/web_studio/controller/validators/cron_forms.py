@@ -10,7 +10,7 @@ from bspider.core.api import BaseForm, ParamRequired
 class AddForm(BaseForm):
     project_id = IntegerField(validators=[ParamRequired()])
     code_id = IntegerField(validators=[ParamRequired()])
-    cron_type = StringField(validators=[ParamRequired()])
+    type = StringField(validators=[ParamRequired()])
     trigger = StringField(validators=[ParamRequired()])
     description = StringField(validators=[ParamRequired()])
 
@@ -18,6 +18,6 @@ class AddForm(BaseForm):
 class UpdateForm(BaseForm):
     project_id = IntegerField()
     code_id = IntegerField()
-    cron_type = StringField()
+    type = StringField()
     trigger = StringField()
     description = StringField()

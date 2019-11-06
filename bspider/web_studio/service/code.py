@@ -53,7 +53,7 @@ class CodeService(BaseService, AgentMixIn):
             if 'content' in changes:
                 sign, msg = valid_code(
                     name=changes.get('name', info['name']),
-                    code_type=changes.get('code_type', info['type']),
+                    code_type=changes.get('type', info['type']),
                     content=changes['content']
                 )
                 if not sign:
