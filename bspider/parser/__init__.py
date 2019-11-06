@@ -5,5 +5,6 @@
 from .base_pipeline import BasePipeline
 from .base_extractor import BaseExtractor
 from .work import run_parser
+from .item import Item, MySQLSaverItem
 
-__all__ = ['BasePipeline', 'BaseExtractor', 'run_parser']
+__all__ = ['BasePipeline', 'BaseExtractor', 'run_parser', 'Item', 'MySQLSaverItem']
