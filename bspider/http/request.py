@@ -22,6 +22,7 @@ class Request(BaseHttp):
                  meta=None,
                  priority: int=3,
                  proxy=None,
+                 sign='',
                  allow_redirect: bool=False,
                  timeout: int=10,
                  verify_ssl: bool=False,
@@ -57,6 +58,7 @@ class Request(BaseHttp):
         self.verify_ssl = verify_ssl
         self.callback = self._set_callback(callback)
         self.errback = self._set_errback(errback)
+        self.sign = sign
 
     @classmethod
     def loads(cls, param: dict):

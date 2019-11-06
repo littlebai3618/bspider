@@ -67,9 +67,15 @@ class Response(BaseHttp):
     def json(self):
         return json.loads(self.text)
 
-    def xpath(self):
+    @property
+    def xpath_selector(self):
         """:return a xpath selector obj"""
         return etree.HTML(self.text)
+
+    def __str__(self):
+        return "<Response:%s %s %s>" % (self.method, self.status, self.url)
+
+    __repr__ = __str__
 
 
 if __name__ == '__main__':

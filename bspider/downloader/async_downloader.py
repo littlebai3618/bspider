@@ -7,6 +7,9 @@
 执行中间件方法
 """
 import asyncio
+import sys
+import traceback
+
 import aiohttp
 
 from aiohttp import ClientResponse
@@ -90,12 +93,14 @@ class AsyncDownloader(object):
                 if is_req:
                     response = await self.__do(request)
             except Exception as e:
-                # self.logger.exception(e)
+                tp, msg, tb = sys.exc_info()
+                e_msg = ''.join(traceback.format_exception(tp, msg, tb))
+                self.log.exception(e_msg)
                 if response is None:
                     response = Response(url=request.url, status=599)
                 # 执行下载异常中间件
                 for mw in self.mws:
-                    self.log.debug(f'{mw.__class__.__name__} executing process_response')
+                    self.log.debug(f'{mw.__class__.__name__} executing process_exception')
                     response = await mw._exec('process_exception', request=request, e=e, response=response)
                     if isinstance(response, Response):
                         continue
