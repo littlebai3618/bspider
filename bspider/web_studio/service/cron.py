@@ -14,7 +14,7 @@ from datetime import datetime
 
 import pytz
 from apscheduler.triggers.cron import CronTrigger
-from apscheduler.util import datetime_to_utc_timestamp, obj_to_ref
+from apscheduler.util import datetime_to_utc_timestamp, obj_to_ref, utc_timestamp_to_datetime
 from pymysql import IntegrityError
 
 from bspider.core.api import BaseService, Conflict, PostSuccess, PatchSuccess, DeleteSuccess, GetSuccess, NotFound, \
@@ -85,6 +85,7 @@ class CronService(BaseService):
         infos, total = self.impl.get_jobs(page, limit, search, sort)
 
         for info in infos:
+            info['next_run_time'] = utc_timestamp_to_datetime(info['next_run_time'])
             self.datetime_to_str(info)
 
         return GetSuccess(

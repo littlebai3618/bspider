@@ -8,8 +8,6 @@ import traceback
 import sys
 
 from bspider.core import BaseManager
-from bspider.downloader.async_downloader import AsyncDownloader
-from bspider.http import Request
 
 from .downloader_monitor import DownloaderMonitor
 
