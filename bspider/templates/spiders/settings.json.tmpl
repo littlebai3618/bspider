@@ -1,5 +1,5 @@
 {
-  "downloader_config": {
+  "downloader": {
     "middleware": ["DemoMiddleware"],
     "settings": {
       "PROJECT_NAME": "${project_name}",
@@ -7,7 +7,7 @@
       "ACCEPT_RESPONSE_CODE": []
     }
   },
-  "parser_config": {
+  "parser": {
     "pipeline": ["DemoExtractor", "DemoPipeline"],
     "settings": {
       "PROJECT_NAME": "${project_name}"
