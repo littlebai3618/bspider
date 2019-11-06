@@ -82,13 +82,14 @@ class BCronManager(object):
         self.log.info('remove job success!')
 
     def real_update_job(self, info):
-        # 防止报错，先去掉trigger_type
         info.pop('trigger_type')
-        info['name'] = '{project_id}-{code_id}'.format(**info)
-        info['status'] = 0
         self.scheduler.modify_job(
-            job_id=info.pop('id'),
-            **info
+            job_id=info['id'],
+            name='{project_id}-{code_id}'.format(**info),
+            status=0,
+            trigger=CronTrigger.from_crontab(info['trigger']),
+            cron_type=info['type'],
+            description=info['description']
         )
 
     def real_add_job(self, info):

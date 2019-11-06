@@ -59,6 +59,8 @@ class CronService(BaseService):
             return Conflict(msg='cron job is already exist', errno=50001)
 
     def update_job(self, cron_id, changes):
+        if 'cron_type' in changes:
+            changes['type'] = changes.pop('cron_type')
         self.impl.update_job(cron_id, changes)
         log.info(f'update cron job->cron_id:{cron_id}->{changes} success')
         return PatchSuccess(msg=f'cron job update success')

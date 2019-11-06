@@ -18,6 +18,6 @@ class AddForm(BaseForm):
 class UpdateForm(BaseForm):
     project_id = IntegerField()
     code_id = IntegerField()
-    code_type = StringField()
+    cron_type = StringField()
     trigger = StringField()
     description = StringField()

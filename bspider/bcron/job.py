@@ -8,7 +8,6 @@ from datetime import datetime
 import six
 from apscheduler.job import Job
 from apscheduler.triggers.base import BaseTrigger
-from apscheduler.triggers.cron import CronTrigger
 from apscheduler.util import convert_to_datetime, ref_to_obj, obj_to_ref, get_callable_name, check_callable_args
 try:
     from collections.abc import Iterable, Mapping
@@ -96,7 +95,7 @@ class MySQLJob(Job):
 
         if 'trigger' in changes:
             # 暂时先这样，后续支持多种定时任务的时候再进行修改
-            trigger = CronTrigger.from_crontab(changes.pop('trigger'))
+            trigger = changes.pop('trigger')
             if not isinstance(trigger, BaseTrigger):
                 raise TypeError('Expected a trigger instance, got %s instead' %
                                 trigger.__class__.__name__)
@@ -130,8 +129,8 @@ class MySQLJob(Job):
                 raise TypeError("description must be a nonempty string")
             approved['description'] = value
 
-        if 'type' in changes:
-            value = changes.pop('type')
+        if 'cron_type' in changes:
+            value = changes.pop('cron_type')
             if not value or value not in ('operation', 'spider'):
                 raise TypeError("cron type must be operation or spider")
             approved['type'] = value
