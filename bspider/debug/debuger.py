@@ -38,11 +38,7 @@ class Debuger(object):
         self.log = LoggerPool().get_logger(key=self.project_name, module='debuger',
                                            project=self.project_name)
 
-        try:
-            self.settings = ProjectConfigParser(json.load(open(abspath('settings.json'))))
-        except Exception:
-            self.log.error(f'Can\'t found {self.project_name} settings!')
-            return
+        self.settings = ProjectConfigParser(json.load(open(abspath('settings.json'))))
 
         self.local_project_class = self.__find_local_class()
         self.mysql_handler = MysqlHandler.from_settings(self.frame_settings.get('WEB_STUDIO_DB'))
@@ -154,3 +150,4 @@ class Debuger(object):
 if __name__ == '__main__':
     for i in range(10, 0):
         print(i)
+        'ProjectConfigError'
