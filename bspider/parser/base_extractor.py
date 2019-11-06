@@ -19,8 +19,8 @@ class BaseExtractor(BasePipeline):
                 try:
                     yield getattr(self, response.callback)(response)
                 except Exception as e:
-                    if hasattr(self, response.errback):
-                        yield getattr(self, response.callback)(response, e)
+                    if response.errback and hasattr(self, response.errback):
+                        yield getattr(self, response.errback)(response, e)
                     raise e
             else:
                 raise ExtractorCallbackError('Cannot find callback {callback} in extractor {name}',

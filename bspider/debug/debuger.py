@@ -21,6 +21,7 @@ from bspider.utils.importer import walk_modules
 from bspider.utils.database.mysql import MysqlHandler
 from bspider.utils.logger import LoggerPool
 from bspider.utils.sign import Sign
+from bspider.utils.tools import make_sign
 
 
 class Debuger(object):
@@ -58,6 +59,10 @@ class Debuger(object):
     def put(self, request: Request):
         """向优先队列中存入req"""
         try:
+            if request.data:
+                request.sign = make_sign(self.project_name, request.url, json.dumps(request.data))
+            else:
+                request.sign = make_sign(self.project_name, request.url)
             self.priority_queue[self.max_priority - request.priority].put(request)
         except KeyError as e:
             self.log.error(
