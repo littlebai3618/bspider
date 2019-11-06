@@ -72,6 +72,7 @@ class CronService(BaseService):
         infos = self.impl.get_job(cron_id)
 
         for info in infos:
+            info['next_run_time'] = utc_timestamp_to_datetime(info['next_run_time']).astimezone(self.tz)
             self.datetime_to_str(info)
 
         if len(infos):
@@ -85,7 +86,7 @@ class CronService(BaseService):
         infos, total = self.impl.get_jobs(page, limit, search, sort)
 
         for info in infos:
-            info['next_run_time'] = utc_timestamp_to_datetime(info['next_run_time'])
+            info['next_run_time'] = utc_timestamp_to_datetime(info['next_run_time']).astimezone(self.tz)
             self.datetime_to_str(info)
 
         return GetSuccess(
