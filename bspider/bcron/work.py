@@ -88,7 +88,7 @@ class BCronManager(object):
         info['status'] = 0
         self.scheduler.modify_job(
             job_id=info.pop('id'),
-            change=info
+            **info
         )
 
     def real_add_job(self, info):
