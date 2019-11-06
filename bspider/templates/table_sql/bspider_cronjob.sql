@@ -27,7 +27,7 @@ CREATE TABLE `bspider_cron` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '自增id',
   `project_id` int(10) NOT NULL COMMENT 'project_id',
   `code_id` int(10) NOT NULL COMMENT 'code_id',
-  `type` varchar(10) NOT NULL COMMENT 'spider、 operation',
+  `type` varchar(10) NOT NULL COMMENT 'crawl、 operation',
   `trigger` text NOT NULL COMMENT '定时任务执行间隔支持crontab写法',
   `trigger_type` varchar(10) NOT NULL COMMENT '定时任务执行间隔类别 cron ...',
   `next_run_time` double DEFAULT NULL COMMENT '任务的下次执行时间',

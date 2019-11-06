@@ -43,7 +43,7 @@ class ProjectService(BaseService, AgentMixIn):
         pc_obj.middleware = [str(middleware_dict[code_name]) for code_name in pc_obj.middleware]
         return pc_obj
 
-    def add(self, name, status, project_type, group, description, editor, rate, config):
+    def add(self, name, status, type, group, description, editor, rate, config):
         """
         1. 预执行配置文件方法
         2. 通知节点接收配置文件 调用接口
@@ -59,7 +59,7 @@ class ProjectService(BaseService, AgentMixIn):
                 data = {
                     'name': name,
                     'status': status,
-                    'type': project_type,
+                    'type': type,
                     'group': group,
                     'description': description,
                     'editor': editor,

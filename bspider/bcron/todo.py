@@ -22,7 +22,7 @@ __log = LoggerPool().get_logger(key='bcorn-todo', module='bcorn')
 
 def do(**kwargs):
     # 模式判断
-    if kwargs.get('type', 'spider') == 'spider':
+    if kwargs.get('type', 'spider') == 'crawl':
         run_spider_project(**kwargs)
     elif kwargs.get('type') == 'operation':
         run_operation_project(**kwargs)
