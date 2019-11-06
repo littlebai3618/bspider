@@ -98,7 +98,7 @@ class BaseMonitor(object):
         for code_id in code_ids:
             content = self.__cache.get_code(code_id)[0]['content']
             _, cls_name, _ = find_class_name_by_content(content)
-            res.append([cls_name, content])
+            res.append((cls_name, content))
 
         return res
 

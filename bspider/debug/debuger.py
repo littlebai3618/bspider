@@ -10,6 +10,7 @@ from os.path import abspath
 from queue import Queue
 
 from bspider.config import FrameSettings
+from bspider.core import ProjectConfigParser
 from bspider.downloader import BaseMiddleware
 from bspider.downloader.async_downloader import AsyncDownloader
 from bspider.parser import BasePipeline, BaseExtractor
@@ -19,6 +20,7 @@ from bspider.utils.conf import PLATFORM_NAME_ENV
 from bspider.utils.importer import walk_modules
 from bspider.utils.database.mysql import MysqlHandler
 from bspider.utils.logger import LoggerPool
+from bspider.utils.sign import Sign
 
 
 class Debuger(object):
@@ -37,7 +39,7 @@ class Debuger(object):
                                            project=self.project_name)
 
         try:
-            self.settings = json.load(open(abspath('settings.json')))
+            self.settings = ProjectConfigParser(json.load(open(abspath('settings.json'))))
         except Exception:
             self.log.error(f'Can\'t found {self.project_name} settings!')
             return
@@ -130,25 +132,23 @@ class Debuger(object):
 
     def parser(self) -> AsyncParser:
         # 判断调用仓库代码还是本地代码
-        pipelines = self.settings['parser_config']['pipeline']
-        for i, pipeline in enumerate(pipelines):
+        for i, pipeline in enumerate(self.settings.pipeline):
             if pipeline in self.local_project_class:
-                self.settings['parser_config']['pipeline'][i] = (pipeline, self.load_local_module_str(pipeline))
+                self.settings.pipeline[i] = (pipeline, self.load_local_module_str(pipeline))
             else:
-                self.settings['parser_config']['pipeline'][i] = (pipeline, self.load_remote_module_str(pipeline))
+                self.settings.pipeline[i] = (pipeline, self.load_remote_module_str(pipeline))
 
-        return AsyncParser(self.project_name, self.settings['parser_config'], 'debug')
+        return AsyncParser(self.settings, Sign())
 
     def downloader(self) -> AsyncDownloader:
         # 判断调用仓库代码还是本地代码
-        pipelines = self.settings['downloader_config']['middleware']
-        for i, pipeline in enumerate(pipelines):
-            if pipeline in self.local_project_class:
-                self.settings['downloader_config']['middleware'][i] = (pipeline, self.load_local_module_str(pipeline))
+        for i, middleware in enumerate(self.settings.middleware):
+            if middleware in self.local_project_class:
+                self.settings.middleware[i] = (middleware, self.load_local_module_str(middleware))
             else:
-                self.settings['downloader_config']['middleware'][i] = (pipeline, self.load_remote_module_str(pipeline))
+                self.settings.middleware[i] = (middleware, self.load_remote_module_str(middleware))
 
-        return AsyncDownloader(self.project_name, self.settings['downloader_config'], 'debug')
+        return AsyncDownloader(self.settings, Sign())
 
 
 if __name__ == '__main__':
