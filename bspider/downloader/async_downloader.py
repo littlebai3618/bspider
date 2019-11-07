@@ -82,7 +82,7 @@ class AsyncDownloader(object):
                 if isinstance(result, Request):
                     request = result
                     continue
-                elif req is None:
+                elif result is None:
                     continue
                 elif isinstance(result, Response):
                     is_req = False

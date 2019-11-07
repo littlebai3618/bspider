@@ -7,7 +7,7 @@ class DemoMiddleware(BaseMiddleware):
     多中间件执行顺序：
     Mid1.process_request -> Mid2.process_request ->... ->
     下载 ->
-    Mid2.process_response -> Mid1.process_response
+    Mid1.process_response -> Mid2.process_response
     """
 
     # by coroutine

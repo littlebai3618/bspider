@@ -4,6 +4,14 @@ from bspider.parser import BasePipeline
 
 class DemoPipeline(BasePipeline):
 
+    """Pipeline支持协程、常规两种编程方式
+    ***协程虽然能提升效率但协程编程是棘手的
+    多Pipeline执行顺序：
+    Pipe1.process_item -> Pipe2.process_item ->... ->
+    下载 ->
+    Pipe1.process_item -> Pipe2.process_item
+    """
+
     def process_item(self, item):
         """
         对item进行处理,各个pipeline重写
