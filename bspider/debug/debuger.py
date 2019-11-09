@@ -138,9 +138,11 @@ class Debuger(object):
         # 判断调用仓库代码还是本地代码
         for pipeline in self.__pipeline:
             if pipeline in self.local_project_class:
-                _parser.pipes.append(getattr(self.local_project_class[pipeline], pipeline))
+                _parser.pipes.append(
+                    getattr(self.local_project_class[pipeline], pipeline)(self.settings.parser_settings, self.log))
             else:
-                _parser.pipes.append(getattr(self.load_remote_module(pipeline), pipeline))
+                _parser.pipes.append(
+                    getattr(self.load_remote_module(pipeline), pipeline)(self.settings.parser_settings, self.log))
 
         return _parser
 
@@ -151,9 +153,11 @@ class Debuger(object):
         # 判断调用仓库代码还是本地代码
         for middleware in self.__middleware:
             if middleware in self.local_project_class:
-                _downloader.mws.append(getattr(self.local_project_class[middleware], middleware))
+                _downloader.mws.append(
+                    getattr(self.local_project_class[middleware], middleware)(self.settings.parser_settings, self.log))
             else:
-                _downloader.mws.append(getattr(self.load_remote_module(middleware), middleware))
+                _downloader.mws.append(
+                    getattr(self.load_remote_module(middleware), middleware)(self.settings.parser_settings, self.log))
 
         return _downloader
 
