@@ -17,7 +17,8 @@ from bspider.parser import BasePipeline, BaseExtractor
 from bspider.parser.async_parser import AsyncParser
 from bspider.http import Request
 from bspider.utils.conf import PLATFORM_NAME_ENV
-from bspider.utils.importer import walk_modules
+from bspider.utils.exceptions import ModuleExistError
+from bspider.utils.importer import walk_modules, import_module_by_code
 from bspider.utils.database.mysql import MysqlHandler
 from bspider.utils.logger import LoggerPool
 from bspider.utils.sign import Sign
@@ -40,6 +41,10 @@ class Debuger(object):
                                            project=self.project_name)
 
         self.settings = ProjectConfigParser(open(abspath('settings.json')).read())
+        self.__pipeline = self.settings.pipeline.copy()
+        self.__middleware = self.settings.middleware.copy()
+        self.settings.pipeline.clear()
+        self.settings.middleware.clear()
 
         self.local_project_class = self.__find_local_class()
         self.mysql_handler = MysqlHandler.from_settings(self.frame_settings.get('WEB_STUDIO_DB'))
@@ -111,45 +116,46 @@ class Debuger(object):
             for obj in vars(mod).values():
                 if inspect.isclass(obj):
                     if issubclass(obj, BasePipeline) and not obj in (BasePipeline, BaseExtractor):
-                        local_project_class[obj.__name__] = mod.__file__
+                        local_project_class[obj.__name__] = mod
                     if issubclass(obj, BaseMiddleware) and not obj in (BaseMiddleware,):
-                        local_project_class[obj.__name__] = mod.__file__
+                        local_project_class[obj.__name__] = mod
         return local_project_class
 
-    def load_remote_module_str(self, class_name):
+    def load_remote_module(self, class_name):
         """加载远程代码"""
         sql = "select `content` from `%s` where `name`='%s';"
         info = self.mysql_handler.select(sql, (self.frame_settings['CODE_STORE_TABLE'], class_name))
         if len(info):
             self.log.debug(f'success find module:{class_name} from remote')
-            return info[0]['content']
+            return import_module_by_code(class_name, info[0]['content'])
         else:
-            self.log.warning(f'module:{class_name} is not exists in remote')
-            return ''
-
-    def load_local_module_str(self, class_name):
-        with open(self.local_project_class[class_name], 'r') as f:
-            return f.read()
+            raise ModuleExistError(f'module:{class_name} is not exists')
 
     def parser(self) -> AsyncParser:
-        # 判断调用仓库代码还是本地代码
-        for i, pipeline in enumerate(self.settings.pipeline):
-            if pipeline in self.local_project_class:
-                self.settings.pipeline[i] = (pipeline, self.load_local_module_str(pipeline))
-            else:
-                self.settings.pipeline[i] = (pipeline, self.load_remote_module_str(pipeline))
+        """修复无法debug的bug"""
+        _parser = AsyncParser(self.settings, Sign())
 
-        return AsyncParser(self.settings, Sign())
+        # 判断调用仓库代码还是本地代码
+        for pipeline in self.__pipeline:
+            if pipeline in self.local_project_class:
+                _parser.pipes.append(getattr(self.local_project_class[pipeline], pipeline))
+            else:
+                _parser.pipes.append(getattr(self.load_remote_module(pipeline), pipeline))
+
+        return _parser
 
     def downloader(self) -> AsyncDownloader:
         # 判断调用仓库代码还是本地代码
-        for i, middleware in enumerate(self.settings.middleware):
-            if middleware in self.local_project_class:
-                self.settings.middleware[i] = (middleware, self.load_local_module_str(middleware))
-            else:
-                self.settings.middleware[i] = (middleware, self.load_remote_module_str(middleware))
+        _downloader = AsyncDownloader(self.settings, Sign())
 
-        return AsyncDownloader(self.settings, Sign())
+        # 判断调用仓库代码还是本地代码
+        for middleware in self.__middleware:
+            if middleware in self.local_project_class:
+                _downloader.mws.append(getattr(self.local_project_class[middleware], middleware))
+            else:
+                _downloader.mws.append(getattr(self.load_remote_module(middleware), middleware))
+
+        return _downloader
 
 
 if __name__ == '__main__':

@@ -36,10 +36,11 @@ class AsyncParser(object):
                         # 通过中间件类名实例化，放入中间件list中
                         self.pipes.append(getattr(mod, cls_name)(config.parser_settings, self.log))
                     except Exception as e:
-                        raise ParserError(f'{self.project_name} pipline init failed: {cls_name} like: {e}')
+                        raise ParserError(f'{self.project_name} pipeline init failed: {cls_name} like: {e}')
             else:
                 msg = f'{self.project_name} pipeline init failed: {cls_name}'
                 raise ParserError(msg)
+
 
     async def parse(self, response: Response) -> list:
         """
