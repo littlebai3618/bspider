@@ -8,43 +8,42 @@ class Item(object):
     """
     item对象,
     """
-    all_field = []
 
     def __init__(self, **kwargs):
         """
         构造函数
         """
-        self.field_value = kwargs
+        self.capacity = kwargs
 
     # 增加元素
     def __setitem__(self, key, value):
-        self.field_value[key] = value
+        self.capacity[key] = value
 
     # 取出元素
     def __getitem__(self, item):
-        return self.field_value[item]
+        return self.capacity[item]
 
     # 删除元素
     def __delitem__(self, key):
-        del self.field_value[key]
+        del self.capacity[key]
 
     def pop(self, key):
-        return self.field_value.pop(key)
+        return self.capacity.pop(key)
 
     def get(self, key):
-        return self.field_value.get(key)
+        return self.capacity.get(key)
 
     def keys(self):
-        return self.field_value.keys()
+        return self.capacity.keys()
 
     def values(self):
-        return self.field_value.values()
+        return self.capacity.values()
 
     def clear(self):
-        return self.field_value.clear()
+        return self.capacity.clear()
 
     def __repr__(self):
-        return f'<Item: {len(self.field_value)} field>'
+        return f'<Item: {len(self.capacity)} field>'
 
     __str__ = __repr__
 
@@ -59,4 +58,4 @@ class MySQLSaverItem(Item):
         super().__init__(**kwargs)
 
     def __repr__(self):
-        return f'<MySQLSaverItem: {len(self.field_value)} field>'
+        return f'<MySQLSaverItem: {len(self.capacity)} field>'

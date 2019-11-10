@@ -43,6 +43,7 @@
 * 强化校验 \*Pipeline、\*Task、\*Operation、\*Middleware、\.Extractor
   1. 取出文档所有类->根据名称校验父类->判断父类合规的数量是否为1->通过校验 done
   2. 原有预执行检测也放入校验类、返回 (bool, check_report) done
+* 解析器支持迭代器嵌套解析 最高优先级
 
 
 

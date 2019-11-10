@@ -68,26 +68,30 @@ class AsyncParser(object):
         """
         self.log.debug(f'{pipeline.__class__.__name__} executing process_response')
         temp_items = await pipeline._exec('process_item', pre_item)
-        # 处理生成器类型
-        if isinstance(temp_items, GeneratorType):
-            while True:
-                try:
-                    result = next(temp_items)
-                    if result:
-                        if isinstance(result, Request):
-                            requests.append(result)
-                        else:
-                            cur_item.append(result)
-                except StopIteration as e:
-                    if e.value:
-                        if isinstance(e.value, Request):
-                            requests.append(e.value)
-                        else:
-                            cur_item.append(e.value)
-                    break
-        else:
-            if temp_items:
-                if isinstance(temp_items, Request):
-                    requests.append(temp_items)
-                else:
-                    cur_item.append(temp_items)
+        self.__exec_items(temp_items, requests, cur_item)
+
+
+    def __exec_items(self, items, requests: list, cur_item: list):
+        if not isinstance(items, GeneratorType):
+            if isinstance(items, Request):
+                requests.append(items)
+            else:
+                cur_item.append(items)
+            return
+
+        while True:
+            try:
+                self.__exec_items(next(items), requests, cur_item)
+            except StopIteration as e:
+                self.__exec_items(e.value, requests, cur_item)
+                break
+
+
+
+
+
+
+
+
+
+
