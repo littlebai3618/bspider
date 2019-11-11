@@ -49,14 +49,14 @@ class Item(object):
 
 class MySQLSaverItem(Item):
 
-    def __init__(self, table_name: str, db: str, auto_update: bool=True, **kwargs):
+    def __init__(self, table: str, db: str, auto_update: bool=True, **kwargs):
         """
         构造函数
         """
-        self.table_name = table_name
+        self.table = table
         self.db = db
         self.auto_update = auto_update
         super().__init__(**kwargs)
 
     def __repr__(self):
-        return f'<MySQLSaverItem: {self.db}{self.table_name} {len(self.capacity)} field>'
+        return f'<MySQLSaverItem: {self.db}{self.table} {len(self.capacity)} field>'
