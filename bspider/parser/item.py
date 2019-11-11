@@ -59,4 +59,4 @@ class MySQLSaverItem(Item):
         super().__init__(**kwargs)
 
     def __repr__(self):
-        return f'<MySQLSaverItem: {len(self.capacity)} field>'
+        return f'<MySQLSaverItem: {self.db}{self.table_name} {len(self.capacity)} field>'

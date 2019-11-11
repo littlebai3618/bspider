@@ -3,8 +3,8 @@
 # @File    : node_impl
 # @Use     :
 from bspider.core.api import BaseImpl
-from bspider.utils.database.mysql import MysqlOutputStream
 from bspider.web_studio import log
+from bspider.utils.database.mysql import prepare_insert_sql
 
 
 class NodeImpl(BaseImpl):
@@ -36,7 +36,9 @@ class NodeImpl(BaseImpl):
         return self.handler.select(sql)
 
     def add_node(self, data):
-        return MysqlOutputStream(self.handler, self.node_table).write(data)
+        sql, values = prepare_insert_sql(self.node_table, data, auto_update=True)
+        log.debug(f'SQL:{sql}')
+        return self.handler.insert(sql, values)
 
     def delete_node(self, node_id, get_sql=False):
         """a common delete func"""
