@@ -25,8 +25,8 @@ def ding(msg, title='', at=None):
     data = {
         'msgtype': 'markdown',
         "markdown": {
-            "title": f"【bspider】{title}",
-            "text": f"{msg} \n> ###### {cur_time}报警 {System.ip_msg} \n"
+            "title": f"【BSpider】{title}",
+            "text": f"{msg} \n> ###### {cur_time}报警 \n######{System.ip_msg}"
         },
         "at": {
             "atMobiles": at,
