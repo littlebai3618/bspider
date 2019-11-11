@@ -7,26 +7,26 @@ import json
 
 import requests
 from urllib3 import disable_warnings
+
 disable_warnings()
 
 from bspider.config import FrameSettings
 from bspider.utils.system import System
 
 
-def ding(msg, at=None):
+def ding(msg, title='', at=None):
     """
     发送钉钉报警
     :param msg: str 钉钉报警的信息
     :param at: list at 谁
     :return: None
     """
-    message = 'Msg: 【bspider】{} \nTime: {} \nIP: {}'.format(
-        msg,datetime.datetime.today().strftime('%Y-%m-%d %H:%M:%S'), System.ip_msg
-    )
+    cur_time = datetime.datetime.today().strftime('%Y-%m-%d %H:%M:%S')
     data = {
-        'msgtype': 'text',
-        'text': {
-            'content': message
+        'msgtype': 'markdown',
+        "markdown": {
+            "title": f"【bspider】{title}",
+            "text": f"{msg} \n> ###### {cur_time}报警 {System.ip_msg} \n"
         },
         "at": {
             "atMobiles": at,
@@ -43,6 +43,7 @@ def ding(msg, at=None):
         data=json.dumps(data),
         verify=False
     )
+
 
 # 短信通知服务
 def sms(msg, phone):
