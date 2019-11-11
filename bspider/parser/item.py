@@ -49,12 +49,13 @@ class Item(object):
 
 class MySQLSaverItem(Item):
 
-    def __init__(self, table_name: str, db: str, **kwargs):
+    def __init__(self, table_name: str, db: str, auto_update: bool=True, **kwargs):
         """
         构造函数
         """
         self.table_name = table_name
         self.db = db
+        self.auto_update = auto_update
         super().__init__(**kwargs)
 
     def __repr__(self):

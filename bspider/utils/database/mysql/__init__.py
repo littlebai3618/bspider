@@ -4,5 +4,4 @@
 # @Use     :
 from .handler import MysqlHandler
 from .async_handler import AioMysqlHandler
-from .mysql_stream import MysqlInputStream
-from .mysql_stream import MysqlOutputStream
+from .mysql_stream import MysqlInputStream, MysqlOutputStream
