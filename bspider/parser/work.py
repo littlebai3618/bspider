@@ -34,14 +34,14 @@ class ParserManager(BaseManager):
                             else:
                                 request.sign = make_sign(parser.project_name, request.url)
                             await self.broker.set_request(requests.pop(), parser.project_id)
-                        self._save_success_result(response.request, response, parser.project_name, parser.project_id)
+                        await self._save_success_result(response.request, response, parser.project_name, parser.project_id)
                         self.log.info('project:project_id->{} project_name->{} complete parser: {}'.format(
                             parser.project_id, parser.project_name, response.url))
                     except Exception as e:
                         tp, msg, tb = sys.exc_info()
                         e_msg = ''.join(traceback.format_exception(tp, msg, tb))
                         self.log.exception(e)
-                        self._save_error_result(response.request, parser.project_name, parser.project_id, e_msg,
+                        await self._save_error_result(response.request, parser.project_name, parser.project_id, e_msg,
                                                 status=-1)
 
                     await self.broker.report_ack(msg_id)

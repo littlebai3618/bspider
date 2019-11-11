@@ -11,6 +11,7 @@ import json
 
 import signal
 
+from bspider.utils.database.mysql import AioMysqlHandler
 from bspider.utils.exceptions import MethodError
 from bspider.utils.logger import LoggerPool
 
@@ -22,6 +23,7 @@ class BaseManager(object):
 
     def __init__(self, unique_tag, monitor_cls):
         tmp = self.__str__().lower()
+        self.broker = RabbitMQBroker(self.log)
         for name in ['parser', 'downloader', 'scheduler']:
             if name in tmp:
                 self.log = LoggerPool().get_logger(key=unique_tag, module=name, name=unique_tag)
@@ -29,7 +31,12 @@ class BaseManager(object):
         self.log.info('manager init success')
         # 注册 任务中间人
         self.monitor = monitor_cls(self.log)
-        self.broker = RabbitMQBroker(self.log)
+
+        self.mysql_handler = AioMysqlHandler(self.broker.frame_settings['WEB_STUDIO_DB'])
+        if name == 'parser':
+            self.status_table = self.broker.frame_settings['DOWNLOADER_STATUS_TABLE']
+        elif name == 'downloader':
+            self.status_table = self.broker.frame_settings['PARSER_STATUS_TABLE']
         # 注册信号量保证程序安全退出
         self.sign = signal.signal(signal.SIGTERM, handler=self.close)
         self.is_close = False
@@ -64,52 +71,7 @@ class BaseManager(object):
     async def do_work(self):
         raise MethodError('you must rebuild self.do_work()')
 
-    # INNER API
-    # def _save_success_result(self, request, response, project_name, exception=None):
-    #     self.log.info('')
-    #     data = {
-    #         'project_name': project_name,
-    #         'sign': response.sign,
-    #         'method': response.method,
-    #         'url': response.url,
-    #         'status': response.status,
-    #         'exception': exception,
-    #         'url_sign': response.url,
-    #     }
-    #     if hasattr(request, 'data'):
-    #         data['data'] = json.dumps(request.data)
-    #     else:
-    #         data['data'] = None
-    #     fields, values = BaseImpl.make_fv(data)
-    #     sql = f'insert into {self.status_table} set {fields};'.replace('`url_sign`=%s', '`url_sign`=md5(%s)')
-    #
-    #     try:
-    #         self.mysql_handler.insert(sql, values)
-    #     except Exception as e:
-    #         self.log.exception(f'save response status error: {e}')
-    #
-    # def _save_error_result(self, request, project_name, exception, status=599):
-    #     data = {
-    #         'project_name': project_name,
-    #         'sign': request.sign,
-    #         'method': request.method,
-    #         'url': request.url,
-    #         'status': status,
-    #         'url_sign': request.url,
-    #         'exception': exception,
-    #     }
-    #     if hasattr(request, 'data'):
-    #         data['data'] = json.dumps(request.data)
-    #     else:
-    #         data['data'] = None
-    #     fields, values = BaseImpl.make_fv(data)
-    #     sql = f'insert into {self.status_table} set {fields};'.replace('`url_sign`=%s', '`url_sign`=md5(%s)')
-    #     try:
-    #         self.mysql_handler.insert(sql, values)
-    #     except Exception as e:
-    #         self.log.exception(f'save response status error: {e}')
-    #
-    def _save_success_result(self, request, response, project_name, project_id, exception=None):
+    async def _save_success_result(self, request, response, project_name, project_id, exception=None):
         data = {
             'project_id': project_id,
             'project_name': project_name,
@@ -125,9 +87,11 @@ class BaseManager(object):
         else:
             data['data'] = None
         fields, values = BaseImpl.make_fv(data)
+        sql = f'insert into {self.status_table} set {fields};'.replace('`url_sign`=%s', '`url_sign`=md5(%s)')
+        await self.mysql_handler.insert(sql, values)
         self.log.info('send success info [{}]'.format(fields % values))
 
-    def _save_error_result(self, request, project_name, project_id, exception, status=599):
+    async def _save_error_result(self, request, project_name, project_id, exception, status=599):
         data = {
             'project_id': project_id,
             'project_name': project_name,
@@ -143,4 +107,6 @@ class BaseManager(object):
         else:
             data['data'] = None
         fields, values = BaseImpl.make_fv(data)
+        sql = f'insert into {self.status_table} set {fields};'.replace('`url_sign`=%s', '`url_sign`=md5(%s)')
+        await self.mysql_handler.insert(sql, values)
         self.log.info('send error info [{}]'.format(fields % values))

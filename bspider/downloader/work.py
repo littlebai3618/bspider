@@ -35,7 +35,7 @@ class DownloaderManager(BaseManager):
                             'project:project_id->{} project_name->{} fail download: {}'.format(
                                 downloader.project_id, downloader.project_name, request.url))
                         self.log.exception(e)
-                        self._save_error_result(request, downloader.project_name, downloader.project_id, e_msg)
+                        await self._save_error_result(request, downloader.project_name, downloader.project_id, e_msg)
                         continue
 
                     if response and response.status != 599:
@@ -43,7 +43,7 @@ class DownloaderManager(BaseManager):
                         self.log.info('project:project_id->{} project_name->{} complete download: {}'.format(
                             downloader.project_id, downloader.project_name, response.url))
                         # 持久化下载结果
-                        self._save_success_result(request, response, downloader.project_name, downloader.project_id)
+                        await self._save_success_result(request, response, downloader.project_name, downloader.project_id)
                     await self.broker.report_ack(msg_id)
         except Exception:
             tp, msg, tb = sys.exc_info()
