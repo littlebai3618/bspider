@@ -2,6 +2,9 @@
 # @Author  : baii
 # @File    : validate_code
 # @Use     : 第三方代码检测
+import sys
+import traceback
+
 from bspider.utils.tools import find_class_name_by_content
 
 
@@ -28,6 +31,8 @@ def valid_code(name: str, code_type: str, content: str) -> (bool, str):
     try:
         exec(content)
     except Exception as e:
-        return False, f'module code has a exception:{e}'
+        tp, msg, tb = sys.exc_info()
+        e_msg = ''.join(traceback.format_exception(tp, msg, tb))
+        return False, f'module code has a exception:{e_msg}'
 
     return True, 'ok!'
