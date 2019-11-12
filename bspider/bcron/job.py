@@ -130,7 +130,7 @@ class MySQLJob(Job):
             approved['description'] = value
 
         if 'cron_type' in changes:
-            value = changes.pop('type')
+            value = changes.pop('cron_type')
             if not value or value not in ('operation', 'spider'):
                 raise TypeError("cron type must be operation or spider")
             approved['type'] = value
