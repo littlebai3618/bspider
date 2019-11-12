@@ -16,7 +16,7 @@ from bspider.core.api.exception import AuthFailed, Forbidden
 from bspider.utils.logger import LoggerPool
 
 
-__log = LoggerPool().get_logger('api_auth', module='api_auth')
+__log = LoggerPool().get_logger(key='api_auth', fn='auth', module='api_auth')
 __key = FrameSettings()['WEB_SECRET_KEY']
 
 User = namedtuple('User', ['user_id', 'role', 'token'])
