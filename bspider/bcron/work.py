@@ -103,7 +103,8 @@ class BCronManager(object):
                 kwargs={'project_id': info['project_id'], 'code_id': info['code_id'], 'type': info['type']},
                 description=info['description'],
                 next_run_time=next_run_time,
-                id=info['id']
+                id=info['id'],
+                cron_type=info['type']
             )
         except Exception as e:
             tp, msg, tb = sys.exc_info()
