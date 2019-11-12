@@ -20,7 +20,7 @@ class BaseTask(object):
         """"""
         self.settings = ProjectConfigParser(settings)
         self.settings.project_name = project_name
-        self.log = LoggerPool().get_logger(key=project_name, module='bcorn', project=project_name)
+        self.log = LoggerPool().get_logger(key=project_name, fn='bcorn', module='bcorn', project=project_name)
         self.frame_settings = FrameSettings()
         self.__mq_handler = RabbitMQHandler(self.frame_settings['RABBITMQ_CONFIG'])
 

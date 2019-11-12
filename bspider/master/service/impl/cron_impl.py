@@ -3,7 +3,7 @@
 # @File    : cron_job_impl
 # @Use     :
 from bspider.core.api import BaseImpl
-from bspider.web_studio import log
+from bspider.master import log
 
 
 class CronImpl(BaseImpl):

@@ -20,23 +20,35 @@ from .api import BaseImpl
 
 
 class BaseManager(object):
+    manager_type = ''
 
     def __init__(self, unique_tag, monitor_cls):
-        tmp = self.__str__().lower()
-        for name in ['parser', 'downloader', 'scheduler']:
-            if name in tmp:
-                self.log = LoggerPool().get_logger(key=unique_tag, module=name, name=unique_tag)
-                break
+        if self.manager_type == 'scheduler':
+            self.log = LoggerPool().get_logger(
+                key=unique_tag,
+                fn=f'{self.manager_type}',
+                module=self.manager_type,
+                name=unique_tag)
+        else:
+            self.log = LoggerPool().get_logger(
+                key=unique_tag,
+                fn=f'{self.manager_type}-{unique_tag}',
+                module=self.manager_type,
+                name=unique_tag)
+
         self.log.info('manager init success')
         # 注册 任务中间人
-        self.monitor = monitor_cls(self.log)
+        self.monitor = monitor_cls(self.log, f'{self.manager_type}-{unique_tag}')
         self.broker = RabbitMQBroker(self.log)
 
-        self.mysql_handler = AioMysqlHandler(self.broker.frame_settings['WEB_STUDIO_DB'])
-        if name == 'parser':
+        if self.manager_type == 'parser':
             self.status_table = self.broker.frame_settings['DOWNLOADER_STATUS_TABLE']
-        elif name == 'downloader':
+        elif self.manager_type == 'downloader':
             self.status_table = self.broker.frame_settings['PARSER_STATUS_TABLE']
+
+        if self.manager_type != 'scheduler':
+            self.mysql_handler = AioMysqlHandler(self.broker.frame_settings['WEB_STUDIO_DB'])
+
         # 注册信号量保证程序安全退出
         self.sign = signal.signal(signal.SIGTERM, handler=self.close)
         self.is_close = False

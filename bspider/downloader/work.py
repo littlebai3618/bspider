@@ -20,6 +20,7 @@ def run_downloader(unique_sign, coro_num=1):
 
 class DownloaderManager(BaseManager):
     """全aio操作的下载器管理器"""
+    manager_type = 'downloader'
 
     async def do_work(self):
         try:

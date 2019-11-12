@@ -18,6 +18,7 @@ def run_parser(unique_sign, coro_num=3):
 
 
 class ParserManager(BaseManager):
+    manager_type = 'parser'
 
     async def do_work(self):
         try:

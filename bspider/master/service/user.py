@@ -8,8 +8,8 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from bspider.core.api import BaseService, ParameterException, NotFound, Conflict, GetSuccess, PostSuccess, DeleteSuccess, PatchSuccess
 from bspider.core.api.auth.token import make_token
 
-from bspider.web_studio.server import log
-from bspider.web_studio.service.impl.user_impl import UserImpl
+from bspider.master.server import log
+from bspider.master.service.impl.user_impl import UserImpl
 
 
 class UserService(BaseService):

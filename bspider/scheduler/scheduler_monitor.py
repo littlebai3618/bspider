@@ -12,12 +12,13 @@ from bspider.utils.sign import Sign
 
 class SchedulerMonitor(object):
 
-    def __init__(self, log):
+    def __init__(self, log, log_fn):
         self.frame_settings = FrameSettings()
         self.project_table = self.frame_settings['PROJECT_TABLE']
         self.__mysql_handler = AioMysqlHandler.from_settings(self.frame_settings['WEB_STUDIO_DB'])
         self.projects = {}
         self.log = log
+        self.log_fn = log_fn
 
     async def get_projects(self):
         sql = f'select `id`, `name`, `rate` from {self.project_table} where `status`=1'
@@ -44,7 +45,7 @@ class SchedulerMonitor(object):
 
     @staticmethod
     def get_work_obj(project_id, project_name: str, rate: int, sign: Sign):
-        return Scheduler(project_id, project_name, rate, sign)
+        return Scheduler(project_id, project_name, rate, sign, self.log_fn)
 
 
 

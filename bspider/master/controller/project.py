@@ -7,7 +7,7 @@ from flask import Blueprint
 from bspider.core.api import auth
 from .validators import PageForm
 from .validators.project_form import UpdateForm, AddForm
-from bspider.web_studio.service.project import ProjectService
+from bspider.master.service.project import ProjectService
 
 project = Blueprint('project_bp', __name__)
 

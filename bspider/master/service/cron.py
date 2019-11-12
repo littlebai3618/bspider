@@ -20,8 +20,8 @@ from pymysql import IntegrityError
 from bspider.core.api import BaseService, Conflict, PostSuccess, PatchSuccess, DeleteSuccess, GetSuccess, NotFound, \
     ParameterException
 from bspider.bcron.todo import do
-from bspider.web_studio import log
-from bspider.web_studio.service.impl.cron_impl import CronImpl
+from bspider.master import log
+from bspider.master.service.impl.cron_impl import CronImpl
 
 
 class CronService(BaseService):

@@ -8,8 +8,8 @@ from bspider.core.api import BaseService, Conflict, NotFound, PostSuccess, Patch
     GetSuccess, ParameterException
 from bspider.core.api import AgentMixIn
 from bspider.utils.validate import valid_code
-from bspider.web_studio.server import log
-from bspider.web_studio.service.impl.code_impl import CodeImpl
+from bspider.master.server import log
+from bspider.master.service.impl.code_impl import CodeImpl
 
 
 class CodeService(BaseService, AgentMixIn):

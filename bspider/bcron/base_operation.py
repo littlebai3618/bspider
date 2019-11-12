@@ -9,7 +9,7 @@ from bspider.utils.logger import LoggerPool
 class BaseOperation(object):
 
     def __init__(self, settings: dict, project_name: str):
-        self.log = LoggerPool().get_logger(key=project_name, module='bcorn', project=project_name)
+        self.log = LoggerPool().get_logger(key=project_name, fn='bcorn', module='bcorn', project=project_name)
         self.settings = settings
         self.project_name = project_name
 

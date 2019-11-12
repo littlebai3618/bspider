@@ -13,4 +13,4 @@ class ParserMonitor(BaseMonitor):
     exchange = EXCHANGE_NAME[2]
 
     def get_work_obj(self, config: ProjectConfigParser, sign: Sign) -> AsyncParser:
-        return AsyncParser(config, sign)
+        return AsyncParser(config, sign, self.log_fn)

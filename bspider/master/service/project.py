@@ -6,8 +6,8 @@ from pymysql import IntegrityError
 
 from bspider.core import ProjectConfigParser
 from bspider.utils.exceptions import ProjectConfigError
-from bspider.web_studio import log
-from bspider.web_studio.service.impl.project_impl import ProjectImpl
+from bspider.master import log
+from bspider.master.service.impl.project_impl import ProjectImpl
 from bspider.core.api import BaseService, Conflict, NotFound, PostSuccess, DeleteSuccess, GetSuccess, \
     PatchSuccess, ParameterException, AgentMixIn
 

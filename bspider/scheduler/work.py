@@ -12,11 +12,12 @@ from .scheduler_monitor import SchedulerMonitor
 def run_scheduler(coro_num=1):
     """A factory to make a download process"""
     coro_num = 1 if coro_num != 1 else coro_num
-    dm = SchedulerManager(FrameSettings().get('SCHEDULER_SIGN', 'scheduler'), SchedulerMonitor)
+    dm = SchedulerManager(FrameSettings().get('SCHEDULER_SIGN', 'default'), SchedulerMonitor)
     dm.run(coro_num)
 
 
 class SchedulerManager(BaseManager):
+    manager_type = 'scheduler'
 
     async def do_work(self):
         while True:

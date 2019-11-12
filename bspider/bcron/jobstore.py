@@ -2,8 +2,6 @@
 # @Author  : 白尚林
 # @File    : jobstore
 # @Use     :
-import json
-
 import datetime
 from apscheduler.jobstores.base import BaseJobStore, JobLookupError
 from apscheduler.triggers.cron import CronTrigger

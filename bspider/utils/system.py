@@ -15,7 +15,9 @@ class System(object):
     """
     #### 后续增加异步获取CPU等使用率
     """
-    ip_msg = '{}->{}'.format(FrameSettings()['MASTER']['ip'], FrameSettings()['AGENT']['ip'])
+    master_ip = FrameSettings()['MASTER']['ip']
+    agent_ip = FrameSettings().get('AGENT', {}).get('ip')
+    ip_msg = f'{master_ip}->{agent_ip}' if agent_ip else master_ip
 
     @property
     def cpu_percent(self):

@@ -17,7 +17,7 @@ from .project_config_parser import ProjectConfigParser
 class BaseMonitor(object):
     exchange = ''
 
-    def __init__(self, log):
+    def __init__(self, log, log_fn):
         """
         :param downloader_tag: 一个下载器的唯一标识，不能和其他下载器一致
         """
@@ -27,6 +27,7 @@ class BaseMonitor(object):
         self.projects = dict()
         self.__weight = None
         self.__total_sum = 0
+        self.log_fn = log_fn
 
     async def sync_config(self):
         """从cache 同步任务数据"""

@@ -6,8 +6,8 @@ from bspider.core.api import BaseService, Conflict, NotFound, PostSuccess, Delet
     ParameterException
 from bspider.core.api import AgentMixIn
 from bspider.utils.exceptions import RemoteOPError
-from bspider.web_studio.server import log
-from bspider.web_studio.service.impl.node_impl import NodeImpl
+from bspider.master.server import log
+from bspider.master.service.impl.node_impl import NodeImpl
 
 
 class Node(BaseService, AgentMixIn):

@@ -4,7 +4,7 @@
  * BSpider use gunicorn and supervisor
  *** in Unix, use 'bspider master start' to run a master process
 """
-from bspider.web_studio.server import create_app
+from bspider.master.server import create_app
 
 app = create_app()
 

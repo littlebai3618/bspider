@@ -7,7 +7,7 @@ from flask import Blueprint
 from bspider.core.api import auth
 from bspider.utils.tools import change_dict_key
 from .validators import PageForm
-from bspider.web_studio.service.cron import CronService
+from bspider.master.service.cron import CronService
 from .validators.cron_forms import AddForm, UpdateForm
 
 cron = Blueprint('cron_bp', __name__)

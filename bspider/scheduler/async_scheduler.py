@@ -2,7 +2,7 @@
 # @Author  : 白尚林
 # @File    : async_scheduler
 # @Use     :
-"""暂时放弃异步任务"""
+"""暂时放弃异步任务调度"""
 import datetime
 
 from bspider.core.broker import RabbitMQBroker

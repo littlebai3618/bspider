@@ -8,7 +8,7 @@ from bspider.core.api import auth
 from bspider.core.api import NotFound
 from .validators import PageForm
 from .validators.user_forms import LoginForm, RegisterForm, UpdateForm
-from bspider.web_studio.service.user import UserService
+from bspider.master.service.user import UserService
 
 user = Blueprint('user_bp', __name__)
 

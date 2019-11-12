@@ -8,7 +8,7 @@
 from flask import Blueprint
 
 from bspider.core.api import auth
-from bspider.web_studio.service.tools import ToolsService
+from bspider.master.service.tools import ToolsService
 
 from .validators.tools_forms import GetCodeListForm, ValidateForm
 

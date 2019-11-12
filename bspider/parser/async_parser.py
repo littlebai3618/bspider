@@ -18,13 +18,13 @@ from bspider.utils.sign import Sign
 
 class AsyncParser(object):
 
-    def __init__(self, config: ProjectConfigParser, sign: Sign):
+    def __init__(self, config: ProjectConfigParser, sign: Sign, log_fn: str):
         """传入下载器的配置文件"""
         self.sign = sign
         self.project_name = config.project_name
         self.project_id = config.project_id
 
-        self.log = LoggerPool().get_logger(key=f'project_parser->{self.project_id}', module='parser', project=self.project_name)
+        self.log = LoggerPool().get_logger(key=f'project_parser->{self.project_id}', fn=log_fn, module='parser', project=self.project_name)
 
         self.pipes = []
         for cls_name, code in config.pipeline:

@@ -5,7 +5,7 @@
 from bspider.config.default_settings import EXCHANGE_NAME
 from bspider.core.api import BaseImpl
 from bspider.utils.rabbitMQ import RabbitMQHandler
-from bspider.web_studio import log
+from bspider.master import log
 
 
 class ProjectImpl(BaseImpl):

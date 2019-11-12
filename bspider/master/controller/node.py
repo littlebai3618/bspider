@@ -21,7 +21,7 @@ from flask import Blueprint
 from bspider.core.api import auth
 from .validators import PageForm
 from .validators.node_forms import AddNodeForm, UpdateNodeForm, AddWorkerForm, UpdateWorkerForm
-from bspider.web_studio.service.node import Node
+from bspider.master.service.node import Node
 
 node = Blueprint('node_bp', __name__)
 

@@ -5,7 +5,7 @@
 from flask import Blueprint
 
 from bspider.core.api import auth
-from bspider.web_studio.service.code import CodeService
+from bspider.master.service.code import CodeService
 from .validators.code_forms import AddForm, UpdateForm
 from .validators import PageForm
 

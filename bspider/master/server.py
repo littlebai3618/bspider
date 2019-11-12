@@ -11,13 +11,13 @@ from werkzeug.exceptions import HTTPException
 
 from bspider.config import FrameSettings
 from bspider.core.api import APIException
-from bspider.web_studio import log
-from bspider.web_studio.controller.cron import cron
-from bspider.web_studio.controller.code import code
-from bspider.web_studio.controller.project import project
-from bspider.web_studio.controller.node import node
-from bspider.web_studio.controller.user import user
-from bspider.web_studio.controller.tools import tools
+from bspider.master import log
+from bspider.master.controller.cron import cron
+from bspider.master.controller.code import code
+from bspider.master.controller.project import project
+from bspider.master.controller.node import node
+from bspider.master.controller.user import user
+from bspider.master.controller.tools import tools
 
 
 def create_app():

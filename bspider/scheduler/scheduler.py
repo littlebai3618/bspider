@@ -15,12 +15,12 @@ from bspider.utils.sign import Sign
 
 class Scheduler(object):
 
-    def __init__(self, project_id: int, project_name: str, rate: int, sign: Sign):
+    def __init__(self, project_id: int, project_name: str, rate: int, sign: Sign, log_fn: str):
         self.sign = sign
         self.project_name = project_name
         self.project_id = project_id
 
-        self.log = LoggerPool().get_logger(key=f'scheduler_parser->{self.project_id}', module='scheduler', project=self.project_name)
+        self.log = LoggerPool().get_logger(key=f'scheduler->{self.project_id}', fn=log_fn, module='scheduler', project=self.project_name)
 
         # 上一次分钟数
         self.__pre_loop_sign = None

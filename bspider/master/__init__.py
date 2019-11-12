@@ -3,5 +3,6 @@
 # @File    : __init__.py
 # @Use     :
 from bspider.utils.logger import LoggerPool
+from bspider.utils.system import System
 
-log = LoggerPool().get_logger('web_studio', module='web_studio')
+log = LoggerPool().get_logger(key='master', fn='master', module=f'master', ip=System.ip_msg)

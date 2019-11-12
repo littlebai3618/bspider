@@ -24,13 +24,13 @@ from bspider.utils.sign import Sign
 
 class AsyncDownloader(object):
 
-    def __init__(self, config: ProjectConfigParser, sign: Sign):
+    def __init__(self, config: ProjectConfigParser, sign: Sign, log_fn: str):
         """传入下载器的配置文件"""
         self.sign = sign
         self.project_name = config.project_name
         self.project_id = config.project_id
 
-        self.log = LoggerPool().get_logger(key=f'project_downloader->{self.project_id}', module='downloader', project=self.project_name)
+        self.log = LoggerPool().get_logger(key=f'project_downloader->{self.project_id}', fn=log_fn, module='downloader', project=self.project_name)
         # 加载重试次数
         if 'RETRY_TIMES' in config.downloader_settings and isinstance(config.downloader_settings['RETRY_TIMES'], int):
             self.retry_times = config.downloader_settings['RETRY_TIMES']
