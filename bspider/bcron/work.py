@@ -100,7 +100,7 @@ class BCronManager(object):
         try:
             self.scheduler.add_job(
                 do, cron, name=name,
-                kwargs={'project_id': info['project_id'], 'code_id': info['code_id'], 'type': info['type']},
+                kwargs={'project_id': info['project_id'], 'code_id': info['code_id'], 'cron_type': info['type']},
                 description=info['description'],
                 next_run_time=next_run_time,
                 id=info['id'],

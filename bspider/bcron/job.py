@@ -129,7 +129,7 @@ class MySQLJob(Job):
                 raise TypeError("description must be a nonempty string")
             approved['description'] = value
 
-        if 'type' in changes:
+        if 'cron_type' in changes:
             value = changes.pop('type')
             if not value or value not in ('operation', 'spider'):
                 raise TypeError("cron type must be operation or spider")
