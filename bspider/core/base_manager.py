@@ -23,7 +23,6 @@ class BaseManager(object):
 
     def __init__(self, unique_tag, monitor_cls):
         tmp = self.__str__().lower()
-        self.broker = RabbitMQBroker(self.log)
         for name in ['parser', 'downloader', 'scheduler']:
             if name in tmp:
                 self.log = LoggerPool().get_logger(key=unique_tag, module=name, name=unique_tag)
@@ -31,6 +30,7 @@ class BaseManager(object):
         self.log.info('manager init success')
         # 注册 任务中间人
         self.monitor = monitor_cls(self.log)
+        self.broker = RabbitMQBroker(self.log)
 
         self.mysql_handler = AioMysqlHandler(self.broker.frame_settings['WEB_STUDIO_DB'])
         if name == 'parser':
