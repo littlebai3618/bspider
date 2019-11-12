@@ -5,6 +5,7 @@
 from flask import Blueprint
 
 from bspider.core.api import auth
+from bspider.utils.tools import change_dict_key
 from .validators import PageForm
 from bspider.web_studio.service.cron import CronService
 from .validators.cron_forms import AddForm, UpdateForm
@@ -18,7 +19,7 @@ cron_service = CronService()
 @auth.login_required
 def add():
     form = AddForm()
-    return cron_service.add_cron(**form.to_dict())
+    return cron_service.add_cron(**change_dict_key('type', 'cron_type', form.to_dict()))
 
 
 @cron.route('/cron/<int:cron_id>', methods=['DELETE'])
