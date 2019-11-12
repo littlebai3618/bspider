@@ -37,7 +37,7 @@ class NodeImpl(BaseImpl):
 
     def add_node(self, data):
         sql, values = prepare_insert_sql(self.node_table, data, auto_update=True)
-        log.debug(f'SQL:{sql}')
+        log.debug(f'SQL:{sql} {values}')
         return self.handler.insert(sql, values)
 
     def delete_node(self, node_id, get_sql=False):

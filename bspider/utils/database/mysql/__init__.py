@@ -32,4 +32,8 @@ def prepare_insert_sql(table: str, data: dict, **kwargs) -> (str, tuple):
         if data.get(key) and key not in kwargs.get('immutable_fields', [])
     ]))
 
+    values.extend([
+        data[key] for key in data.keys()
+        if data.get(key) and key not in kwargs.get('immutable_fields', [])
+    ])
     return sbuf.getvalue(), tuple(values)
