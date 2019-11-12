@@ -58,6 +58,7 @@ class CreateApp(MasterMixIn):
 
     def __init_agent(self, ip, name, description, port) -> bool:
         cache = AgentCache()
+        system = System()
         try:
             # 初始化缓存、获取缓存数据
             cache.initialization()
@@ -65,9 +66,9 @@ class CreateApp(MasterMixIn):
                 'ip': ip,
                 'description': description,
                 'name': name,
-                'cpu_num': System.cpu_num,
-                'mem_size': System.mem_size,
-                'disk_size': System.disk_size,
+                'cpu_num': system.cpu_num,
+                'mem_size': system.mem_size,
+                'disk_size': system.disk_size,
                 'port': port
             })
         except sqlite3.Error:
