@@ -38,11 +38,11 @@ class System(object):
     @property
     def mem_size(self):
         """返回字节大小"""
-        return psutil.virtual_memory().total
+        return psutil.virtual_memory().total/1024/1024/1024
 
     @property
     def disk_size(self):
-        return psutil.disk_usage('/').total
+        return psutil.disk_usage('/').total/1024/1024/1024
 
 
 class WorkerProcess():
@@ -55,11 +55,13 @@ if __name__ == '__main__':
     ps_info = {
         'CPU COUNT': psutil.cpu_count(),
         'CPU PERCENT': psutil.cpu_percent(),
-        'MEM SIZE': psutil.virtual_memory().total,
+        'MEM SIZE': psutil.virtual_memory().total/1024/1024/1024,
         'MEM PERCENT': psutil.virtual_memory().percent,
-        'DISK SIZE': psutil.disk_usage('/').total,
+        'DISK SIZE': psutil.disk_usage('/').total/1024/1024/1024,
         'DISK PERCENT': psutil.disk_usage('/').percent
     }
 
     for key, value in ps_info.items():
         print(f'{key}:{value}')
+
+
