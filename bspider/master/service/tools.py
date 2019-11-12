@@ -7,12 +7,12 @@
 """
 from apscheduler.triggers.cron import CronTrigger
 
-from bspider.core.api import BaseService, GetSuccess, NotFound
+from bspider.core.api import BaseService, GetSuccess, NotFound, AgentMixIn
 
 from .impl.tools_impl import ToolsImpl
 
 
-class ToolsService(BaseService):
+class ToolsService(BaseService, AgentMixIn):
 
     def __init__(self):
         self.impl = ToolsImpl()
@@ -34,6 +34,10 @@ class ToolsService(BaseService):
             except Exception:
                 return GetSuccess(msg='validate complete', data={'valid': False})
         return NotFound(msg='unknow validate type', errno=60001)
+
+    def node_status(self, ip):
+        """调用接口返回节点状态，兼职探活"""
+        return GetSuccess(data=self.op_get_node_status(ip))
 
 
 

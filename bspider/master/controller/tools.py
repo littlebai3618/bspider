@@ -37,3 +37,8 @@ def validate(valid_type):
     """返回节点列表"""
     form = ValidateForm()
     return tools_service.validate(valid_type, form.data.data)
+
+@tools.route('/nodestatus/<string:node_ip>', methods=['GET'])
+@auth.login_required
+def node_status(node_ip):
+    return tools_service.node_status(node_ip)
