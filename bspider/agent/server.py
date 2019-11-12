@@ -24,6 +24,7 @@ from bspider.agent.controller.node import node, node_service
 from bspider.agent.controller.code import code
 
 from bspider.utils.exceptions import RemoteOPError
+from bspider.utils.system import System
 
 
 class CreateApp(MasterMixIn):
@@ -60,7 +61,15 @@ class CreateApp(MasterMixIn):
         try:
             # 初始化缓存、获取缓存数据
             cache.initialization()
-            data = self.op_add_node({'ip': ip, 'name': name, 'description': description, 'port': port})
+            data = self.op_add_node({
+                'ip': ip,
+                'description': description,
+                'name': name,
+                'cpu_num': System.cpu_num,
+                'mem_size': System.mem_size,
+                'disk_size': System.disk_size,
+                'port': port
+            })
         except sqlite3.Error:
             tp, msg, tb = sys.exc_info()
             e_msg = ''.join(traceback.format_exception(tp, msg, tb))

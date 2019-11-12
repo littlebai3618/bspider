@@ -43,13 +43,3 @@ def ding(msg, title='', at=None):
         data=json.dumps(data),
         verify=False
     )
-
-
-# 短信通知服务
-def sms(msg, phone):
-    message = '【bspider】{}'.format(msg)
-    for p in phone:
-        r = requests.post(
-            url=f'http://172.20.31.177/sp/tools/sms.php?phone={p}&msg={message}',
-            verify=False
-        )

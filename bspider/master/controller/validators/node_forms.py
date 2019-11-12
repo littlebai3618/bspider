@@ -12,17 +12,18 @@ class AddNodeForm(BaseForm):
     ip = StringField(validators=[ParamRequired(), length(min=7, max=15)])
     name = StringField(validators=[ParamRequired(), length(min=3, max=30)])
     description = StringField(validators=[ParamRequired()])
-
-
-class GetNodeForm(BaseForm):
-    is_all = IntegerField(default=0)
-    node_ip = StringField()
-
+    cpu_num = IntegerField(validators=[ParamRequired()])
+    mem_size = IntegerField(validators=[ParamRequired()])
+    disk_size = IntegerField(validators=[ParamRequired()])
+    port = IntegerField(validators=[ParamRequired()])
 
 class UpdateNodeForm(BaseForm):
     name = StringField()
     status = IntegerField()
     description = StringField()
+    cpu_num = IntegerField()
+    mem_size = IntegerField()
+    disk_size = IntegerField()
 
 
 class AddWorkerForm(BaseForm):

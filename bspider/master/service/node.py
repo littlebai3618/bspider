@@ -16,11 +16,20 @@ class Node(BaseService, AgentMixIn):
         self.impl = NodeImpl()
 
     # node API
-    def add_node(self, ip, description, name):
-        self.impl.add_node({'ip': ip, 'description': description, 'name': name})
-        log.info(f'add agent from {name}:{ip} success')
+    def add_node(self, ip, description, name, cpu_num, mem_size, disk_size, port):
+        self.impl.add_node({
+            'ip': ip,
+            'description': description,
+            'name': name,
+            'cpu_num': cpu_num,
+            'mem_size': mem_size,
+            'disk_size': disk_size,
+            'status': 1,
+            'port': port
+        })
+        log.info(f'add agent from {name}->{ip}:{port} success')
         return PostSuccess(
-            msg=f'add agent from {name}:{ip} success',
+            msg=f'add agent from {name}->{ip}:{port} success',
             data={
                 'projects': self.impl.get_all_projects(),
                 'codes': self.impl.get_all_codes(),
@@ -59,15 +68,13 @@ class Node(BaseService, AgentMixIn):
                     remote_change = True
                     break
 
-            status = kwargs.pop('status')
-
             if remote_change:
                 with self.impl.handler.session() as session:
                     if len(kwargs):
                         session.update(*self.impl.update_node(node_id, kwargs, get_sql=True))
-                    if status == 1:
+                    if kwargs['status'] == 1:
                         self.op_start_node(node['ip'])
-                    elif status == 0:
+                    elif kwargs['status'] == 0:
                         self.op_stop_node(node['ip'])
 
             elif len(kwargs):
