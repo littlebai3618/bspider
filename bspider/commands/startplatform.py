@@ -23,7 +23,7 @@ TEMPLATES_TO_RENDER = (
     ('bin', 'agent_manager.py.tmpl'),
     ('bin', 'bcorn_manager.py.tmpl'),
     ('bin', 'scheduler_manager.py.tmpl'),
-    ('bin', 'studio_manager.py.tmpl')
+    ('bin', 'master_manager.py.tmpl')
 )
 
 
