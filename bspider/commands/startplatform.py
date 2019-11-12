@@ -60,6 +60,7 @@ class Command(BSpiderCommand):
             render_templatefile(tplfile, platform_name=platform_name)
 
         mkdir(join(abspath(platform_name), 'log'))
+        mkdir(join(abspath(platform_name), 'log', 'supervisor'))
         mkdir(join(abspath(platform_name), 'cache'))
         mkdir(join(abspath(platform_name), 'projects'))
 
