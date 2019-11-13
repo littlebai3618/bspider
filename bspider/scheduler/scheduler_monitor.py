@@ -3,6 +3,8 @@
 # @File    : scheduler_monitor
 # @Use     :
 import asyncio
+import sys
+import traceback
 
 from bspider.config import FrameSettings
 from bspider.scheduler.scheduler import Scheduler
@@ -40,6 +42,9 @@ class SchedulerMonitor(object):
                 self.projects = tmp_projects
                 self.log.info('sync project success with {} projects'.format(len(self.projects)))
             except Exception as e:
+                tp, msg, tb = sys.exc_info()
+                e_msg = ''.join(traceback.format_exception(tp, msg, tb))
+                self.log.error(f'server exec:{e_msg}')
                 self.log.error(f'sync project rate error:{e}')
             await asyncio.sleep(4)
 

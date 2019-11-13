@@ -41,7 +41,6 @@ class RabbitMQHandler(object):
                 port=mq_config['port'],
                 credentials=credentials,
                 virtual_host=mq_config.get('virtual_host', None),
-                heartbeat=60,
             )
         )
         self.channel = self.connection.channel()

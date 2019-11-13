@@ -87,7 +87,7 @@ class BaseMonitor(object):
         """
         if self.__weight is not None and self.__total_sum:
             seed = random.randint(0, self.__total_sum - 1)
-            for project_id, weight in self.__weight:
+            for project_id, weight in self.__weight.items():
                 seed -= weight
                 if seed < 0:
                     self.log.debug(f'choice project:project-:project_id->{project_id}')
