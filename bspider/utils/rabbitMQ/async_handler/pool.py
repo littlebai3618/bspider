@@ -46,7 +46,7 @@ class Pool:
             if self._is_overflow:
                 return await self.__items.get()
 
-            print('Creating a new instance of %r', self.__constructor)
+            # print('Creating a new instance of %r', self.__constructor)
             item = await self.__constructor(*self.__constructor_args)
             self.__created += 1
             return item
@@ -55,10 +55,10 @@ class Pool:
         if self._is_overflow:
             channel = await self.__items.get()
             if channel.is_closed:
-                print('channel is close')
+                # print('channel is close')
                 self.__created -= 1
                 channel = await self._create_item()
-                print('new a channel ', channel.is_closed)
+                # print('new a channel ', channel.is_closed)
             return channel
 
         return await self._create_item()
