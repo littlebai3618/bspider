@@ -43,8 +43,7 @@ class SchedulerMonitor(object):
                 self.log.error(f'sync project rate error:{e}')
             await asyncio.sleep(4)
 
-    @staticmethod
-    def get_work_obj(project_id, project_name: str, rate: int, sign: Sign):
+    def get_work_obj(self, project_id, project_name: str, rate: int, sign: Sign):
         return Scheduler(project_id, project_name, rate, sign, self.log_fn)
 
 
