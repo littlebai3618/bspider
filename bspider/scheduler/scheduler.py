@@ -46,7 +46,7 @@ class Scheduler(object):
             # 本次调度数量
             rate_slice = self.rate / 12
 
-            for i in range(int(rate_slice * 4)):
+            for i in range(int(rate_slice * 1.5)):
                 if int(rate_slice * cur_slice) > self.__scheduler_count:
                     if self.schedule_task():
                         self.__scheduler_count += 1
@@ -73,7 +73,7 @@ class Scheduler(object):
         msg_count = self.__mq_handler.get_queue_message_count(queue_name)
         threshold = rate // 12
         if threshold < 2:
-            threshold = 2
+            threshold = 1
         return msg_count > threshold
 
     def __repr__(self):
