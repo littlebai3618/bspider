@@ -80,7 +80,7 @@ class ProjectImpl(BaseImpl):
         if len(code_names):
             cl = ', '.join(["'%s'" % code for code in code_names])
             sql = f'select `id`, `name` from {self.code_table} ' \
-                  f'where `name` in ({cl}) and `type`="pipeline"'
+                  f'where `name` in ({cl}) and `type`="pipeline" or `type`="extractor"'
             return self.handler.select(sql)
         return []
 
