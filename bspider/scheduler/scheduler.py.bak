@@ -40,9 +40,7 @@ class Scheduler(object):
 
         cur_slice = int(int(now.strftime('%S')) // (60 / 12) + 1)
 
-        if self.rate < 1 or self.__is_full_queue(self.__download_queue, self.rate):
-            return
-        else:
+        if not self.rate < 1 or self.__is_full_queue(self.__download_queue, self.rate):
             # 本次调度数量
             rate_slice = self.rate / 12
 

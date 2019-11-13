@@ -7,7 +7,7 @@ import sys
 import traceback
 
 from bspider.config import FrameSettings
-from bspider.scheduler.scheduler import Scheduler
+from bspider.scheduler.async_scheduler import AsyncScheduler
 from bspider.utils.database.mysql import AioMysqlHandler
 from bspider.utils.sign import Sign
 
@@ -49,7 +49,7 @@ class SchedulerMonitor(object):
             await asyncio.sleep(4)
 
     def get_work_obj(self, project_id, project_name: str, rate: int, sign: Sign):
-        return Scheduler(project_id, project_name, rate, sign, self.log_fn)
+        return AsyncScheduler(project_id, project_name, rate, sign, self.log_fn)
 
 
 

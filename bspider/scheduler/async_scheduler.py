@@ -7,21 +7,24 @@ import datetime
 
 from bspider.core.broker import RabbitMQBroker
 from bspider.utils.logger import LoggerPool
+from bspider.utils.sign import Sign
 
 
 class AsyncScheduler(object):
 
-    def __init__(self, job_name: str, rate: int, job_id: int, unique_sign):
-        self.log = LoggerPool().get_logger(key=job_name, module='scheduler', project=job_name)
+    def __init__(self, project_id: int, project_name: str, rate: int, sign: Sign, log_fn: str):
+        self.sign = sign
+        self.project_name = project_name
+        self.project_id = project_id
+
+        self.log = LoggerPool().get_logger(key=f'scheduler->{self.project_id}', fn=log_fn, module='scheduler', project=self.project_name)
         self.__broker = RabbitMQBroker(self.log)
+
         # 上一次分钟数
         self.__pre_loop_sign = None
         self.__scheduler_count = 0
-        self.__download_queue = 'download_{}'.format(job_name)
-        self.job_name = job_name
+        self.__download_queue = 'download_{}'.format(self.project_id)
         self.rate = rate
-        self.unique_sign = unique_sign
-        self.job_id = job_id
 
     async def scheduler(self):
         now = datetime.datetime.now()
@@ -34,15 +37,13 @@ class AsyncScheduler(object):
         cur_slice = int(int(now.strftime('%S')) // (60 / 12) + 1)
 
         if self.rate < 1 or await self.__is_full_queue(self.__download_queue, self.rate):
-            return
-        else:
             # 本次调度数量
             rate_slice = self.rate / 12
 
             for i in range(int(rate_slice * 4)):
                 # 获取项目本分钟内已经推送的数量,和当前时间段的需要推送量比较
                 if int(rate_slice * cur_slice) > self.__scheduler_count:
-                    if self.__broker.schedule_task(self.job_name):
+                    if self.__broker.schedule_task(self.project_id):
                         self.__scheduler_count += 1
                 else:
                     break
@@ -95,7 +96,7 @@ class AsyncScheduler(object):
         msg_count = await self.__broker.mq_handler.get_queue_message_count(queue_name)
         threshold = rate // 12
         if threshold < 2:
-            threshold = 2
+            threshold = 1
         return msg_count > threshold
     #
     # async def __is_empty_queue(self, queue_name):
@@ -103,4 +104,4 @@ class AsyncScheduler(object):
     #     return count == 0
 
     def __repr__(self):
-        return f'<AsyncScheduler->{self.job_id}:{self.job_name}:{self.unique_sign}>'
+        return f'<AsyncScheduler->{self.project_name}:{self.sign}>'

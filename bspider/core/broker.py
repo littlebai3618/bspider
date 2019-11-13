@@ -65,6 +65,7 @@ class RabbitMQBroker(object):
                 await self.mq_handler.ack(msg_id)
                 return True
             else:
+                self.log.warning(f'send a new task fail sign->{request.sign}')
                 await self.mq_handler.nack(msg_id)
         return False
 
