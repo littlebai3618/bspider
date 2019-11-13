@@ -50,6 +50,7 @@ class ProjectService(BaseService, AgentMixIn):
         2. 持久化project配置
         """
         pc_obj = self.__get_config_obj(config)
+        log.debug(f'pc_opj->pipeline:{pc_obj.pipeline}, middleware:{pc_obj.middleware}')
 
         try:
             with self.impl.handler.session() as session:
