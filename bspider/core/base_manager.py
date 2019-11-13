@@ -29,16 +29,17 @@ class BaseManager(object):
                 fn=f'{self.manager_type}',
                 module=self.manager_type,
                 name=unique_tag)
+            self.monitor = monitor_cls(self.log, self.manager_type)
         else:
             self.log = LoggerPool().get_logger(
                 key=unique_tag,
                 fn=f'{self.manager_type}-{unique_tag}',
                 module=self.manager_type,
                 name=unique_tag)
+            self.monitor = monitor_cls(self.log, f'{self.manager_type}-{unique_tag}')
 
         self.log.info('manager init success')
         # 注册 任务中间人
-        self.monitor = monitor_cls(self.log, f'{self.manager_type}-{unique_tag}')
         self.broker = RabbitMQBroker(self.log)
 
         if self.manager_type == 'parser':

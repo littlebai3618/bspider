@@ -52,6 +52,7 @@ class Scheduler(object):
                         self.__scheduler_count += 1
                 else:
                     break
+        self.log.debug(f'scheduler {self.project_id} comput finish')
 
     def schedule_task(self) -> bool:
         """调度抓取任务到下载队列"""
