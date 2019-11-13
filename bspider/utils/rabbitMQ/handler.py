@@ -57,7 +57,7 @@ class RabbitMQHandler(object):
     # Exchange API
 
     @retry
-    def declare_exchange(self, exchange: str):
+    def exchange_declare(self, exchange: str):
         self.channel.exchange_declare(exchange=exchange, exchange_type='topic', durable=True)
 
     # Queue API
@@ -72,18 +72,18 @@ class RabbitMQHandler(object):
         return result.method.message_count
 
     @retry
-    def declare_queue(self, queue):
+    def queue_declare(self, queue):
         """声明一个队列 新版pika"""
         return self.channel.queue_declare(
             queue=queue, durable=True, arguments=self.queue_arg)
 
     @retry
-    def remove_queue(self, queue):
+    def queue_delete(self, queue):
         """删除一个队列-- 这个方法会直接删除队列，很危险"""
         return self.channel.queue_delete(queue)
 
     @retry
-    def bind_queue(self, queue, exchange, routing_key):
+    def queue_bind(self, queue, exchange, routing_key):
         """绑定一个队列"""
         self.channel.queue_bind(queue=queue, exchange=exchange, routing_key=routing_key)
 

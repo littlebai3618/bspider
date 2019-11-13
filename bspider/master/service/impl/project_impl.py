@@ -102,20 +102,20 @@ class ProjectImpl(BaseImpl):
         sql = f'delete from {self.project_table} where `project_id`={project_id};'
         return sql
 
-    def bind_queue(self, project_name):
+    def bind_queue(self, project_id):
         for exchange in EXCHANGE_NAME:
-            queue_name = '{}_{}'.format(exchange, project_name)
-            self.__bind(exchange, queue_name, project_name)
+            queue_name = '{}_{}'.format(exchange, project_id)
+            self.__bind(exchange, queue_name, project_id)
         return True
 
     def __bind(self, exchange, queue_name, routing_key):
-        self.__mq_handler.declare_exchange(exchange)
-        self.__mq_handler.declare_queue(queue_name)
-        self.__mq_handler.bind_queue(queue_name, exchange, routing_key)
+        self.__mq_handler.exchange_declare(exchange)
+        self.__mq_handler.queue_declare(queue_name)
+        self.__mq_handler.queue_bind(queue_name, exchange, routing_key)
 
     def unbind_queue(self, project_id):
         for exchange in EXCHANGE_NAME:
-            self.__mq_handler.remove_queue(queue='{}_{}'.format(exchange, project_id))
+            self.__mq_handler.queue_delete(queue='{}_{}'.format(exchange, project_id))
         return True
 
     def get_nodes(self):

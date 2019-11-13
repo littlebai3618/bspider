@@ -54,9 +54,6 @@ class ProjectService(BaseService, AgentMixIn):
 
         try:
             with self.impl.handler.session() as session:
-                self.impl.bind_queue(project_name=name)
-                log.debug(f'bind new project:{name} queue success!')
-
                 data = {
                     'name': name,
                     'status': status,
@@ -68,6 +65,8 @@ class ProjectService(BaseService, AgentMixIn):
                     'config': config
                 }
                 project_id = session.insert(*self.impl.add_project(data), lastrowid=True)
+                self.impl.bind_queue(project_id=project_id)
+                log.debug(f'bind new project=>{name} queue success!')
                 pc_obj.middleware.extend(pc_obj.pipeline)
                 self.impl.add_project_binds(pc_obj.middleware, project_id)
                 info = {

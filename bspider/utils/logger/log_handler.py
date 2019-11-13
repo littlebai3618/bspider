@@ -16,29 +16,6 @@ from bspider.utils.sign import Sign
 from .formatter import get_stream_formatter
 
 
-class RabbitMQLogHandler(logging.Handler):
-
-    def __init__(self, mq_handler, level='INFO'):
-        super().__init__(level=level)
-        self.mq_handler = mq_handler
-        # 创建交换机
-        self.frame_settings = FrameSettings()
-        self.mq_handler.declare_exchange(self.frame_settings['LOGGER_EXCHANGE_NAME'])
-
-    def emit(self, record):
-        self.mq_handler.send_message(
-            exchange=self.frame_settings['LOGGER_EXCHANGE_NAME'],
-            routing_key=self.frame_settings['LOGGER_EXCHANGE_NAME'],
-            body=self.format(record)
-        )
-
-    def close(self):
-        """
-        clear when closing
-        """
-        logging.Handler.close(self)
-
-
 @singleton
 class LoggerPool(object):
     """日志句柄池"""
