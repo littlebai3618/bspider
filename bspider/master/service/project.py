@@ -70,7 +70,7 @@ class ProjectService(BaseService, AgentMixIn):
 
                 cids = pc_obj.middleware.copy() + pc_obj.pipeline.copy()
                 log.debug(f'code num: {cids}')
-                self.impl.add_project_binds(cids, project_id)
+                session.insert(*self.impl.add_project_binds(cids, project_id))
                 info = {
                     'project_id': project_id,
                     'name': name,
@@ -96,13 +96,19 @@ class ProjectService(BaseService, AgentMixIn):
         for key in ('name', 'config', 'rate', 'status'):
             if key in changes:
                 if key == 'config':
-                    remote_param['config'] = self.__get_config_obj(changes['config']).dumps()
+                    remote_param['config'] = self.__get_config_obj(changes['config'])
                 else:
                     remote_param[key] = changes[key]
 
         if len(remote_param):
             with self.impl.handler.session() as session:
                 session.update(*self.impl.update_project(project_id, changes))
+                pc_obj = remote_param.get('config')
+                if pc_obj:
+                    cids = pc_obj.middleware.copy() + pc_obj.pipeline.copy()
+                    log.debug(f'code num: {cids}')
+                    session.insert(*self.impl.add_project_binds(cids, project_id))
+                    remote_param['config'] = pc_obj.dumps()
                 sign, result = self.op_update_project(self.impl.get_nodes(), project_id, remote_param)
                 if not sign:
                     log.warning(f'not all node update project:project_id->{project_id} =>{result}')
@@ -116,7 +122,8 @@ class ProjectService(BaseService, AgentMixIn):
 
     def delete(self, project_id):
         with self.impl.handler.session() as session:
-            session.update(*self.impl.delete_project(project_id))
+            session.delete(*self.impl.delete_project(project_id))
+            session.delete(*self.impl.delete_project_binds(project_id))
             sign, result = self.op_delete_project(self.impl.get_nodes(), project_id)
             if not sign:
                 log.error(f'all project delete failed:{project_id} =>{result}')

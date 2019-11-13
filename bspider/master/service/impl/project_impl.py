@@ -53,13 +53,13 @@ class ProjectImpl(BaseImpl):
 
     def delete_project_binds(self, project_id):
         sql = f'delete from {self.p2c_table} where `project_id`={project_id};'
-        return sql
+        return sql,
 
     def add_project_binds(self, cids, pid):
         values = ', '.join([f'({pid}, {cid})' for cid in cids])
-        sql = f'insert into {self.p2c_table}(`project_id`, `customcode_id`)' \
-              f' values {values};'
-        return sql
+        sql = f'replace insert into {self.p2c_table}(`project_id`, `customcode_id`) ' \
+              f'values {values};'
+        return sql,
 
     def update_project(self, unique_value, data, unique_key='id'):
         fields, values = BaseImpl.make_fv(data)
@@ -99,7 +99,7 @@ class ProjectImpl(BaseImpl):
         return self.handler.select(sql)
 
     def delete_project(self, project_id):
-        sql = f'delete from {self.project_table} where `project_id`={project_id};'
+        sql = f'delete from {self.project_table} where `id`={project_id};'
         return sql,
 
     def bind_queue(self, project_id):
