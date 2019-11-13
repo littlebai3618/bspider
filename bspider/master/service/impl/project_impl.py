@@ -100,7 +100,7 @@ class ProjectImpl(BaseImpl):
 
     def delete_project(self, project_id):
         sql = f'delete from {self.project_table} where `project_id`={project_id};'
-        return sql
+        return sql,
 
     def bind_queue(self, project_id):
         for exchange in EXCHANGE_NAME:
