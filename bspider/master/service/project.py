@@ -68,7 +68,8 @@ class ProjectService(BaseService, AgentMixIn):
                     'config': config
                 }
                 project_id = session.insert(*self.impl.add_project(data), lastrowid=True)
-                self.impl.add_project_binds(pc_obj.middleware.extend(pc_obj.pipeline), project_id)
+                pc_obj.middleware.extend(pc_obj.pipeline)
+                self.impl.add_project_binds(pc_obj.middleware, project_id)
                 info = {
                     'project_id': project_id,
                     'name': name,
