@@ -15,7 +15,8 @@ def valid_code(name: str, code_type: str, content: str) -> (bool, str):
         'BaseTask': 'task',
         'BaseOperation': 'operation',
         'BasePipeline': 'pipeline',
-        'BaseMiddleware': 'middleware'
+        'BaseMiddleware': 'middleware',
+        'BaseExtractor': 'extractor'
     }
 
     module_type = code_type_map.get(sub_class_name)
