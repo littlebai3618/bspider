@@ -92,10 +92,11 @@ class ProjectService(BaseService, AgentMixIn):
     def update(self, project_id, changes):
         remote_param = {}
         for key in ('name', 'config', 'rate', 'status'):
-            if key in changes and key == 'config':
-                remote_param['config'] = self.__get_config_obj(changes['config']).dumps()
-            else:
-                remote_param[key] = changes[key]
+            if key in changes:
+                if key == 'config':
+                    remote_param['config'] = self.__get_config_obj(changes['config']).dumps()
+                else:
+                    remote_param[key] = changes[key]
 
         if len(remote_param):
             with self.impl.handler.session() as session:
