@@ -21,9 +21,12 @@ class SchedulerManager(BaseManager):
 
     async def do_work(self):
         while True:
-            for _, scheduler in self.monitor.projects.items():
+            self.log.debug('A new schedule start!')
+            for project_id, scheduler in self.monitor.projects.items():
                 scheduler.scheduler()
-            await asyncio.sleep(5)
+                self.log.debug(f'schedule project:project_id=>{project_id}!')
+            self.log.info(f'A new schedule complete ! project_count=>{len(self.monitor.projects)}')
+            await asyncio.sleep(1)
 
 
 if __name__ == '__main__':
