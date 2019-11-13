@@ -24,7 +24,8 @@ class AsyncParser(object):
         self.project_name = config.project_name
         self.project_id = config.project_id
 
-        self.log = LoggerPool().get_logger(key=f'project_parser->{self.project_id}', fn=log_fn, module='parser', project=self.project_name)
+        self.log = LoggerPool().get_logger(key=f'project_parser->{self.project_id}', fn=log_fn, module='parser',
+                                           project=self.project_name)
 
         self.pipes = []
         for cls_name, code in config.pipeline:
@@ -40,7 +41,6 @@ class AsyncParser(object):
             else:
                 msg = f'{self.project_name} pipeline init failed: {cls_name}'
                 raise ParserError(msg)
-
 
     async def parse(self, response: Response) -> list:
         """
@@ -70,7 +70,6 @@ class AsyncParser(object):
         temp_items = await pipeline._exec('process_item', pre_item)
         self.__exec_items(temp_items, requests, cur_item)
 
-
     def __exec_items(self, items, requests: list, cur_item: list):
         if not isinstance(items, GeneratorType):
             if isinstance(items, Request):
@@ -85,13 +84,3 @@ class AsyncParser(object):
             except StopIteration as e:
                 self.__exec_items(e.value, requests, cur_item)
                 break
-
-
-
-
-
-
-
-
-
-

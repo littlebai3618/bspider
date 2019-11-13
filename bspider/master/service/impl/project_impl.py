@@ -119,5 +119,5 @@ class ProjectImpl(BaseImpl):
         return True
 
     def get_nodes(self):
-        sql = f'select `ip`, `name` from {self.node_table} '
+        sql = f'select `ip` from {self.node_table} where `status` = 1'
         return [info['ip'] for info in self.handler.select(sql)]

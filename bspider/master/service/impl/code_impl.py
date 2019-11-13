@@ -23,7 +23,7 @@ class CodeImpl(BaseImpl):
         return sql, values, True
 
     def get_nodes(self):
-        sql = f'select `ip` from {self.node_table};'
+        sql = f'select `ip` from {self.node_table} where `status` = 1;'
         return [info['ip'] for info in self.handler.select(sql)]
 
     def get_project_by_code_id(self, cid):
