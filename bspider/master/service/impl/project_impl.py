@@ -116,7 +116,8 @@ class ProjectImpl(BaseImpl):
 
     def unbind_queue(self, project_id):
         for exchange in EXCHANGE_NAME:
-            self.__mq_handler.queue_delete(queue='{}_{}'.format(exchange, project_id))
+            res = self.__mq_handler.queue_delete(queue=f'{exchange}_{project_id}')
+            log.debug(f'delete queue: {exchange}_{project_id} => res:{res}')
         return True
 
     def get_nodes(self):

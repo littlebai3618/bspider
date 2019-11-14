@@ -37,7 +37,7 @@ def run_spider_project(project_id, code_id, **kwargs):
     :param self:
     :return:
     """
-    __log.info(f'corn job: {project_id, code_id} run as spider pattern')
+    __log.info(f'corn job: {project_id, code_id} run as crawl pattern')
     PROJECT_TABLE = __frame_settings['PROJECT_TABLE']
     sql = f'select `name`, `config`, `status` from {PROJECT_TABLE} where `id`="{project_id}"'
 
