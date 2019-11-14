@@ -22,10 +22,10 @@ __log = LoggerPool().get_logger(key='bcorn-todo', fn='bcorn', module='bcorn')
 
 def do(**kwargs):
     # 模式判断
-    if kwargs.get('type', 'spider') == 'crawl':
-        run_spider_project(**kwargs)
-    elif kwargs.get('type') == 'operation':
+    if kwargs.get('type') == 'operation':
         run_operation_project(**kwargs)
+    elif kwargs.get('type', 'crawl') == 'crawl':
+        run_spider_project(**kwargs)
     else:
         __log.warning(f'WARNING: UNKNOW CRON JOB PARAMS: {kwargs}')
 

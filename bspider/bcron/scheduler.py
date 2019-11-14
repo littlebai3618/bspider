@@ -39,7 +39,7 @@ class MySQLScheduler(BackgroundScheduler):
             # 新增两个属性
             'status': status,
             'description': description,
-            'type': cron_type
+            'cron_type': cron_type
         }
         job_kwargs = dict((key, value) for key, value in six.iteritems(job_kwargs) if
                           value is not undefined)
