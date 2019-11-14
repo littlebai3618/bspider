@@ -57,8 +57,9 @@ class ProjectImpl(BaseImpl):
 
     def add_project_binds(self, cids, pid):
         values = ', '.join([f'({pid}, {cid})' for cid in cids])
-        sql = f'replace insert into {self.p2c_table}(`project_id`, `customcode_id`) ' \
+        sql = f'replace insert into `{self.p2c_table}`(`project_id`, `customcode_id`) ' \
               f'values {values};'
+        log.debug(sql)
         return sql,
 
     def update_project(self, unique_value, data, unique_key='id'):
