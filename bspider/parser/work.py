@@ -8,7 +8,7 @@ import traceback
 import asyncio
 
 from bspider.core import BaseManager
-from bspider.utils.tools import make_sign, coroutine_result
+from bspider.utils.tools import make_sign
 from .parser_monitor import ParserMonitor
 
 
@@ -45,7 +45,7 @@ class ParserManager(BaseManager):
                         await self._save_error_result(response.request, parser.project_name, parser.project_id, e_msg,
                                                 status=-1)
 
-                    coroutine_result(self.broker.report_ack(msg_id))
+                    await self.broker.report_ack(msg_id)
                 else:
                     await asyncio.sleep(2)
         except Exception:
