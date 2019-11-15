@@ -4,6 +4,8 @@
 # @Use     :
 import asyncio
 import random
+import sys
+import traceback
 
 from bspider.config.default_settings import EXCHANGE_NAME
 from bspider.utils.sign import Sign
@@ -35,6 +37,9 @@ class BaseMonitor(object):
             try:
                 await self.__sync_config()
             except Exception as e:
+                tp, msg, tb = sys.exc_info()
+                e_msg = ''.join(traceback.format_exception(tp, msg, tb))
+                self.log.error(f'sync project failed:{e_msg}')
                 self.log.error(f'sync project failed:{e}')
             await asyncio.sleep(2)
 
@@ -51,7 +56,7 @@ class BaseMonitor(object):
 
         while len(projects):
             info = projects.pop()
-            if await self.__mq_handler.get_queue_message_count(queue='{}_{}'.format(self.exchange, info['id'])):
+            if await self.__mq_handler.get_queue_message_count(queue='{}_{}'.format(self.exchange, info['id'])) != 0:
                 tmp_weight[info['id']] = info['rate']
                 total_sum += info['rate']
 
