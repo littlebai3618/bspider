@@ -24,16 +24,16 @@ class SchedulerMonitor(object):
 
     async def get_projects(self):
         sql = f'select `id`, `name`, `rate` from {self.project_table} where `status`=1'
-        info = await self.__mysql_handler.select(sql)
-        self.log.debug(f'read info success: {info}')
-        return info
+        return await self.__mysql_handler.select(sql)
 
     async def sync_config(self):
         while True:
             self.log.info('start sync project!')
             tmp_projects = dict()
             try:
-                for info in await self.get_projects():
+                infos = await self.get_projects()
+                self.log.debug(f'read info success: {infos}')
+                for info in infos:
                     project_obj = self.projects.get(info['id'])
                     cur_sign = Sign(project_name=info['name'], project_id=info['id'], rate=info['rate'])
                     if project_obj is None or project_obj.sign != cur_sign:
