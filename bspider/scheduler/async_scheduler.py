@@ -23,7 +23,8 @@ class AsyncScheduler(object):
         # 上一次分钟数
         self.__pre_loop_sign = None
         self.__scheduler_count = 0
-        self.__download_queue = 'download_{}'.format(self.project_id)
+        self.__download_queue = f'download_{self.project_id}'
+        self.__candidate_queue = f'candidate_{self.project_id}'
         self.rate = rate
 
     async def scheduler(self):
