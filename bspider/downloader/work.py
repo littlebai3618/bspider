@@ -55,7 +55,7 @@ class DownloaderManager(BaseManager):
         """由于for 循环不兼容 await 所以单独剥离出来"""
         project_id = await self.monitor.choice_project()
         if project_id is None:
-            self.log.debug('no task in all candidate queue empty sleep 2s!')
+            # self.log.debug('no task in all candidate queue empty sleep 2s!')
             await asyncio.sleep(2)
             return None, None, None
 
