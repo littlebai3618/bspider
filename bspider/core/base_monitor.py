@@ -95,9 +95,9 @@ class BaseMonitor(object):
             for project_id, weight in self.__weight:
                 seed -= weight
                 if seed < 0:
-                    self.log.debug(f'choice project:project_id->{project_id}')
+                    # self.log.debug(f'choice project:project_id->{project_id}')
                     return project_id
-        self.log.debug('project weight is empty')
+        # self.log.debug('project weight is empty')
 
     def code_id_to_content(self, code_ids: list):
         res = list()
