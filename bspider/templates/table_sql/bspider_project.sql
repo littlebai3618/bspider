@@ -11,6 +11,7 @@ CREATE TABLE `bspider_project` (
   `editor` varchar(50) NOT NULL COMMENT '任务editor',
   `rate` double NOT NULL COMMENT '抓取速度 /min',
   `config` longtext COMMENT '配置',
+  `r_config` longtext COMMENT '转义后的配置，用于同步给工作节点进行缓存',
   `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (`id`),

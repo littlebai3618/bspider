@@ -46,7 +46,7 @@ class ProjectImpl(BaseImpl):
         return sql,
 
     def delete_job(self, project_id: int):
-        sql = f"update {self.table_name} set `status`=%s where `project_id` = '{project_id}';"
+        sql = f"update {self.cron_table} set `status`=%s where `project_id` = '{project_id}';"
         log.debug(f'SQL:{sql}')
         return sql, (3)
 
