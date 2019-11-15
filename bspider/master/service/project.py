@@ -62,7 +62,8 @@ class ProjectService(BaseService, AgentMixIn):
                     'description': description,
                     'editor': editor,
                     'rate': rate,
-                    'config': config
+                    'config': config,
+                    'r_config': pc_obj.dumps()
                 }
                 project_id = session.insert(*self.impl.add_project(data), lastrowid=True)
                 self.impl.bind_queue(project_id=project_id)
@@ -75,7 +76,7 @@ class ProjectService(BaseService, AgentMixIn):
                     'project_id': project_id,
                     'name': name,
                     'rate': rate,
-                    'config': pc_obj.dumps(),
+                    'config': data['r_config'],
                     'status': status
                 }
                 node_list = self.impl.get_nodes()
@@ -97,6 +98,7 @@ class ProjectService(BaseService, AgentMixIn):
             if key in changes:
                 if key == 'config':
                     remote_param['config'] = self.__get_config_obj(changes['config'])
+                    changes['r_config'] = remote_param['config'].dumps()
                 else:
                     remote_param[key] = changes[key]
 

@@ -19,7 +19,7 @@ class NodeImpl(BaseImpl):
         self.p2c = self.frame_settings['P2C_TABLE']
 
     def get_all_projects(self):
-        sql = f'select `id` as `project_id`, `name`, `status`, `config`, `rate` ' \
+        sql = f'select `id` as `project_id`, `name`, `status`, `r_config` as `config`, `rate` ' \
               f'from {self.project_table} where `type`= "spider"'
         log.debug(f'SQL:{sql}')
         return self.handler.select(sql)
