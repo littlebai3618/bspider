@@ -33,12 +33,14 @@ class AsyncScheduler(object):
         if cur_loop_sign != self.__pre_loop_sign:
             self.__pre_loop_sign = cur_loop_sign
             self.__scheduler_count = 0
-
+        self.log.debug(f'scheduler->{self.project_id} schedule cycle {cur_loop_sign} start!')
         cur_slice = int(int(now.strftime('%S')) // (60 / 12) + 1)
+        self.log.debug(f'cur_slice: {cur_slice}')
 
         if self.rate < 1 or await self.__is_full_queue(self.__download_queue, self.rate):
             # 本次调度数量
             rate_slice = self.rate / 12
+            self.log.debug(f'rate_slice: {rate_slice}')
 
             for i in range(int(rate_slice * 4)):
                 # 获取项目本分钟内已经推送的数量,和当前时间段的需要推送量比较
@@ -47,6 +49,7 @@ class AsyncScheduler(object):
                         self.__scheduler_count += 1
                 else:
                     break
+        self.log.debug(f'scheduler->{self.project_id} schedule cycle {cur_loop_sign} finish!')
 
 
     # async def do_work(self):
