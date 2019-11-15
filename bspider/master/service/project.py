@@ -124,6 +124,7 @@ class ProjectService(BaseService, AgentMixIn):
         with self.impl.handler.session() as session:
             session.delete(*self.impl.delete_project(project_id))
             session.delete(*self.impl.delete_project_binds(project_id))
+            session.delete(*self.impl.delete_job(project_id))
             sign, result = self.op_delete_project(self.impl.get_nodes(), project_id)
             if not sign:
                 log.error(f'all project delete failed:{project_id} =>{result}')

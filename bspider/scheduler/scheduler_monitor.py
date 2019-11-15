@@ -24,7 +24,9 @@ class SchedulerMonitor(object):
 
     async def get_projects(self):
         sql = f'select `id`, `name`, `rate` from {self.project_table} where `status`=1'
-        return await self.__mysql_handler.select(sql)
+        info = await self.__mysql_handler.select(sql)
+        self.log.info(f'read info success: {info}')
+        return info
 
     async def sync_config(self):
         while True:
@@ -50,8 +52,6 @@ class SchedulerMonitor(object):
 
     def get_work_obj(self, project_id, project_name: str, rate: int, sign: Sign):
         return AsyncScheduler(project_id, project_name, rate, sign, self.log_fn)
-
-
 
     def close(self):
         pass

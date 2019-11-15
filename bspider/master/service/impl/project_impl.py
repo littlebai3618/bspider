@@ -41,19 +41,14 @@ class ProjectImpl(BaseImpl):
         sql = f"insert into {self.project_table} set {fields};"
         return sql, values
 
-    def add_cron(self, data):
-        fields, values = self.make_fv(data)
-        sql = f"insert into {self.cron_table} set {fields};"
-        return sql, values
-
-    def add_code(self, data):
-        fields, values = self.make_fv(data)
-        sql = f"insert into {self.code_table} set {fields};"
-        return sql, values
-
     def delete_project_binds(self, project_id):
         sql = f'delete from {self.p2c_table} where `project_id`={project_id};'
         return sql,
+
+    def delete_job(self, project_id: int):
+        sql = f"update {self.table_name} set `status`=%s where `project_id` = '{project_id}';"
+        log.debug(f'SQL:{sql}')
+        return sql, (3)
 
     def add_project_binds(self, cids, pid):
         values = ', '.join([f'({pid}, {cid})' for cid in cids])
@@ -106,7 +101,7 @@ class ProjectImpl(BaseImpl):
     def bind_queue(self, project_id):
         for exchange in EXCHANGE_NAME:
             queue_name = '{}_{}'.format(exchange, project_id)
-            self.__bind(exchange, queue_name, project_id)
+            self.__bind(exchange, queue_name, str(project_id))
         return True
 
     def __bind(self, exchange, queue_name, routing_key):
