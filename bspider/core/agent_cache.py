@@ -83,7 +83,7 @@ class AgentCache(object):
         return [{'id': code_id, 'content': content} for code_id, content in self.handler.select(sql)]
 
     def get_code(self, code_id):
-        sql = f'select `id`, `content` from {self.code_table} where `id`={code_id};'
+        sql = f'select `content` from {self.code_table} where `id`={code_id};'
         return [{'id': code_id, 'content': content} for code_id, content in self.handler.select(sql)]
 
     def set_code(self, code_id: int, content: str):

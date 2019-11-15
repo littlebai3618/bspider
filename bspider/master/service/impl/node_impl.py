@@ -25,7 +25,7 @@ class NodeImpl(BaseImpl):
         return self.handler.select(sql)
 
     def get_all_codes(self):
-        sql = f'select `id` as `code_id`, `content` from {self.code_table} where `type` = "pipeline" or `type` = "middleware"'
+        sql = f'select `id` as `code_id`, `content` from {self.code_table} where `type` in ("pipeline", "middleware", "extractor");'
         log.debug(f'SQL:{sql}')
         return self.handler.select(sql)
 
