@@ -26,7 +26,7 @@ class RabbitMQBroker(object):
         # 这里dump方法使用了浅拷贝，会影响一部分性能
         data = json.dumps(request.dumps())
         await self.mq_handler.send_msg(data, EXCHANGE_NAME[0], str(project_id), request.priority)
-        self.log.info(f'success set a new Request: {data}')
+        self.log.info(f'success set a new Request: {request}')
         return True
 
     async def get_request(self, project_id: int) -> (int, Request):
@@ -34,7 +34,7 @@ class RabbitMQBroker(object):
         msg_id, data = await self.mq_handler.recv_msg(queue_name)
         if msg_id:
             request = Request.loads(json.loads(data))
-            self.log.info(f'success get a new Request: {data}')
+            self.log.info(f'success get a new Request: {request}')
             return msg_id, request
         return None, None
 
@@ -43,7 +43,7 @@ class RabbitMQBroker(object):
         # 这里dump方法使用了浅拷贝，会影响一部分性能
         data = json.dumps(response.dumps())
         await self.mq_handler.send_msg(data, EXCHANGE_NAME[2], str(project_id), response.request.priority)
-        self.log.debug(f'success set a new Response: {data}')
+        self.log.debug(f'success set a new Response: {response}')
         return True
 
     async def get_response(self, project_id: int) -> (int, Response):
@@ -51,7 +51,7 @@ class RabbitMQBroker(object):
         msg_id, data = await self.mq_handler.recv_msg(queue_name)
         if msg_id:
             request = Response.loads(json.loads(data))
-            self.log.debug(f'success get a new Response: {data}')
+            self.log.debug(f'success get a new Response: {request}')
             return msg_id, request
         return None, None
     

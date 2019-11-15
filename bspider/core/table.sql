@@ -29,56 +29,6 @@ CREATE TABLE `bspider_casbin_auth` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-DROP table if exists bspider_downloader_status;
-CREATE TABLE `bspider_downloader_status` (
-  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '自增id',
-  `project_name` varchar(100) NOT NULL COMMENT '任务名称',
-  `sign` varchar(150) NOT NULL COMMENT 'request唯一标识',
-  `method` varchar(10) NOT NULL COMMENT '请求方法',
-  `data` text COMMENT '请求携带参数',
-  `url` text NOT NULL COMMENT '请求url',
-  `status` int(4) NOT NULL COMMENT '下载状态',
-  `url_sign` char(32) NOT NULL COMMENT 'url标识',
-  `exception` text COMMENT '异常',
-  `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  PRIMARY KEY (`id`),
-  KEY `idx_create_time` (`create_time`),
-  KEY `idx_project_name` (`project_name`),
-  KEY `idx_url_sign` (`url_sign`),
-  KEY `idx_sign` (`sign`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-DROP table if exists bspider_parser_status;
-CREATE TABLE `bspider_parser_status` (
-  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '自增id',
-  `project_name` varchar(100) NOT NULL COMMENT '任务名称',
-  `sign` varchar(150) NOT NULL COMMENT 'request唯一标识',
-  `method` varchar(10) NOT NULL COMMENT '请求方法',
-  `data` text COMMENT '请求携带参数',
-  `url` text NOT NULL COMMENT '请求url',
-  `status` int(4) NOT NULL COMMENT '下载状态',
-  `url_sign` char(32) NOT NULL COMMENT 'url标识',
-  `exception` text COMMENT '异常',
-  `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  PRIMARY KEY (`id`),
-  KEY `idx_create_time` (`create_time`),
-  KEY `idx_project_name` (`project_name`),
-  KEY `idx_url_sign` (`url_sign`),
-  KEY `idx_sign` (`sign`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-DROP table if exists bspider_node;
-CREATE TABLE `bspider_node` (
-  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '自增id',
-  `ip` varchar(50) NOT NULL COMMENT '节点ip(内网)',
-  `name` varchar(50) NOT NULL COMMENT '节点名称',
-  `description` text NOT NULL COMMENT '节点简介',
-  `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `idx_ip` (`ip`),
-  UNIQUE KEY `idx_name` (`name`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 DROP table if exists bspider_node_status;
 CREATE TABLE `bspider_node_status` (

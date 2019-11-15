@@ -27,7 +27,7 @@ class ParserManager(BaseManager):
                 if msg_id:
                     try:
                         requests = await parser.parse(response)
-                        while requests:
+                        while len(requests):
                             # 发送request到待下载队列
                             request = requests.pop()
                             if request.data:
