@@ -16,9 +16,9 @@ from bspider.utils.tools import make_sign
 
 class BaseTask(object):
 
-    def __init__(self, settings, project_name):
+    def __init__(self, settings: ProjectConfigParser, project_name: str):
         """"""
-        self.settings = ProjectConfigParser(settings)
+        self.settings = settings
         self.settings.project_name = project_name
         self.log = LoggerPool().get_logger(key=project_name, fn='bcorn', module='bcorn', project=project_name)
         self.frame_settings = FrameSettings()

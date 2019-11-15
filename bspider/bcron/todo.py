@@ -5,7 +5,6 @@
 """
 这个是实际执行的方法，这个方法接收参数，通过参数决定行为
 """
-import json
 import sys
 import traceback
 
@@ -55,6 +54,7 @@ def run_spider_project(project_id, code_id, **kwargs):
         # ding(f'spider project job:{project_name} is not run')
 
     run_status, run_msg = run_corn_job_code(code_id, info['name'], info['config'])
+    __log.debug(info['config'])
     if run_status:
         __log.info(run_msg)
     else:
@@ -86,7 +86,7 @@ def run_corn_job_code(code_id, name, config):
         except Exception:
             tp, msg, tb = sys.exc_info()
             e_msg = ''.join(traceback.format_exception(tp, msg, tb))
-            return False, f'{name}-{class_name} config\'s type must json str:\n{e_msg}'
+            return False, f'{name}-{class_name}:\n{e_msg}'
         try:
             instance = getattr(mod, class_name)(project_config, name)
             instance.execute_task()
