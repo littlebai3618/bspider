@@ -39,7 +39,7 @@ def run_spider_project(project_id, code_id, **kwargs):
     """
     __log.info(f'corn job: {project_id, code_id} run as crawl pattern')
     PROJECT_TABLE = __frame_settings['PROJECT_TABLE']
-    sql = f'select `name`, `config`, `status` from {PROJECT_TABLE} where `id`="{project_id}"'
+    sql = f'select `id`, `name`, `config`, `status` from {PROJECT_TABLE} where `id`="{project_id}"'
 
     infos = __handler.select(sql)
     __log.debug(f'run spider_project cron_job select sql:{sql}')
@@ -53,7 +53,7 @@ def run_spider_project(project_id, code_id, **kwargs):
         __log.warning(f'project_id:{project_id} is not run')
         # ding(f'spider project job:{project_name} is not run')
 
-    run_status, run_msg = run_corn_job_code(code_id, info['name'], info['config'])
+    run_status, run_msg = run_corn_job_code(code_id, info['id'], info['name'], info['config'])
     __log.debug(info['config'])
     if run_status:
         __log.info(run_msg)
@@ -63,7 +63,7 @@ def run_spider_project(project_id, code_id, **kwargs):
 
 
 def run_operation_project(code_id, **kwargs):
-    run_status, run_msg = run_corn_job_code(code_id, 'operation', '{"desc": "operation cron job"}')
+    run_status, run_msg = run_corn_job_code(code_id, 0, 'operation', '{"desc": "operation cron job"}')
     if run_status:
         __log.info(run_msg)
     else:
@@ -71,28 +71,30 @@ def run_operation_project(code_id, **kwargs):
         ding(run_msg)
 
 
-def run_corn_job_code(code_id, name, config):
+def run_corn_job_code(code_id, project_id, project_name, config):
     CODE_STORE_TABLE = __frame_settings['CODE_STORE_TABLE']
     sql = f'select `name`, `content` from {CODE_STORE_TABLE} where `id`="{code_id}"'
     tmp = __handler.select(sql)
     if not len(tmp):
-        return False, f'{name}-code_id:{code_id} is not exist in remote code store'
+        return False, f'{project_id}-code_id:{code_id} is not exist in remote code store'
     content = tmp[0]['content']
     class_name = tmp[0]['name']
     mod = import_module_by_code(class_name, content)
     if hasattr(mod, class_name):
         try:
             project_config = ProjectConfigParser(config)
+            project_config.project_id = project_id
+            project_config.project_name = project_name
         except Exception:
             tp, msg, tb = sys.exc_info()
             e_msg = ''.join(traceback.format_exception(tp, msg, tb))
-            return False, f'{name}-{class_name}:\n{e_msg}'
+            return False, f'{project_id}-{code_id}:\n{e_msg}'
         try:
-            instance = getattr(mod, class_name)(project_config, name)
+            instance = getattr(mod, class_name)(project_config)
             instance.execute_task()
-            return True, f'{name}-{class_name} run succeed'
+            return True, f'{project_id}-{code_id} run succeed'
         except Exception:
             tp, msg, tb = sys.exc_info()
             e_msg = ''.join(traceback.format_exception(tp, msg, tb))
-            return False, f'{name}-{class_name} cron job run failed:\n{e_msg}'
-    return False, f'{name}-{class_name} don\'t have {class_name}'
+            return False, f'{project_id}-{code_id} cron job run failed:\n{e_msg}'
+    return False, f'{project_id}-{code_id} don\'t have {class_name}'
