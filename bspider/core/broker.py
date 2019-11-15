@@ -57,6 +57,7 @@ class RabbitMQBroker(object):
     
     async def schedule_task(self, project_id: int) -> bool:
         """调度抓取任务到下载队列"""
+        self.log.debug(f'start to schedule task')
         queue_name = '{}_{}'.format(EXCHANGE_NAME[0], project_id)
         msg_id, data = await self.mq_handler.recv_msg(queue_name)
         if msg_id is not None:

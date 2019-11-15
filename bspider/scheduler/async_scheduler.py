@@ -41,13 +41,11 @@ class AsyncScheduler(object):
         if self.rate < 1 or await self.__is_full_queue(self.__candidate_queue, self.rate):
             # 本次调度数量
             rate_slice = self.rate / 12
-            self.log.debug(f'rate_slice: {rate_slice} real_plain_schedule_num {int(rate_slice * 4)}')
-
+            self.log.debug(f'rate_slice: {rate_slice} real plan schedule num {int(rate_slice * 4)}')
             for i in range(int(rate_slice * 4)):
                 # 获取项目本分钟内已经推送的数量,和当前时间段的需要推送量比较
-                self.log.debug(f'rate: {int(rate_slice * cur_slice)} => {self.__scheduler_count}')
                 if int(rate_slice * cur_slice) > self.__scheduler_count:
-                    if self.__broker.schedule_task(self.project_id):
+                    if await self.__broker.schedule_task(self.project_id):
                         self.__scheduler_count += 1
                 else:
                     break
