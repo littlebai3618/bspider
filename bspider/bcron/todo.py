@@ -10,6 +10,7 @@ import sys
 import traceback
 
 from bspider.config import FrameSettings
+from bspider.core import ProjectConfigParser
 from bspider.utils.database.mysql import MysqlHandler
 from bspider.utils.logger import LoggerPool
 from bspider.utils.importer import import_module_by_code
@@ -81,7 +82,7 @@ def run_corn_job_code(code_id, name, config):
     mod = import_module_by_code(class_name, content)
     if hasattr(mod, class_name):
         try:
-            project_config = json.loads(config)
+            project_config = ProjectConfigParser(config)
         except Exception:
             tp, msg, tb = sys.exc_info()
             e_msg = ''.join(traceback.format_exception(tp, msg, tb))
