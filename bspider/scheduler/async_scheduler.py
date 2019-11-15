@@ -24,7 +24,7 @@ class AsyncScheduler(object):
         # 上一次分钟数
         self.__pre_loop_sign = None
         self.__scheduler_count = 0
-        self.__candidate_queue = f'{EXCHANGE_NAME[0]}_{self.project_id}'
+        self.__downloader_queue = f'{EXCHANGE_NAME[1]}_{self.project_id}'
         self.rate = rate
 
     async def scheduler(self):
@@ -38,7 +38,7 @@ class AsyncScheduler(object):
         cur_slice = int(int(now.strftime('%S')) // (60 / 12) + 1)
         self.log.debug(f'cur_slice: {cur_slice}')
 
-        if self.rate < 1 or await self.__is_full_queue(self.__candidate_queue, self.rate):
+        if self.rate < 1 or await self.__is_full_queue(self.__downloader_queue, self.rate):
             # 本次调度数量
             rate_slice = self.rate / 12
             self.log.debug(f'rate_slice: {rate_slice} real plan schedule num {int(rate_slice * 4)}')
