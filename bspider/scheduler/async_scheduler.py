@@ -45,7 +45,7 @@ class AsyncScheduler(object):
 
             for i in range(int(rate_slice * 4)):
                 # 获取项目本分钟内已经推送的数量,和当前时间段的需要推送量比较
-                self.log.debug(f'rate: {int(rate_slice * cur_slice)}')
+                self.log.debug(f'rate: {int(rate_slice * cur_slice)} => {self.__scheduler_count}')
                 if int(rate_slice * cur_slice) > self.__scheduler_count:
                     if self.__broker.schedule_task(self.project_id):
                         self.__scheduler_count += 1
