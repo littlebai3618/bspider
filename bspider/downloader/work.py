@@ -8,6 +8,7 @@ import traceback
 import sys
 
 from bspider.core import BaseManager
+from bspider.utils.tools import coroutine_result
 
 from .downloader_monitor import DownloaderMonitor
 
@@ -45,7 +46,7 @@ class DownloaderManager(BaseManager):
                             downloader.project_id, downloader.project_name, response.url))
                         # 持久化下载结果
                         await self._save_success_result(request, response, downloader.project_name, downloader.project_id)
-                    await self.broker.report_ack(msg_id)
+                    coroutine_result(self.broker.report_ack(msg_id))
         except Exception:
             tp, msg, tb = sys.exc_info()
             e_msg = ''.join(traceback.format_exception(tp, msg, tb))
