@@ -15,7 +15,7 @@ from .downloader_monitor import DownloaderMonitor
 def run_downloader(unique_sign, coro_num=1):
     """A factory to make a download process"""
     dm = DownloaderManager(unique_sign, DownloaderMonitor)
-    dm.run(1)
+    dm.run(10)
 
 
 class DownloaderManager(BaseManager):
