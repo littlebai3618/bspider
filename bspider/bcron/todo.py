@@ -40,9 +40,11 @@ def do(**kwargs):
             tp, msg, tb = sys.exc_info()
             e_msg = '> '.join(traceback.format_exception(tp, msg, tb))
             e.with_traceback(tb)
+            __log.error(f'thread event loop error:\n{e_msg}')
             ding(f'> {e_msg} \n', 'bcron thread event loop')
         finally:
             loop.close()
+            __log.debug('event loop closed')
 
 
 async def run_spider_project(project_id, code_id, **kwargs):
