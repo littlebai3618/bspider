@@ -2,11 +2,12 @@
 # @Author  : 白尚林
 # @File    : base_middleware
 # @Use     :
-from asyncio import iscoroutinefunction
 from logging import Logger
 
+from bspider.core.custom_module import BaseCustomModule
 
-class BaseMiddleware(object):
+
+class BaseMiddleware(BaseCustomModule):
 
     def __init__(self, settings: dict, log: Logger):
         """
@@ -16,14 +17,6 @@ class BaseMiddleware(object):
         """
         self.settings = settings
         self.log = log
-
-    async def _exec(self, func_name, **kwargs):
-        """用以支持协程和非协程编程方式"""
-        func = getattr(self, func_name)
-        if iscoroutinefunction(func):
-            return await func(**kwargs)
-        else:
-            return func(**kwargs)
 
     def process_request(self, request):
         """

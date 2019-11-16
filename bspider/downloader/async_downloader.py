@@ -95,6 +95,7 @@ class AsyncDownloader(object):
             except Exception as e:
                 tp, msg, tb = sys.exc_info()
                 e_msg = ''.join(traceback.format_exception(tp, msg, tb))
+                e.with_traceback(tb)
                 self.log.exception(e_msg)
                 if response is None:
                     response = Response(url=request.url, status=599)
@@ -122,7 +123,7 @@ class AsyncDownloader(object):
                 # 无需重试的情况
                 if 900 <= response.status <= 999 or response.status in self.accept_response_code:
                     return response
-                self.log.info('download error, retry. url:{} status:{}'.format(request.url, response.status))
+                self.log.info('Retry download: url->{} status->{}'.format(request.url, response.status))
             return response
 
     async def __assemble_response(self, response: ClientResponse, request: Request) -> Response:

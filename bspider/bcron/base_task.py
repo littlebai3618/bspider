@@ -7,6 +7,7 @@ import json
 
 from bspider.config import FrameSettings
 from bspider.core import ProjectConfigParser
+from bspider.core.custom_module import BaseCustomModule
 from bspider.http import Request
 from bspider.utils.exceptions import MethodError
 from bspider.utils.logger import LoggerPool
@@ -14,7 +15,7 @@ from bspider.utils.rabbitMQ import RabbitMQHandler
 from bspider.utils.tools import make_sign
 
 
-class BaseTask(object):
+class BaseTask(BaseCustomModule):
 
     def __init__(self, settings: ProjectConfigParser):
         self.settings = settings

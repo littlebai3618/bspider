@@ -22,7 +22,10 @@ from .api import BaseImpl
 class BaseManager(object):
     manager_type = ''
 
-    def __init__(self, unique_tag, monitor_cls):
+    def __init__(self, unique_tag, monitor_cls, coro_num):
+        # 记录协程数
+        self.coro_num = coro_num
+
         if self.manager_type == 'scheduler':
             self.log = LoggerPool().get_logger(
                 key=unique_tag,
@@ -30,6 +33,7 @@ class BaseManager(object):
                 module=self.manager_type,
                 name=unique_tag)
             self.monitor = monitor_cls(self.log, self.manager_type)
+            self.broker = RabbitMQBroker(self.log, 10)
         else:
             self.log = LoggerPool().get_logger(
                 key=unique_tag,
@@ -37,10 +41,10 @@ class BaseManager(object):
                 module=self.manager_type,
                 name=unique_tag)
             self.monitor = monitor_cls(self.log, f'{self.manager_type}-{unique_tag}')
+            self.broker = RabbitMQBroker(self.log, self.coro_num)
 
         self.log.info('manager init success')
         # 注册 任务中间人
-        self.broker = RabbitMQBroker(self.log)
 
         if self.manager_type == 'parser':
             self.status_table = self.broker.frame_settings['DOWNLOADER_STATUS_TABLE']
@@ -54,9 +58,9 @@ class BaseManager(object):
         self.sign = signal.signal(signal.SIGTERM, handler=self.close)
         self.is_close = False
 
-    def run(self, coro_num):
+    def run(self):
         tasks = [asyncio.ensure_future(self.monitor.sync_config())]
-        for i in range(coro_num):
+        for i in range(self.coro_num):
             tasks.append(asyncio.ensure_future(self.do_work()))
         self.loop = asyncio.get_event_loop()
         try:

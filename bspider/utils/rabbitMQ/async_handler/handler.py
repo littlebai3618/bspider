@@ -16,8 +16,9 @@ from aiormq.types import ConfirmationFrameType, DrainResult
 from pamqp import specification as spec
 
 from bspider.config.default_settings import QUEUE_ARG
-from bspider.utils.rabbitMQ.async_handler.pool import Pool
 from bspider.utils import singleton
+from .session import ChannelSession
+from .pool import Pool
 
 
 @singleton
@@ -34,7 +35,7 @@ class RabbitMQPoolFactory(object):
         hashcode = hashlib.md5(hashstr.encode('utf8')).hexdigest()
         return hashcode
 
-    def get_pool(self, mq_config: dict) -> Pool:
+    def get_pool(self, mq_config: dict, max_size: int) -> Pool:
         hashcode = self.__make_hash(mq_config)
         if hashcode in self.__pools:
             return self.__pools[hashcode]
@@ -42,7 +43,7 @@ class RabbitMQPoolFactory(object):
             pool = Pool(
                 self.get_channel,
                 Pool(self.get_connection, mq_config, max_size=1),
-                max_size=3,
+                max_size=max_size,
             )
             self.__pools[hashcode] = pool
             return pool
@@ -58,8 +59,8 @@ class RabbitMQPoolFactory(object):
 
 class AioRabbitMQHandler(object):
 
-    def __init__(self, config: dict):
-        self.__pool = RabbitMQPoolFactory().get_pool(mq_config=config)
+    def __init__(self, config: dict, max_size: int = 3):
+        self.__pool = RabbitMQPoolFactory().get_pool(mq_config=config, max_size=max_size)
         self.queue_arg = QUEUE_ARG
 
     @classmethod
@@ -106,30 +107,22 @@ class AioRabbitMQHandler(object):
             body=msg.encode(),
             properties=properties)
 
-    async def recv_msg(self, queue: str = '', no_ack: bool = False) -> tuple:
-        msg = await self._do_query(func_name='basic_get', queue=queue, no_ack=no_ack)
+    async def recv_msg(self, queue: str = '') -> tuple:
+        msg = await self._do_query(func_name='basic_get', queue=queue, no_ack=True)
         if msg:
             method, properties, body, _ = msg
             if method is not None and isinstance(body, bytes):
                 return method.delivery_tag, body.decode()
         return None, None
 
-    # report ACK
-    async def ack(self, delivery_tag) -> DrainResult:
-        return await self._do_ack('basic_ack', delivery_tag)
-
-    async def nack(self, delivery_tag) -> DrainResult:
-        return await self._do_ack('basic_nack', delivery_tag)
-
-    async def _do_ack(self, func_name, delivery_tag):
-        async with self.__pool.acquire() as channel:
-            func = getattr(channel, func_name)
-            return func(delivery_tag=delivery_tag)
-
     async def _do_query(self, func_name, **kwargs):
         async with self.__pool.acquire() as channel:
             func = getattr(channel, func_name)
             return await func(**kwargs)
+
+    def session(self) -> ChannelSession:
+        """返回一个session 来支持手动ack"""
+        return ChannelSession(self.__pool)
 
 
 async def test():

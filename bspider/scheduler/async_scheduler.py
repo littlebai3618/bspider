@@ -19,7 +19,6 @@ class AsyncScheduler(object):
         self.project_id = project_id
 
         self.log = LoggerPool().get_logger(key=f'scheduler->{self.project_id}', fn=log_fn, module='scheduler', project=self.project_name)
-        self.__broker = RabbitMQBroker(self.log)
 
         # 上一次分钟数
         self.__pre_loop_sign = None
@@ -27,7 +26,7 @@ class AsyncScheduler(object):
         self.__downloader_queue = f'{EXCHANGE_NAME[1]}_{self.project_id}'
         self.rate = rate
 
-    async def scheduler(self):
+    async def scheduler(self, broker: RabbitMQBroker):
         now = datetime.datetime.now()
         cur_loop_sign = 'scheduler-' + now.strftime('%H%M')
         # 表示新的调度周期
@@ -45,7 +44,7 @@ class AsyncScheduler(object):
             for i in range(int(rate_slice * 4)):
                 # 获取项目本分钟内已经推送的数量,和当前时间段的需要推送量比较
                 if int(rate_slice * cur_slice) > self.__scheduler_count:
-                    if await self.__broker.schedule_task(self.project_id):
+                    if await broker.schedule_task(self.project_id):
                         self.__scheduler_count += 1
                 else:
                     break

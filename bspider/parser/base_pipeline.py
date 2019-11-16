@@ -3,22 +3,15 @@
 # @File    : base_pipeline
 # @Use     :
 import logging
-from asyncio import iscoroutinefunction
+
+from bspider.core.custom_module import BaseCustomModule
 
 
-class BasePipeline(object):
+class BasePipeline(BaseCustomModule):
 
     def __init__(self, settings: dict, log: logging.Logger):
         self.settings = settings
         self.log = log
-
-    async def _exec(self, func_name, item):
-        """用以支持协程和非协程编程方式"""
-        func = getattr(self, func_name)
-        if iscoroutinefunction(func):
-            return await func(item)
-        else:
-            return func(item)
 
     def process_item(self, item):
         """
