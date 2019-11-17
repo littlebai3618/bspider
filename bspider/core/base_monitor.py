@@ -22,6 +22,7 @@ class BaseMonitor(object):
     def __init__(self, log, log_fn, mq_handler: AioRabbitMQHandler):
         self.log = log
         self.__cache = AgentCache()
+        self.log.info(f'init cache success! {self.__cache}')
         self.__mq_handler = mq_handler
         self.projects = dict()
         self.__weight = None
