@@ -23,7 +23,7 @@ __log = LoggerPool().get_logger(key='bcorn-todo', fn='bcorn', module='bcorn')
 
 
 def do(**kwargs):
-    # 新建线程内事件循环
+    # 这里使用主线程的时间循环，因为异步MYSQL使用默认时间循环
     func = None
     if kwargs.get('type') == 'operation':
         func = run_operation_project
@@ -33,18 +33,16 @@ def do(**kwargs):
         __log.warning(f'WARNING: UNKNOW CRON JOB PARAMS: {kwargs}')
 
     if func:
-        loop = asyncio.new_event_loop()
+        loop = asyncio.get_event_loop()
         try:
-            loop.run_until_complete(func(**kwargs))
+            future = asyncio.run_coroutine_threadsafe(func(**kwargs), loop)
+            future.result()
         except Exception as e:
             tp, msg, tb = sys.exc_info()
             e_msg = '> '.join(traceback.format_exception(tp, msg, tb))
             e.with_traceback(tb)
             __log.error(f'thread event loop error:\n{e_msg}')
             ding(f'> {e_msg} \n', 'bcron thread event loop')
-        finally:
-            loop.close()
-            __log.debug('event loop closed')
 
 
 async def run_spider_project(project_id, code_id, **kwargs):
