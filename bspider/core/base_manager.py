@@ -80,7 +80,7 @@ class BaseManager(object):
             except Exception as e:
                 # 吞掉异常
                 self.log.debug(f'close event loop! {e}')
-            self.monitor.close()
+            # self.monitor.close()
             self.log.info('have fun Bye!')
             exit()
         self.is_close = True
