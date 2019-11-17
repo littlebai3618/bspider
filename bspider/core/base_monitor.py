@@ -8,6 +8,7 @@ import sys
 import traceback
 
 from bspider.config.default_settings import EXCHANGE_NAME
+from bspider.utils.rabbitMQ import AioRabbitMQHandler
 from bspider.utils.sign import Sign
 from bspider.utils.tools import find_class_name_by_content
 
@@ -19,13 +20,13 @@ from .project_config_parser import ProjectConfigParser
 class BaseMonitor(object):
     exchange = ''
 
-    def __init__(self, log, log_fn):
+    def __init__(self, log, log_fn, mq_handler: AioRabbitMQHandler):
         """
         :param downloader_tag: 一个下载器的唯一标识，不能和其他下载器一致
         """
         self.log = log
         self.__cache = AgentCache()
-        self.__mq_handler = RabbitMQBroker(log).mq_handler
+        self.__mq_handler = mq_handler
         self.projects = dict()
         self.__weight = None
         self.__total_sum = 0

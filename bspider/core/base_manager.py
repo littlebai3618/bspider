@@ -32,16 +32,16 @@ class BaseManager(object):
                 fn=f'{self.manager_type}',
                 module=self.manager_type,
                 name=unique_tag)
-            self.monitor = monitor_cls(self.log, self.manager_type)
             self.broker = RabbitMQBroker(self.log, 10)
+            self.monitor = monitor_cls(self.log, self.manager_type, self.broker.mq_handler)
         else:
             self.log = LoggerPool().get_logger(
                 key=unique_tag,
                 fn=f'{self.manager_type}-{unique_tag}',
                 module=self.manager_type,
                 name=unique_tag)
-            self.monitor = monitor_cls(self.log, f'{self.manager_type}-{unique_tag}')
             self.broker = RabbitMQBroker(self.log, self.coro_num)
+            self.monitor = monitor_cls(self.log, f'{self.manager_type}-{unique_tag}', self.broker.mq_handler)
 
         self.log.info('manager init success')
         # 注册 任务中间人
