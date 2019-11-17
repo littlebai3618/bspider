@@ -37,7 +37,8 @@ class AsyncScheduler(object):
         cur_slice = int(int(now.strftime('%S')) // (60 / 12) + 1)
         self.log.debug(f'cur_slice: {cur_slice}')
 
-        if not (self.rate < 1 or await self.__is_full_queue(self.__downloader_queue, self.rate)):
+        queue_is_full = await self.__is_full_queue(self.__downloader_queue, self.rate)
+        if not (self.rate < 1 or queue_is_full):
             # 本次调度数量
             rate_slice = self.rate / 12
             self.log.debug(f'rate_slice: {rate_slice} real plan schedule num {int(rate_slice * 4)}')
