@@ -27,6 +27,8 @@ class ParserManager(BaseManager):
         try:
             while True:
                 parser = self.monitor.projects.get(await self.monitor.choice_project())
+                if parser is None:
+                    continue
                 e_msg = None
                 async with self.broker.mq_handler.session() as session:
                     msg_id, data = await session.recv_msg(f'{self.exchange}_{parser.project_id}')

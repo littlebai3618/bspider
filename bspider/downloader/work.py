@@ -30,6 +30,8 @@ class DownloaderManager(BaseManager):
         try:
             while True:
                 downloader = self.monitor.projects.get(await self.monitor.choice_project())
+                if downloader is None:
+                    continue
                 e_msg = None
                 async with self.broker.mq_handler.session() as session:
                     msg_id, data = await session.recv_msg(f'{self.exchange}_{downloader.project_id}')

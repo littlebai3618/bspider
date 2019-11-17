@@ -85,7 +85,7 @@ class BaseMonitor(object):
         self.__total_sum = total_sum
         self.log.info('sync weight success {} total num {}'.format(len(self.__weight), self.__total_sum))
 
-    async def choice_project(self) -> str:
+    async def choice_project(self) -> int:
         """
         # 根据project的权重值随机选取一个
         :param weight: list对应的权重序列
@@ -96,7 +96,7 @@ class BaseMonitor(object):
             for project_id, weight in self.__weight:
                 seed -= weight
                 if seed < 0:
-                    # self.log.debug(f'choice project:project_id->{project_id}')
+                    self.log.debug(f'choice project:project_id->{project_id}')
                     return project_id
         # self.log.debug('project weight is empty')
 
