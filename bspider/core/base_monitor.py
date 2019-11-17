@@ -19,13 +19,14 @@ from .project_config_parser import ProjectConfigParser
 class BaseMonitor(object):
     exchange = ''
 
-    def __init__(self, log, mq_handler: AioRabbitMQHandler):
+    def __init__(self, log, log_fn, mq_handler: AioRabbitMQHandler):
         self.log = log
         self.__cache = AgentCache()
         self.__mq_handler = mq_handler
         self.projects = dict()
         self.__weight = None
         self.__total_sum = 0
+        self.log_fn = log_fn
 
     async def sync_config(self):
         """从cache 同步任务数据"""
