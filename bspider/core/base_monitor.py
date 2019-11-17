@@ -12,7 +12,6 @@ from bspider.utils.rabbitMQ import AioRabbitMQHandler
 from bspider.utils.sign import Sign
 from bspider.utils.tools import find_class_name_by_content
 
-from .broker import RabbitMQBroker
 from .agent_cache import AgentCache
 from .project_config_parser import ProjectConfigParser
 
@@ -20,17 +19,13 @@ from .project_config_parser import ProjectConfigParser
 class BaseMonitor(object):
     exchange = ''
 
-    def __init__(self, log, log_fn, mq_handler: AioRabbitMQHandler):
-        """
-        :param downloader_tag: 一个下载器的唯一标识，不能和其他下载器一致
-        """
+    def __init__(self, log, mq_handler: AioRabbitMQHandler):
         self.log = log
         self.__cache = AgentCache()
         self.__mq_handler = mq_handler
         self.projects = dict()
         self.__weight = None
         self.__total_sum = 0
-        self.log_fn = log_fn
 
     async def sync_config(self):
         """从cache 同步任务数据"""
@@ -88,7 +83,6 @@ class BaseMonitor(object):
     async def choice_project(self) -> int:
         """
         # 根据project的权重值随机选取一个
-        :param weight: list对应的权重序列
         :return:选取的值在原列表里的索引
         """
         if self.__weight is not None and self.__total_sum:
@@ -112,6 +106,3 @@ class BaseMonitor(object):
     def get_work_obj(self, config: ProjectConfigParser, sign: Sign):
         """继承重写 -> 根据配置返回对象"""
         pass
-
-    def close(self):
-        del self.__cache
