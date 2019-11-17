@@ -89,7 +89,11 @@ def run_spider_project(project_id, code_id, **kwargs):
 
 
 def run_operation_project(code_id, **kwargs):
-    run_status, run_msg = run_corn_job_code(code_id, 0, 'operation', '{"desc": "operation cron job"}')
+    run_status, run_msg = run_corn_job_code(
+        code_id,
+        0,
+        f'operation-{code_id}',
+        '{"downloader": {"middleware": [], "settings": {}}, "parser": {"pipeline": [], "settings": {}}}')
     if run_status:
         __log.info(run_msg)
     else:
