@@ -37,10 +37,10 @@ class DownloaderManager(BaseManager):
                 e_msg = None
                 async with self.broker.mq_handler.session() as session:
                     msg_id, data = await session.recv_msg(f'{self.exchange}_{downloader.project_id}')
-                    request = Request.loads(json.loads(data))
-                    self.log.info(f'success get a new Request: {request}')
                     if msg_id:
                         try:
+                            request = Request.loads(json.loads(data))
+                            self.log.info(f'success get a new Request: {request}')
                             response = await downloader.download(request)
                         except Exception as e:
                             tp, msg, tb = sys.exc_info()

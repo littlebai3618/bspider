@@ -35,10 +35,10 @@ class ParserManager(BaseManager):
                 e_msg = None
                 async with self.broker.mq_handler.session() as session:
                     msg_id, data = await session.recv_msg(f'{self.exchange}_{parser.project_id}')
-                    response = Response.loads(json.loads(data))
-                    self.log.info(f'success get a new Response: {response}')
                     if msg_id:
                         try:
+                            response = Response.loads(json.loads(data))
+                            self.log.info(f'success get a new Response: {response}')
                             requests = await parser.parse(response)
                         except Exception as e:
                             tp, msg, tb = sys.exc_info()
