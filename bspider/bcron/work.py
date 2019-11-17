@@ -47,7 +47,7 @@ class BCronManager(object):
             # 'processpool': ProcessPoolExecutor(frame_settings.CRON_JOB_PROCESS_NUM)
         }
         self.log.debug(
-            'success make executors, process num: {} thread num:{}'.format(self.frame_settings['CRON_JOB_PROCESS_NUM'],
+            'success make executors thread num:{}'.format(self.frame_settings['CRON_JOB_PROCESS_NUM'],
                                                                            self.frame_settings['CRON_JOB_THREAD_NUM']))
 
         self.scheduler = MySQLScheduler(

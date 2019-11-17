@@ -37,6 +37,7 @@ def do(**kwargs):
         try:
             future = asyncio.run_coroutine_threadsafe(func(**kwargs), loop)
             loop.run_until_complete(future)
+            __log.debug('future run success!')
         except Exception as e:
             tp, msg, tb = sys.exc_info()
             e_msg = '> '.join(traceback.format_exception(tp, msg, tb))
