@@ -31,6 +31,8 @@ class DownloaderManager(BaseManager):
             while True:
                 downloader = self.monitor.projects.get(await self.monitor.choice_project())
                 if downloader is None:
+                    # 防止协程抢占无法轮换
+                    await asyncio.sleep(1)
                     continue
                 e_msg = None
                 async with self.broker.mq_handler.session() as session:

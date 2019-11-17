@@ -2,6 +2,7 @@
 # @Author  : 白尚林
 # @File    : work
 # @Use     :
+import asyncio
 import json
 import sys
 import traceback
@@ -28,6 +29,8 @@ class ParserManager(BaseManager):
             while True:
                 parser = self.monitor.projects.get(await self.monitor.choice_project())
                 if parser is None:
+                    # 防止协程抢占无法轮换
+                    await asyncio.sleep(1)
                     continue
                 e_msg = None
                 async with self.broker.mq_handler.session() as session:
