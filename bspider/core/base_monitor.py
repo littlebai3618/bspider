@@ -92,7 +92,7 @@ class BaseMonitor(object):
             for project_id, weight in self.__weight:
                 seed -= weight
                 if seed < 0:
-                    self.log.debug(f'choice project:project_id->{project_id}')
+                    # self.log.debug(f'choice project:project_id->{project_id}')
                     return project_id
         # self.log.debug('project weight is empty')
 
