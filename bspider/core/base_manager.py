@@ -7,6 +7,7 @@
 监听配置变化 -> 磁盘文件
 """
 import asyncio
+import base64
 import json
 
 import signal
@@ -127,7 +128,7 @@ class BaseManager(object):
             'status': response.status,
             'url_sign': request.url,
             'exception': exception,
-            'response': zlib.compress(json.dumps(response.dumps()).encode())
+            'response': base64.b64encode(zlib.compress(json.dumps(response.dumps()).encode()))
         }
         if hasattr(request, 'data'):
             data['data'] = json.dumps(request.data)
