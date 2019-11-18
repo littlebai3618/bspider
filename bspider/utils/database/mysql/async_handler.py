@@ -152,7 +152,7 @@ class AioMysqlHandler(object):
                     result = await cur.execute(sql)
                 else:
                     result = await cur.execute(sql, values)
-                conn.commit()
+                await conn.commit()
                 return result
 
     async def _select(self, sql: str, values: tuple = None) -> list:

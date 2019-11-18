@@ -11,7 +11,7 @@ import json
 
 import signal
 
-from bspider.utils.database.mysql import MysqlHandler
+from bspider.utils.database.mysql import AioMysqlHandler
 from bspider.utils.exceptions import MethodError
 from bspider.utils.logger import LoggerPool
 
@@ -52,7 +52,7 @@ class BaseManager(object):
             self.status_table = self.broker.frame_settings['PARSER_STATUS_TABLE']
 
         if self.manager_type != 'scheduler':
-            self.mysql_handler = MysqlHandler(self.broker.frame_settings['WEB_STUDIO_DB'])
+            self.mysql_handler = AioMysqlHandler(self.broker.frame_settings['WEB_STUDIO_DB'])
 
         # 注册信号量保证程序安全退出
         self.sign = signal.signal(signal.SIGTERM, handler=self.close)
@@ -105,8 +105,7 @@ class BaseManager(object):
             data['data'] = None
         fields, values = BaseImpl.make_fv(data)
         sql = f'insert into {self.status_table} set {fields};'.replace('`url_sign`=%s', '`url_sign`=md5(%s)')
-        self.log.debug(sql % values)
-        self.mysql_handler.insert(sql, values)
+        await self.mysql_handler.insert(sql, values)
         self.log.info('send success info [{}]'.format(fields % values))
 
     async def _save_error_result(self, request, project_name, project_id, exception, status=599):
@@ -126,5 +125,5 @@ class BaseManager(object):
             data['data'] = None
         fields, values = BaseImpl.make_fv(data)
         sql = f'insert into {self.status_table} set {fields};'.replace('`url_sign`=%s', '`url_sign`=md5(%s)')
-        self.mysql_handler.insert(sql, values)
+        await self.mysql_handler.insert(sql, values)
         self.log.info('send error info [{}]'.format(fields % values))
