@@ -105,6 +105,7 @@ class BaseManager(object):
             data['data'] = None
         fields, values = BaseImpl.make_fv(data)
         sql = f'insert into {self.status_table} set {fields};'.replace('`url_sign`=%s', '`url_sign`=md5(%s)')
+        self.log.info(sql)
         await self.mysql_handler.insert(sql, values)
         self.log.info('send success info [{}]'.format(fields % values))
 
