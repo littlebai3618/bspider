@@ -8,7 +8,7 @@ import sys
 import traceback
 
 from bspider.core import BaseManager
-from bspider.http import Response
+from bspider.http import Response, ERROR_RESPONSE
 from bspider.utils.tools import make_sign
 from bspider.config.default_settings import EXCHANGE_NAME
 
@@ -33,6 +33,8 @@ class ParserManager(BaseManager):
                     await asyncio.sleep(1)
                     continue
                 e_msg = None
+                response = ERROR_RESPONSE
+
                 async with self.broker.mq_handler.session() as session:
                     msg_id, data = await session.recv_msg(f'{self.exchange}_{parser.project_id}')
                     if msg_id:
@@ -49,8 +51,7 @@ class ParserManager(BaseManager):
 
                 if msg_id:
                     if e_msg:
-                        await self._save_error_result(response.request, parser.project_name, parser.project_id, e_msg,
-                                                      status=-1)
+                        await self._save_error_result(response, parser.project_name, parser.project_id, e_msg)
                         self.log.warning('parser failed: project:project_id->{} project_name->{} sign: {}'.format(
                             parser.project_id, parser.project_name, response.sign))
                     else:
@@ -62,8 +63,7 @@ class ParserManager(BaseManager):
                             else:
                                 request.sign = make_sign(parser.project_name, request.url)
                             await self.broker.set_request(requests.pop(), parser.project_id)
-                        await self._save_success_result(response.request, response, parser.project_name,
-                                                        parser.project_id)
+                        await self._save_success_result(response, parser.project_name, parser.project_id)
                         self.log.info('project:project_id->{} project_name->{} complete parser: {}'.format(
                             parser.project_id, parser.project_name, response.url))
         except Exception:

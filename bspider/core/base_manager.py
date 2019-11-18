@@ -11,6 +11,7 @@ import json
 
 import signal
 
+from bspider.http import Request, Response
 from bspider.utils.database.mysql import AioMysqlHandler
 from bspider.utils.exceptions import MethodError
 from bspider.utils.logger import LoggerPool
@@ -88,7 +89,10 @@ class BaseManager(object):
     async def do_work(self):
         raise MethodError('you must rebuild self.do_work()')
 
-    async def _save_success_result(self, request, response, project_name, project_id, exception=None):
+    async def _save_success_result(self,
+                                   response: Response,
+                                   project_name: str,
+                                   project_id: int):
         data = {
             'project_id': project_id,
             'project_name': project_name,
@@ -96,11 +100,10 @@ class BaseManager(object):
             'method': response.method,
             'url': response.url,
             'status': response.status,
-            'exception': exception,
             'url_sign': response.url,
         }
-        if hasattr(request, 'data'):
-            data['data'] = json.dumps(request.data)
+        if hasattr(response.request, 'data'):
+            data['data'] = json.dumps(response.request.data)
         else:
             data['data'] = None
         fields, values = BaseImpl.make_fv(data)
@@ -108,16 +111,22 @@ class BaseManager(object):
         await self.mysql_handler.insert(sql, values)
         self.log.info('send success info [{}]'.format(fields % values))
 
-    async def _save_error_result(self, request, project_name, project_id, exception, status=599):
+    async def _save_error_result(self,
+                                 response: Response,
+                                 project_name: str,
+                                 project_id: int,
+                                 exception: str):
+        request = response.request
         data = {
             'project_id': project_id,
             'project_name': project_name,
             'sign': request.sign,
             'method': request.method,
             'url': request.url,
-            'status': status,
+            'status': response.status,
             'url_sign': request.url,
             'exception': exception,
+            'response': json.dumps(response.dumps())
         }
         if hasattr(request, 'data'):
             data['data'] = json.dumps(request.data)

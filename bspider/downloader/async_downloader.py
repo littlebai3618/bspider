@@ -62,7 +62,7 @@ class AsyncDownloader(object):
             self.accept_response_code = set()
             self.log.debug(f'{self.project_name} init default accept response code: {self.accept_response_code}')
 
-    async def download(self, request: Request):
+    async def download(self, request: Request) -> (Response, bool):
         """
         donwloader入口, 执行整个下载过程
         执行中间件，执行下载时，异步
@@ -70,7 +70,7 @@ class AsyncDownloader(object):
         :param config: 下载器配置项
         :return:
         """
-        response = None
+        response = Response(url=request.url, status=599, request=request)
         for retry_index in range(self.retry_times):
 
             # 下载前中间件
@@ -97,34 +97,22 @@ class AsyncDownloader(object):
                 e_msg = ''.join(traceback.format_exception(tp, msg, tb))
                 e.with_traceback(tb)
                 self.log.exception(e_msg)
-                if response is None:
-                    response = Response(url=request.url, status=599)
-                # 执行下载异常中间件
-                for mw in self.mws:
-                    self.log.debug(f'{mw.__class__.__name__} executing process_exception')
-                    response = await mw._exec('process_exception', request=request, e=e, response=response)
-                    if isinstance(response, Response):
-                        continue
-                    elif response is None:
-                        return None
+                self.log.info(f'Retry download: url->{request.url} status->{response.status} time:{retry_index}')
+                continue
 
             for mw in self.mws:
 
                 self.log.debug(f'{mw.__class__.__name__} executing process_response')
-                response = await mw._exec('process_response', request=request, response=response)
-                if isinstance(response, Response):
+                result = await mw._exec('process_response', request=request, response=response)
+                if isinstance(result, Response):
                     continue
-                if response is None:
-                    return None
+                if result is None:
+                    break
 
-            if response is None:
-                return None
-            if response.status != 200:
-                # 无需重试的情况
-                if 900 <= response.status <= 999 or response.status in self.accept_response_code:
-                    return response
-                self.log.info(f'Retry download: url->{request.url} status->{response.status} time:{retry_index}')
-        return response
+            if response.status == 200 or response.status in self.accept_response_code:
+                return response, True
+            self.log.info(f'Retry download: url->{request.url} status->{response.status} time:{retry_index}')
+        return response, False
 
     async def __assemble_response(self, response: ClientResponse, request: Request) -> Response:
         # 这里只处理 str 类型的数据
