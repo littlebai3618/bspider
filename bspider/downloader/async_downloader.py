@@ -70,8 +70,8 @@ class AsyncDownloader(object):
         :param config: 下载器配置项
         :return:
         """
+        response = None
         for retry_index in range(self.retry_times):
-            response = None
 
             # 下载前中间件
             is_req = True
@@ -123,8 +123,8 @@ class AsyncDownloader(object):
                 # 无需重试的情况
                 if 900 <= response.status <= 999 or response.status in self.accept_response_code:
                     return response
-                self.log.info('Retry download: url->{} status->{}'.format(request.url, response.status))
-            return response
+                self.log.info(f'Retry download: url->{request.url} status->{response.status} time:{retry_index}')
+        return response
 
     async def __assemble_response(self, response: ClientResponse, request: Request) -> Response:
         # 这里只处理 str 类型的数据
