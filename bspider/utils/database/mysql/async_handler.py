@@ -132,8 +132,7 @@ class AioMysqlHandler(object):
                                     retry_times=retry_times,
                                     retry_interval=retry_interval)
 
-    @staticmethod
-    async def _do_query(func, sql: str, values: tuple = None,
+    async def _do_query(self, func, sql: str, values: tuple = None,
                         retry_times: int = 0, retry_interval: int = 1):
         loop_times = retry_times if retry_times > 0 else 3
         while loop_times > 0:
