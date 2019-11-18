@@ -39,7 +39,7 @@ def is_ip(ip_str):
 
 def make_sign(project_name, url, salt=''):
     plaintext = '{}{}'.format(url, salt).encode('utf-8')
-    return '{}:{}:{}'.format(project_name, hashlib.md5(plaintext).hexdigest(), time.time())
+    return '{}-{}-{}'.format(project_name, hashlib.md5(plaintext).hexdigest(), time.time())
 
 def coroutine_result(coroutine, loop=None):
     """a function to get coroutine return"""
