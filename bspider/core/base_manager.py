@@ -10,6 +10,7 @@ import asyncio
 import json
 
 import signal
+import zlib
 
 from bspider.http import Request, Response
 from bspider.utils.database.mysql import AioMysqlHandler
@@ -126,7 +127,7 @@ class BaseManager(object):
             'status': response.status,
             'url_sign': request.url,
             'exception': exception,
-            'response': json.dumps(response.dumps())
+            'response': zlib.compress(json.dumps(response.dumps()).encode())
         }
         if hasattr(request, 'data'):
             data['data'] = json.dumps(request.data)

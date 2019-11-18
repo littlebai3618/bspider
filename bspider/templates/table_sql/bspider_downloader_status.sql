@@ -10,6 +10,7 @@ CREATE TABLE `bspider_downloader_status` (
   `status` int(4) NOT NULL COMMENT '下载状态',
   `url_sign` char(32) NOT NULL COMMENT 'url标识',
   `exception` text COMMENT '异常',
+  `response` text COMMENT 'response',
   `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   PRIMARY KEY (`id`),
   KEY `idx_create_time` (`create_time`),
