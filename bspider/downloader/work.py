@@ -60,10 +60,10 @@ class DownloaderManager(BaseManager):
                     else:
                         # 持久化下载结果
                         await self.broker.set_response(response, downloader.project_id)
-                        self.log.info('project:project_id->{} project_name->{} complete download: {}'.format(
-                            downloader.project_id, downloader.project_name, response.url))
                         await self._save_success_result(request, response, downloader.project_name,
                                                         downloader.project_id)
+                        self.log.info('project:project_id->{} project_name->{} complete download: {}'.format(
+                            downloader.project_id, downloader.project_name, response.url))
         except Exception:
             tp, msg, tb = sys.exc_info()
             e_msg = ''.join(traceback.format_exception(tp, msg, tb))

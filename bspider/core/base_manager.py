@@ -46,9 +46,9 @@ class BaseManager(object):
         self.log.info('manager init success')
         # 注册 任务中间人
 
-        if self.manager_type == 'parser':
+        if self.manager_type == 'downloader':
             self.status_table = self.broker.frame_settings['DOWNLOADER_STATUS_TABLE']
-        elif self.manager_type == 'downloader':
+        elif self.manager_type == 'parser':
             self.status_table = self.broker.frame_settings['PARSER_STATUS_TABLE']
 
         if self.manager_type != 'scheduler':
