@@ -166,8 +166,8 @@ class MasterMixIn(RemoteMixIn):
 
 
 class RabbitMQMixIn(object):
-    authorization = HTTPBasicAuth(FrameSettings()['RABBITMQ_MANAGEMENT_ADDRESS']['username'],
-                                  FrameSettings()['RABBITMQ_MANAGEMENT_ADDRESS']['password'])
+    authorization = HTTPBasicAuth(FrameSettings()['RABBITMQ_MANAGEMENT_CONFIG']['username'],
+                                  FrameSettings()['RABBITMQ_MANAGEMENT_CONFIG']['password'])
     virtual_host = FrameSettings()['RABBITMQ_CONFIG']['virtual_host']
     base_url = '{}/%s'.format(FrameSettings()['RABBITMQ_MANAGEMENT_CONFIG']['address'])
 
