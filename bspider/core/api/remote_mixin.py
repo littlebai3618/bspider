@@ -169,7 +169,7 @@ class RabbitMQMixIn(object):
     authorization = HTTPBasicAuth(FrameSettings()['RABBITMQ_MANAGEMENT_ADDRESS']['username'],
                                   FrameSettings()['RABBITMQ_MANAGEMENT_ADDRESS']['password'])
     virtual_host = FrameSettings()['RABBITMQ_CONFIG']['virtual_host']
-    base_url = '{}/%s'.format(FrameSettings()['RABBITMQ_MANAGEMENT_ADDRESS']['address'])
+    base_url = '{}/%s'.format(FrameSettings()['RABBITMQ_MANAGEMENT_CONFIG']['address'])
 
     def request(self, url, method, params=None, data=None):
         headers = {'Content-Type': 'application/json'}
