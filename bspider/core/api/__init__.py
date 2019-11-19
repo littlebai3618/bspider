@@ -8,4 +8,4 @@ from .base_form import BaseForm, ParamRequired
 from .auth import auth
 from .exception import *
 from .resp import *
-from .remote_mixin import AgentMixIn, MasterMixIn
+from .remote_mixin import AgentMixIn, MasterMixIn, RabbitMQMixIn

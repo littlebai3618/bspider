@@ -6,6 +6,7 @@ import json
 import xmlrpc.client
 
 import requests
+from requests.auth import HTTPBasicAuth
 from requests.exceptions import ConnectionError
 from flask import g
 
@@ -92,7 +93,6 @@ class AgentMixIn(RemoteMixIn):
         data = req.json()
         if data['errno'] == 0:
             return data['data']
-        raise RemoteOPError('start work error {}', data['msg'])
 
     def op_get_worker(self, ip: str, worker_id: int) -> dict:
         url = self.base_url.format(ip, f'/worker/{worker_id}')
@@ -163,3 +163,29 @@ class MasterMixIn(RemoteMixIn):
             return data['data']
 
         raise RemoteOPError('Call Master Failed to reg node msg {}', data['msg'])
+
+
+class RabbitMQMixIn(object):
+    authorization = HTTPBasicAuth(FrameSettings()['RABBITMQ_MANAGEMENT_ADDRESS']['username'],
+                                  FrameSettings()['RABBITMQ_MANAGEMENT_ADDRESS']['password'])
+    virtual_host = FrameSettings()['RABBITMQ_CONFIG']['virtual_host']
+    base_url = '{}/%s'.format(FrameSettings()['RABBITMQ_MANAGEMENT_ADDRESS']['address'])
+
+    def request(self, url, method, params=None, data=None):
+        headers = {'Content-Type': 'application/json'}
+        if data:
+            data = json.dumps(data)
+        try:
+            req = requests.request(method, url, headers=headers, data=data, params=params, auth=self.authorization)
+        except ConnectionError as e:
+            raise RemoteOPError(f'Call RabbitMQ Management plug-in failed please check!, error:{e}')
+        return req
+
+    def op_get_project_queue_detail(self, project_id: int):
+        """根据project_id 获取队列的信息"""
+        uri = f'api/queues/{self.virtual_host}'
+        req = self.request(self.base_url % uri, 'GET', params={'name': f'_{project_id}'})
+        if req.status_code == 200:
+            return req.json()
+        raise RemoteOPError('get queue info Failed {}', req.text)
+
