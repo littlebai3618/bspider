@@ -16,6 +16,7 @@ from bspider.master.controller.cron import cron
 from bspider.master.controller.code import code
 from bspider.master.controller.project import project
 from bspider.master.controller.node import node
+from bspider.master.controller.rabbitmq import rabbitmq
 from bspider.master.controller.user import user
 from bspider.master.controller.tools import tools
 
@@ -37,6 +38,8 @@ def create_app():
     app.register_blueprint(cron)
     # tools
     app.register_blueprint(tools, url_prefix="/tools")
+    # rabbitmq
+    app.register_blueprint(rabbitmq, url_prefix="/rabbitmq")
 
     @app.errorhandler(Exception)
     def framework_error(error):
