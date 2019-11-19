@@ -13,8 +13,8 @@ class RabbitMQService(BaseService, RabbitMQMixIn):
         for queue_info in queue_infos:
             result[queue_info['name'].replace(f'_{project_id}', '')] = {
                 'total': [queue_info['messages'], queue_info['messages_details']['rate']],
-                'unacknowledged': [queue_info['messages_unacknowledged'], queue_info['messages_unacknowledged']['rate']],
-                'ready': [queue_info['messages_ready'], queue_info['messages_ready']['rate']],
+                'unacknowledged': [queue_info['messages_unacknowledged'], queue_info['messages_unacknowledged_details']['rate']],
+                'ready': [queue_info['messages_ready'], queue_info['messages_ready_details']['rate']],
             }
         return GetSuccess(msg='get queue info success', data=result)
 
