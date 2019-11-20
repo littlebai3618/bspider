@@ -139,6 +139,9 @@ class ProjectService(BaseService, AgentMixIn):
 
     def get(self, project_id):
         infos = self.impl.get_project(project_id)
+        for info in infos:
+            self.datetime_to_str(info)
+
         if len(infos):
             return GetSuccess(data=infos[0])
         else:

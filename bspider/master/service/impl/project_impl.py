@@ -20,7 +20,7 @@ class ProjectImpl(BaseImpl):
         self.__mq_handler = RabbitMQHandler(self.frame_settings['RABBITMQ_CONFIG'])
 
     def get_project(self, project_id):
-        sql = f'select `id`, `name`, `status`, `type`, `group`, `description`, `editor`, `rate`, `config` ' \
+        sql = f'select `id`, `name`, `status`, `type`, `group`, `description`, `editor`, `rate`, `config`, `create_time`, `update_time` ' \
               f'from {self.project_table} where `id`="{project_id}";'
         return self.handler.select(sql)
 
