@@ -20,18 +20,18 @@ def downloader_pv():
 
 @chart.route('/downloader/<int:project_id>', methods=['GET'])
 @auth.login_required
-def downloader_pv(project_id):
+def downloader_pv_by_project(project_id):
     """返回节点列表"""
     return chart_service.downloader_pv(project_id)
 
 @chart.route('/parser', methods=['GET'])
 @auth.login_required
-def downloader_pv():
+def parser_pv():
     """返回节点列表"""
     return chart_service.parser_pv()
 
 @chart.route('/parser/<int:project_id>', methods=['GET'])
 @auth.login_required
-def downloader_pv(project_id):
+def parser_pv_by_project(project_id):
     """返回节点列表"""
     return chart_service.parser_pv(project_id)
