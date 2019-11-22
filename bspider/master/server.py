@@ -12,6 +12,7 @@ from werkzeug.exceptions import HTTPException
 from bspider.config import FrameSettings
 from bspider.core.api import APIException
 from bspider.master import log
+from bspider.master.controller.chart import chart
 from bspider.master.controller.cron import cron
 from bspider.master.controller.code import code
 from bspider.master.controller.project import project
@@ -40,6 +41,8 @@ def create_app():
     app.register_blueprint(tools, url_prefix="/tools")
     # rabbitmq
     app.register_blueprint(rabbitmq, url_prefix="/rabbitmq")
+    # chart
+    app.register_blueprint(chart, url_prefix="/chart")
 
     @app.errorhandler(Exception)
     def framework_error(error):

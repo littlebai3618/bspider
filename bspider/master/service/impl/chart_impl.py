@@ -5,7 +5,7 @@
 from bspider.core.api import BaseImpl
 
 
-class ToolsImpl(BaseImpl):
+class ChartImpl(BaseImpl):
 
     def __init__(self):
         super().__init__()
@@ -14,15 +14,37 @@ class ToolsImpl(BaseImpl):
         self.downloader_status_table  = self.frame_settings['DOWNLOADER_STATUS_TABLE']
         self.parser_status_table = self.frame_settings['PARSER_STATUS_TABLE']
 
-    def get_node_list(self):
-        sql = f"select `id`, `name`, `ip` from `{self.node_table}`;"
+    def get_project_downloader_pv(self, project_id: int = None):
+        """获取按小时统计的下载数据"""
+        if project_id:
+            sql = f"SELECT DATE_FORMAT(`create_time`,'%Y-%m-%d %H:00:00') AS `time`," \
+                  f"COUNT(IF (`status` !=200,TRUE,NULL)) AS `exception`," \
+                  f"COUNT(*) AS total " \
+                  f"FROM {self.downloader_status_table} " \
+                  f"WHERE `project_id`={project_id} " \
+                  f"GROUP BY `time` ORDER BY `time`;"
+        else:
+            sql = f"SELECT DATE_FORMAT(`create_time`,'%Y-%m-%d %H:00:00') AS `time`," \
+                  f"COUNT(IF (`status` !=200,TRUE,NULL)) AS `exception`," \
+                  f"COUNT(*) AS total " \
+                  f"FROM {self.downloader_status_table} " \
+                  f"GROUP BY `time` ORDER BY `time`;"
         return self.handler.select(sql)
 
-    def get_code_list(self, code_type):
-        if code_type:
-            sql = f"select `id`, `name`, `editor` from `{self.code_table}` where `type`='{code_type}';"
+    def get_project_parser_pv(self, project_id: int = None):
+        if project_id:
+            sql = f"SELECT DATE_FORMAT(`create_time`,'%Y-%m-%d %H:00:00') AS `time`," \
+                  f"COUNT(IF (`exception` is not null,TRUE,NULL)) AS `exception`," \
+                  f"COUNT(*) AS total " \
+                  f"FROM {self.parser_status_table} " \
+                  f"WHERE `project_id`={project_id} " \
+                  f"GROUP BY `time` ORDER BY `time`;"
         else:
-            sql = f"select `id`, `name`, `editor` from `{self.code_table}`;"
+            sql = f"SELECT DATE_FORMAT(`create_time`,'%Y-%m-%d %H:00:00') AS `time`," \
+                  f"COUNT(IF (`exception` is not null,TRUE,NULL)) AS `exception`," \
+                  f"COUNT(*) AS total " \
+                  f"FROM {self.parser_status_table} " \
+                  f"GROUP BY `time` ORDER BY `time`;"
         return self.handler.select(sql)
 
 

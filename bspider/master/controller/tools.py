@@ -42,3 +42,4 @@ def validate(valid_type):
 @auth.login_required
 def node_status(node_ip):
     return tools_service.node_status(node_ip)
+
