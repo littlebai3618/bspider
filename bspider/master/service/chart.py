@@ -27,7 +27,7 @@ class ChartService(BaseService):
         return GetSuccess(data={
             'xAxis': x_axis,
             'legend': legend,
-            'series': self.get_two_line_chart_series(p_error, p_total)
+            'series': self.get_two_line_chart_series(legend, p_error, p_total)
         })
 
     def downloader_pv(self, project_id: int = None):
@@ -49,9 +49,9 @@ class ChartService(BaseService):
             'series': self.get_two_line_chart_series(d_error, d_total)
         })
 
-    def get_two_line_chart_series(self, series_one, series_two):
+    def get_two_line_chart_series(self, legend, series_one, series_two):
         return [{
-            'name': 'expected',
+            'name': legend[0],
             'itemStyle': {
                 'normal': {
                     'color': '#FF005A',
@@ -68,7 +68,7 @@ class ChartService(BaseService):
             'animationEasing': 'cubicInOut'
         },
         {
-            'name': 'actual',
+            'name': legend[1],
             'smooth': True,
             'type': 'line',
             'itemStyle': {
