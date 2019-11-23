@@ -22,7 +22,7 @@ class ChartService(BaseService):
         'type': 'line',
         'data': None,
         'animationDuration': 2800,
-        'animationEasing': 'cubicInOut'
+        'animationEasing': None
     }
 
     def __init__(self):
@@ -31,7 +31,10 @@ class ChartService(BaseService):
     def parser_pv(self, project_id: int = None):
         p_total = list()
         p_error = list()
-        base_config = [('P.TOTAL', '#3888fa', p_total), ('P.ERROR', '#FF005A', p_error)]
+        base_config = [
+            ('P.TOTAL', '#3888fa', p_total, 'quadraticOut'),
+            ('P.ERROR', '#FF005A', p_error, 'cubicInOut')
+        ]
 
         parser_metadata = self.impl.get_project_parser_pv(project_id)
 
@@ -44,12 +47,13 @@ class ChartService(BaseService):
         series = list()
         legend = list()
 
-        for l, c, d in base_config:
+        for l, c, d, a in base_config:
             cur_series = self.line_chart_series.copy()
             cur_series['name'] = l
             cur_series['itemStyle']['normal']['color'] = c
             cur_series['itemStyle']['normal']['lineStyle']['color'] = c
             cur_series['data'] = d
+            cur_series['animationEasing'] = a
             series.append(cur_series)
             legend.append(l)
 
@@ -62,7 +66,10 @@ class ChartService(BaseService):
     def downloader_pv(self, project_id: int = None):
         d_total = list()
         d_error = list()
-        base_config = [('D.TOTAL', '#3888fa', d_total), ('D.ERROR', '#FF005A', d_error)]
+        base_config = [
+            ('D.TOTAL', '#3888fa', d_total, 'quadraticOut'),
+            ('D.ERROR', '#FF005A', d_error, 'cubicInOut')
+        ]
 
         downloader_metadata = self.impl.get_project_downloader_pv(project_id)
 
@@ -75,12 +82,13 @@ class ChartService(BaseService):
         series = list()
         legend = list()
 
-        for l, c, d in base_config:
+        for l, c, d, a in base_config:
             cur_series = self.line_chart_series.copy()
             cur_series['name'] = l
             cur_series['itemStyle']['normal']['color'] = c
             cur_series['itemStyle']['normal']['lineStyle']['color'] = c
             cur_series['data'] = d
+            cur_series['animationEasing'] = a
             series.append(cur_series)
             legend.append(l)
 
