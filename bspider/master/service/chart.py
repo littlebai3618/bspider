@@ -14,7 +14,7 @@ class ChartService(BaseService):
     def parser_pv(self, project_id: int = None):
         p_total = list()
         p_error = list()
-        legend = ['P.TOTAL', 'P.ERROR']
+        legend = ['P.ERROR', 'P.TOTAL']
 
         parser_metadata = self.impl.get_project_parser_pv(project_id)
 
@@ -27,13 +27,13 @@ class ChartService(BaseService):
         return GetSuccess(data={
             'xAxis': x_axis,
             'legend': legend,
-            'series': self.get_two_line_chart_series(legend, p_error, p_total)
+            'series': self.get_two_line_chart_series(legend, p_total, p_error)
         })
 
     def downloader_pv(self, project_id: int = None):
         d_total = list()
         d_error = list()
-        legend = ['D.TOTAL', 'D.ERROR']
+        legend = ['D.ERROR', 'D.TOTAL']
 
         downloader_metadata = self.impl.get_project_downloader_pv(project_id)
 
@@ -49,7 +49,7 @@ class ChartService(BaseService):
             'series': self.get_two_line_chart_series(legend, d_error, d_total)
         })
 
-    def get_two_line_chart_series(self, legend, series_one, series_two):
+    def get_two_line_chart_series(self, legend, error, total):
         return [{
             'name': legend[0],
             'itemStyle': {
@@ -63,7 +63,7 @@ class ChartService(BaseService):
             },
             'smooth': True,
             'type': 'line',
-            'data': series_one,
+            'data': error,
             'animationDuration': 2800,
             'animationEasing': 'cubicInOut'
         },
@@ -83,7 +83,7 @@ class ChartService(BaseService):
                     }
                 }
             },
-            'data': series_two,
+            'data': total,
             'animationDuration': 2800,
             'animationEasing': 'quadraticOut'
         }]
