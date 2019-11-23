@@ -46,7 +46,7 @@ class ChartService(BaseService):
         return GetSuccess(data={
             'xAxis': x_axis,
             'legend': legend,
-            'series': self.get_two_line_chart_series(d_error, d_total)
+            'series': self.get_two_line_chart_series(legend, d_error, d_total)
         })
 
     def get_two_line_chart_series(self, legend, series_one, series_two):
