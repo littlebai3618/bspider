@@ -7,23 +7,6 @@ from .impl.chart_impl import ChartImpl
 
 
 class ChartService(BaseService):
-    line_chart_series = {
-        'name': None,
-        'itemStyle': {
-            'normal': {
-                'color': None,
-                'lineStyle': {
-                    'color': None,
-                    'width': 2
-                }
-            }
-        },
-        'smooth': True,
-        'type': 'line',
-        'data': None,
-        'animationDuration': 2800,
-        'animationEasing': None
-    }
 
     def __init__(self):
         self.impl = ChartImpl()
@@ -31,10 +14,7 @@ class ChartService(BaseService):
     def parser_pv(self, project_id: int = None):
         p_total = list()
         p_error = list()
-        base_config = [
-            ('P.TOTAL', '#3888fa', p_total, 'quadraticOut'),
-            ('P.ERROR', '#FF005A', p_error, 'cubicInOut')
-        ]
+        legend = ['P.TOTAL', 'P.ERROR']
 
         parser_metadata = self.impl.get_project_parser_pv(project_id)
 
@@ -44,32 +24,16 @@ class ChartService(BaseService):
             p_error.append(metadata['exception'])
             x_axis.append(metadata['time'])
 
-        series = list()
-        legend = list()
-
-        for l, c, d, a in base_config:
-            cur_series = self.line_chart_series.copy()
-            cur_series['name'] = l
-            cur_series['itemStyle']['normal']['color'] = c
-            cur_series['itemStyle']['normal']['lineStyle']['color'] = c
-            cur_series['data'] = d
-            cur_series['animationEasing'] = a
-            series.append(cur_series)
-            legend.append(l)
-
         return GetSuccess(data={
             'xAxis': x_axis,
             'legend': legend,
-            'series': series
+            'series': self.get_two_line_chart_series(p_error, p_total)
         })
 
     def downloader_pv(self, project_id: int = None):
         d_total = list()
         d_error = list()
-        base_config = [
-            ('D.TOTAL', '#3888fa', d_total, 'quadraticOut'),
-            ('D.ERROR', '#FF005A', d_error, 'cubicInOut')
-        ]
+        legend = ['D.TOTAL', 'D.ERROR']
 
         downloader_metadata = self.impl.get_project_downloader_pv(project_id)
 
@@ -79,21 +43,47 @@ class ChartService(BaseService):
             d_error.append(metadata['exception'])
             x_axis.append(metadata['time'])
 
-        series = list()
-        legend = list()
-
-        for l, c, d, a in base_config:
-            cur_series = self.line_chart_series.copy()
-            cur_series['name'] = l
-            cur_series['itemStyle']['normal']['color'] = c
-            cur_series['itemStyle']['normal']['lineStyle']['color'] = c
-            cur_series['data'] = d
-            cur_series['animationEasing'] = a
-            series.append(cur_series)
-            legend.append(l)
-
         return GetSuccess(data={
             'xAxis': x_axis,
             'legend': legend,
-            'series': series
+            'series': self.get_two_line_chart_series(d_error, d_total)
         })
+
+    def get_two_line_chart_series(self, series_one, series_two):
+        return [{
+            'name': 'expected',
+            'itemStyle': {
+                'normal': {
+                    'color': '#FF005A',
+                    'lineStyle': {
+                        'color': '#FF005A',
+                        'width': 2
+                    }
+                }
+            },
+            'smooth': True,
+            'type': 'line',
+            'data': series_one,
+            'animationDuration': 2800,
+            'animationEasing': 'cubicInOut'
+        },
+        {
+            'name': 'actual',
+            'smooth': True,
+            'type': 'line',
+            'itemStyle': {
+                'normal': {
+                    'color': '#3888fa',
+                    'lineStyle': {
+                        'color': '#3888fa',
+                        'width': 2
+                    },
+                    'areaStyle': {
+                        'color': '#f3f8ff'
+                    }
+                }
+            },
+            'data': series_two,
+            'animationDuration': 2800,
+            'animationEasing': 'quadraticOut'
+        }]
