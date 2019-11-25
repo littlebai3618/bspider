@@ -46,7 +46,7 @@ def parser_exception(project_id):
 
 @tools.route('/downloader/exception/<int:project_id>', methods=['GET'])
 @auth.login_required
-def parser_exception(project_id):
+def downloader_exception(project_id):
     """返回节点列表"""
     return tools_service.get_downloader_exception(project_id)
 
