@@ -38,8 +38,15 @@ def validate(valid_type):
     form = ValidateForm()
     return tools_service.validate(valid_type, form.data.data)
 
-@tools.route('/nodestatus/<string:node_ip>', methods=['GET'])
+@tools.route('/parser/exception/<int:project_id>', methods=['GET'])
 @auth.login_required
-def node_status(node_ip):
-    return tools_service.node_status(node_ip)
+def parser_exception(project_id):
+    """返回节点列表"""
+    return tools_service.get_parser_exception(project_id)
+
+@tools.route('/downloader/exception/<int:project_id>', methods=['GET'])
+@auth.login_required
+def parser_exception(project_id):
+    """返回节点列表"""
+    return tools_service.get_downloader_exception(project_id)
 

@@ -39,39 +39,31 @@ class ToolsService(BaseService, AgentMixIn):
         """调用接口返回节点状态，兼职探活"""
         return GetSuccess(data=self.op_get_node_status(ip))
 
+    def get_parser_exception(self, project_id):
+        return GetSuccess(data=self.impl.get_parser_exception(project_id))
 
+    def get_downloader_exception(self, project_id):
+        return GetSuccess(data=self.impl.get_downloader_exception(project_id))
 
+    def get_request_track(self, url=None, sign=None):
+        if url:
+            sign = self.impl.get_sign_by_url(url)
 
+        if sign:
+            track_info = self.impl.get_reqest_track(sign)
+            return 0, f'查询成功', track_info
 
+    def parser_error(self, error):
+        for err in error:
+            err['size'] = 'large'
+            err['timestamp'] = err['crawl_time']
+            if err['status'] == 599:
+                err['type'] = 'warning'
+            else:
+                err['type'] = 'danger'
 
-
-    # def get_parser_error(self, project_name):
-    #     error = self.impl.get_parser_error(project_name)
-    #     return 0, f'查询{project_name}成功', self.parser_error(error)
-    #
-    # def get_downloader_error(self, project_name):
-    #     error = self.impl.get_downloader_error(project_name)
-    #     return 0, f'查询{project_name}成功', self.parser_error(error)
-    #
-    # def get_reqest_track(self, url=None, sign=None):
-    #     if url:
-    #         sign = self.impl.get_sign_by_url(url)
-    #
-    #     if sign:
-    #         track_info = self.impl.get_reqest_track(sign)
-    #         return 0, f'查询成功', track_info
-    #
-    # def parser_error(self, error):
-    #     for err in error:
-    #         err['size'] = 'large'
-    #         err['timestamp'] = err['crawl_time']
-    #         if err['status'] == 599:
-    #             err['type'] = 'warning'
-    #         else:
-    #             err['type'] = 'danger'
-    #
-    #         if err['status'] == -1:
-    #             err['status'] = 'FAIL'
-    #         if err['exception']:
-    #             err['exception'] = err['exception'].replace('\n\n', '<br>')
-    #     return error
+            if err['status'] == -1:
+                err['status'] = 'FAIL'
+            if err['exception']:
+                err['exception'] = err['exception'].replace('\n\n', '<br>')
+        return error
