@@ -43,7 +43,8 @@ class ToolsService(BaseService, AgentMixIn):
         infos = self.impl.get_parser_exception(project_id)
         for info in infos:
             self.datetime_to_str(info)
-            info['exception'] = info['exception'].replace('\n', '<br>')
+            if info['exception']:
+                info['exception'] = info['exception'].replace('\n', '<br>')
         return GetSuccess(data=infos)
 
     def get_downloader_exception(self, project_id):
