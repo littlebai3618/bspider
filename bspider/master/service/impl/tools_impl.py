@@ -35,7 +35,7 @@ class ToolsImpl(BaseImpl):
               f'AND `project_id`="{project_id}" ' \
               f'AND `status` NOT BETWEEN 900 AND 999 ' \
               f'AND `status` !=200 ' \
-              f'GROUP BY `exception` ORDER BY `create_time` DESC LIMIT 4'
+              f'ORDER BY `create_time` DESC LIMIT 4'
         return self.handler.select(sql)
 
     def get_parser_exception(self, project_id):
