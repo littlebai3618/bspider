@@ -40,10 +40,16 @@ class ToolsService(BaseService, AgentMixIn):
         return GetSuccess(data=self.op_get_node_status(ip))
 
     def get_parser_exception(self, project_id):
-        return GetSuccess(data=self.impl.get_parser_exception(project_id))
+        infos = self.impl.get_parser_exception(project_id)
+        for info in infos:
+            self.datetime_to_str(info)
+        return GetSuccess(data=infos)
 
     def get_downloader_exception(self, project_id):
-        return GetSuccess(data=self.impl.get_downloader_exception(project_id))
+        infos = self.impl.get_downloader_exception(project_id)
+        for info in infos:
+            self.datetime_to_str(info)
+        return GetSuccess(data=infos)
 
     def get_request_track(self, url=None, sign=None):
         if url:
