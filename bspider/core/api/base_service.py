@@ -14,3 +14,5 @@ class BaseService(object):
         for key, value in d.items():
             if isinstance(value, datetime):
                 d[key] = value.strftime("%Y-%m-%d %H:%M:%S")
+            if isinstance(value, dict):
+                self.datetime_to_str(value)

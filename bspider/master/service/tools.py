@@ -55,6 +55,17 @@ class ToolsService(BaseService, AgentMixIn):
                 info['exception'] = info['exception'].replace('\n', '<br>')
         return GetSuccess(data=infos)
 
+    def get_crawl_detail(self, tag, data):
+        if tag == 'sign':
+            infos = self.impl.get_crawl_detail(tag, data)
+        else:
+            infos = self.impl.get_crawl_detail('url_sign', f'md5(\'{data}\')')
+
+        for info in infos:
+            self.datetime_to_str(info)
+        return GetSuccess(data=infos)
+
+
     def get_request_track(self, url=None, sign=None):
         if url:
             sign = self.impl.get_sign_by_url(url)

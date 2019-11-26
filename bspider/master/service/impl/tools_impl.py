@@ -28,7 +28,7 @@ class ToolsImpl(BaseImpl):
 
     def get_downloader_exception(self, project_id):
         """目前是自动获取8小时内，前4条错误信息"""
-        sql = f'SELECT `project_id`, `project_name`,`sign`,`method`,`data` ,`url`,`status`,`url_sign`,' \
+        sql = f'SELECT `sign`,`method`, `url`, `status`, `url_sign`,' \
               f'`exception`,`create_time` as crawl_time ' \
               f'FROM {self.downloader_status_table} ' \
               f'WHERE `create_time` > now()-INTERVAL 8 HOUR ' \
@@ -39,7 +39,7 @@ class ToolsImpl(BaseImpl):
         return self.handler.select(sql)
 
     def get_parser_exception(self, project_id):
-        sql = f'SELECT `project_name`,`sign`,`method`,`data` ,`url`,`status`,`url_sign`,' \
+        sql = f'SELECT `sign`,`method`,`url`,`status`,`url_sign`,' \
               f'`exception`,`create_time` as crawl_time ' \
               f'FROM {self.parser_status_table} ' \
               f'WHERE `create_time` > now()-INTERVAL 8 HOUR ' \
@@ -47,29 +47,40 @@ class ToolsImpl(BaseImpl):
               f'AND `exception` is not null ' \
               f'GROUP BY `exception` ORDER BY `create_time` DESC LIMIT 4'
         return self.handler.select(sql)
-    #
-    # def get_reqest_track(self, sign):
-    #     result = {}
-    #     sql = f'select `project_name`,`sign`,`method`,`data` ,`url`,`status`,`url_sign`,' \
-    #           f'`exception`,`create_time` as crawl_time ' \
-    #           f'FROM {self.parser_status_table} ' \
-    #           f'WHERE  `sign`="{sign}"'
-    #     parser = self.handler.select(sql)
-    #     if len(parser):
-    #         result['parser'] = parser[0]
-    #     sql = f'select `project_name`,`sign`,`method`,`data` ,`url`,`status`,`url_sign`,' \
-    #           f'`exception`,`create_time` as crawl_time ' \
-    #           f'FROM {self.downloader_status_table} ' \
-    #           f'WHERE  `sign`="{sign}"'
-    #     downloader = self.handler.select(sql)
-    #     if len(downloader):
-    #         result['download'] = downloader[0]
-    #     return result
-    #
-    # def get_sign_by_url(self, url):
-    #     sql = f'select `sign` from {self.downloader_status_table} ' \
-    #           f'where `url_sign`=md5("{url}") ' \
-    #           f'ORDER BY `create_time` DESC LIMIT 1'
-    #     info = self.handler.select(sql)
-    #     if len(info):
-    #         return info['sign']
+
+    def get_crawl_detail(self, key, value):
+        result = dict(
+            parser={},
+            downloader={}
+        )
+
+        sql = f'select `project_id`, `project_name`,`sign`,`method`,`data` ,`url`,`status`,`url_sign`,`response`' \
+              f'`exception`,`create_time` as crawl_time ' \
+              f'FROM {self.parser_status_table} ' \
+              f'WHERE  `{key}`="{value}"'
+
+        infos = self.handler.select(sql)
+        if infos:
+            result['parser'] = infos[0]
+            if result['parser']['exception']:
+                result['parser']['exception'] = result['parser']['exception'].replace('\n', '<br>')
+
+        sql = f'select `project_id`, `project_name`,`sign`,`method`,`data` ,`url`,`status`,`url_sign`,`response`' \
+              f'`exception`,`create_time` as crawl_time ' \
+              f'FROM {self.downloader_status_table} ' \
+              f'WHERE  `{key}`="{value}"'
+
+        infos = self.handler.select(sql)
+        if infos:
+            result['downloader'] = infos[0]
+            if result['downloader']['exception']:
+                result['downloader']['exception'] = result['downloader']['exception'].replace('\n', '<br>')
+        return result
+
+    def get_sign_by_url(self, url):
+        sql = f'select `sign` from {self.downloader_status_table} ' \
+              f'where `url_sign`=md5("{url}") ' \
+              f'ORDER BY `create_time` DESC LIMIT 1'
+        info = self.handler.select(sql)
+        if len(info):
+            return info['sign']
