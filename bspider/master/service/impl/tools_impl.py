@@ -76,9 +76,9 @@ class ToolsImpl(BaseImpl):
         infos = self.handler.select(sql)
         if infos:
             result['downloader'] = infos[0]
+            result['downloader']['response'] = base64.b64decode(zlib.decompress(infos[0]['response']))
             if result['downloader']['exception']:
                 result['downloader']['exception'] = result['downloader']['exception'].replace('\n', '<br>')
-                result['response'] = base64.b64decode(zlib.decompress(result['response']))
         return result
 
     def get_sign_by_url(self, url):
