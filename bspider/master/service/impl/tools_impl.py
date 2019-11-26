@@ -77,7 +77,7 @@ class ToolsImpl(BaseImpl):
         infos = self.handler.select(sql)
         if infos:
             result['downloader'] = infos[0]
-            result['downloader']['response'] = zlib.decompress(base64.b64decode(infos[0]['response']))
+            result['downloader']['response'] = zlib.decompress(base64.b64decode(infos[0]['response'])).decode()
             log.debug(result['downloader']['response'])
             if result['downloader']['exception']:
                 result['downloader']['exception'] = result['downloader']['exception'].replace('\n', '<br>')
