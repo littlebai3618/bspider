@@ -78,7 +78,7 @@ class ToolsImpl(BaseImpl):
             result['downloader'] = infos[0]
             if result['downloader']['exception']:
                 result['downloader']['exception'] = result['downloader']['exception'].replace('\n', '<br>')
-                result['request'] = base64.b64decode(zlib.decompress(result['request']))
+                result['response'] = base64.b64decode(zlib.decompress(result['response']))
         return result
 
     def get_sign_by_url(self, url):
