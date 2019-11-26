@@ -62,7 +62,7 @@ class AsyncDownloader(object):
             self.accept_response_code = set()
             self.log.debug(f'{self.project_name} init default accept response code: {self.accept_response_code}')
 
-    async def download(self, request: Request) -> (Response, bool):
+    async def download(self, request: Request) -> (Response, bool, str):
         """
         donwloader入口, 执行整个下载过程
         执行中间件，执行下载时，异步
@@ -98,10 +98,16 @@ class AsyncDownloader(object):
                 e.with_traceback(tb)
                 self.log.exception(e_msg)
                 self.log.info(f'Retry download: url->{request.url} status->{response.status} time:{retry_index}')
-                continue
+                # 执行下载异常中间件
+                for mw in self.mws:
+                    self.log.debug(f'{mw.__class__.__name__} executing process_response')
+                    result = await mw._exec('process_exception', request=request, e=e, response=response)
+                    if isinstance(result, Response):
+                        continue
+                    elif result is None:
+                        return response, False, e_msg
 
             for mw in self.mws:
-
                 self.log.debug(f'{mw.__class__.__name__} executing process_response')
                 result = await mw._exec('process_response', request=request, response=response)
                 if isinstance(result, Response):
@@ -110,9 +116,9 @@ class AsyncDownloader(object):
                     break
 
             if response.status == 200 or response.status in self.accept_response_code:
-                return response, True
+                return response, True, None
             self.log.info(f'Retry download: url->{request.url} status->{response.status} time:{retry_index}')
-        return response, False
+        return response, False, None
 
     async def __assemble_response(self, response: ClientResponse, request: Request) -> Response:
         # 这里只处理 str 类型的数据

@@ -36,3 +36,12 @@ class BaseMiddleware(BaseCustomModule):
         返回None类型或其他返回值，丢弃，后面不再处理
         """
         return response
+
+
+    def process_exception(self, request, e, response):
+        """
+        这里捕获下载时发生的异常，不包括中间件异常
+        返回Response类型，正常，继续下一个中间件
+        返回None类型或其他返回值，丢弃，后面不再处理
+        """
+        return response

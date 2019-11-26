@@ -67,7 +67,7 @@ class AsyncParser(object):
         :return:
         """
         self.log.debug(f'{pipeline.__class__.__name__} executing process_response')
-        temp_items = await pipeline._exec('process_item', pre_item)
+        temp_items = await pipeline._exec('process_item', item=pre_item)
         self.__exec_items(temp_items, requests, cur_item)
 
     def __exec_items(self, items, requests: list, cur_item: list):
