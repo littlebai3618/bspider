@@ -6,6 +6,7 @@ import base64
 import zlib
 
 from bspider.core.api import BaseImpl
+from bspider.master import log
 
 
 class ToolsImpl(BaseImpl):
@@ -77,6 +78,7 @@ class ToolsImpl(BaseImpl):
         if infos:
             result['downloader'] = infos[0]
             result['downloader']['response'] = zlib.decompress(base64.b64decode(infos[0]['response']))
+            log.debug(result['downloader']['response'])
             if result['downloader']['exception']:
                 result['downloader']['exception'] = result['downloader']['exception'].replace('\n', '<br>')
         return result
