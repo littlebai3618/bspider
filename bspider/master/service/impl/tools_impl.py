@@ -87,4 +87,4 @@ class ToolsImpl(BaseImpl):
               f'ORDER BY `create_time` DESC LIMIT 1'
         info = self.handler.select(sql)
         if len(info):
-            return info['sign']
+            return info[0]['sign']
