@@ -2,6 +2,9 @@
 # @Author  : 白尚林
 # @File    : tools_impl
 # @Use     :
+import base64
+import zlib
+
 from bspider.core.api import BaseImpl
 
 
@@ -48,16 +51,16 @@ class ToolsImpl(BaseImpl):
               f'GROUP BY `exception` ORDER BY `create_time` DESC LIMIT 4'
         return self.handler.select(sql)
 
-    def get_crawl_detail(self, key, value):
+    def get_crawl_detail(self, value):
         result = dict(
             parser={},
             downloader={}
         )
 
-        sql = f'select `project_id`, `project_name`,`sign`,`method`,`data` ,`url`,`status`,`url_sign`,`response`' \
+        sql = f'select `project_id`, `project_name`,`sign`,`method`,`data` ,`url`,`status`,`url_sign`,' \
               f'`exception`,`create_time` as crawl_time ' \
               f'FROM {self.parser_status_table} ' \
-              f'WHERE  `{key}`="{value}"'
+              f'WHERE  `sign`="{value}"'
 
         infos = self.handler.select(sql)
         if infos:
@@ -65,16 +68,17 @@ class ToolsImpl(BaseImpl):
             if result['parser']['exception']:
                 result['parser']['exception'] = result['parser']['exception'].replace('\n', '<br>')
 
-        sql = f'select `project_id`, `project_name`,`sign`,`method`,`data` ,`url`,`status`,`url_sign`,`response`' \
+        sql = f'select `project_id`, `project_name`,`sign`,`method`,`data` ,`url`,`status`,`url_sign`,`response`,' \
               f'`exception`,`create_time` as crawl_time ' \
               f'FROM {self.downloader_status_table} ' \
-              f'WHERE  `{key}`="{value}"'
+              f'WHERE  `sign`="{value}"'
 
         infos = self.handler.select(sql)
         if infos:
             result['downloader'] = infos[0]
             if result['downloader']['exception']:
                 result['downloader']['exception'] = result['downloader']['exception'].replace('\n', '<br>')
+                result['request'] = base64.b64decode(zlib.decompress(result['request']))
         return result
 
     def get_sign_by_url(self, url):

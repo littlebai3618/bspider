@@ -57,9 +57,13 @@ class ToolsService(BaseService, AgentMixIn):
 
     def get_crawl_detail(self, tag, data):
         if tag == 'sign':
-            infos = self.impl.get_crawl_detail(tag, data)
+            infos = self.impl.get_crawl_detail(data)
         else:
-            infos = self.impl.get_crawl_detail('url_sign', f'md5(\'{data}\')')
+            sign = self.impl.get_sign_by_url(data)
+            if sign:
+                infos = self.impl.get_crawl_detail(sign)
+            else:
+                return NotFound(errno=60002, msg=f'NotFound url:{data}')
 
         for info in infos:
             self.datetime_to_str(info)
