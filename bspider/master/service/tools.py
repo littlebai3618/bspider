@@ -65,7 +65,7 @@ class ToolsService(BaseService, AgentMixIn):
             else:
                 return NotFound(errno=60002, msg=f'NotFound url:{data}')
 
-        for info in infos:
+        for key, info in infos.items():
             self.datetime_to_str(info)
         return GetSuccess(data=infos)
 
