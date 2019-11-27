@@ -2,7 +2,7 @@
 # @Author  : baii
 # @File    : rabbitmq
 # @Use     :
-from bspider.core.api import BaseService, RabbitMQMixIn, GetSuccess
+from bspider.core.api import BaseService, RabbitMQMixIn, GetSuccess, DeleteSuccess
 
 
 class RabbitMQService(BaseService, RabbitMQMixIn):
@@ -17,4 +17,9 @@ class RabbitMQService(BaseService, RabbitMQMixIn):
                 'ready': [queue_info['messages_ready'], queue_info['messages_ready_details']['rate']],
             }
         return GetSuccess(msg='get queue info success', data=result)
+
+    def purge_project_queue(self, project_id: int):
+        self.op_purge_queue_msg(project_id)
+        return DeleteSuccess()
+
 

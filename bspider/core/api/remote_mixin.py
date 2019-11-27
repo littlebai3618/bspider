@@ -189,3 +189,11 @@ class RabbitMQMixIn(object):
             return req.json()
         raise RemoteOPError('get queue info Failed {}', req.text)
 
+    def op_purge_queue_msg(self, project_id: int):
+        uri = f'api/queues/bspider/candidate_{project_id}/contents'
+        req = self.request(self.base_url % uri, 'DELETE', params={"vhost": self.virtual_host,"name":f"candidate_{project_id}","mode":"purge"})
+        if req.status_code == 204:
+            return None
+        raise RemoteOPError('purge queue info Failed {}', req.text)
+
+
