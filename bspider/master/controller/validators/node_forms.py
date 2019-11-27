@@ -2,7 +2,7 @@
 # @Author  : 白尚林
 # @File    : forms
 # @Use     :
-from wtforms import StringField, IntegerField
+from wtforms import StringField, IntegerField, FloatField
 from wtforms.validators import length
 
 from bspider.core.api import BaseForm, ParamRequired
@@ -13,8 +13,8 @@ class AddNodeForm(BaseForm):
     name = StringField(validators=[ParamRequired(), length(min=3, max=30)])
     description = StringField(validators=[ParamRequired()])
     cpu_num = IntegerField(validators=[ParamRequired()])
-    mem_size = IntegerField(validators=[ParamRequired()])
-    disk_size = IntegerField(validators=[ParamRequired()])
+    mem_size = FloatField(validators=[ParamRequired()])
+    disk_size = FloatField(validators=[ParamRequired()])
     port = IntegerField(validators=[ParamRequired()])
 
 class UpdateNodeForm(BaseForm):
