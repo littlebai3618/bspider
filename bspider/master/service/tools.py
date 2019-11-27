@@ -73,7 +73,8 @@ class ToolsService(BaseService, AgentMixIn):
             self.datetime_to_str(info)
             if info['response'] is not None:
                 info['response'] = json.loads(zlib.decompress(base64.b64decode(infos[0]['response'])).decode())
-        return GetSuccess(data=infos[0])
+            return GetSuccess(data=info)
+        return NotFound(errno=60002, msg=f'NotFound tag:{data}')
 
 
     def get_request_track(self, url=None, sign=None):
