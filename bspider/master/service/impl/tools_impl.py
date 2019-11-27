@@ -53,36 +53,18 @@ class ToolsImpl(BaseImpl):
               f'GROUP BY `exception` ORDER BY `create_time` DESC LIMIT 4'
         return self.handler.select(sql)
 
-    def get_crawl_detail(self, value):
-        result = dict(
-            parser={},
-            downloader={}
-        )
-
-        sql = f'select `project_id`, `project_name`,`sign`,`method`,`data` ,`url`,`status`,`url_sign`,' \
-              f'`exception`,`create_time` as crawl_time ' \
-              f'FROM {self.parser_status_table} ' \
-              f'WHERE  `sign`="{value}"'
-
-        infos = self.handler.select(sql)
-        if infos:
-            result['parser'] = infos[0]
-            if result['parser']['exception']:
-                result['parser']['exception'] = result['parser']['exception'].replace('\n', '<br>')
+    def get_crawl_detail(self, value, source):
+        if source == 'parser':
+            table = self.parser_status_table
+        else:
+            table = self.downloader_status_table
 
         sql = f'select `project_id`, `project_name`,`sign`,`method`,`data` ,`url`,`status`,`url_sign`,`response`,' \
               f'`exception`,`create_time` as crawl_time ' \
-              f'FROM {self.downloader_status_table} ' \
+              f'FROM {table} ' \
               f'WHERE  `sign`="{value}"'
 
-        infos = self.handler.select(sql)
-        if infos:
-            result['downloader'] = infos[0]
-            result['downloader']['response'] = json.loads(zlib.decompress(base64.b64decode(infos[0]['response'])).decode())
-            log.debug(result['downloader']['response'])
-            if result['downloader']['exception']:
-                result['downloader']['exception'] = result['downloader']['exception'].replace('\n', '<br>')
-        return result
+        return self.handler.select(sql)
 
     def get_sign_by_url(self, url):
         sql = f'select `sign` from {self.downloader_status_table} ' \
@@ -90,4 +72,6 @@ class ToolsImpl(BaseImpl):
               f'ORDER BY `create_time` DESC LIMIT 1'
         info = self.handler.select(sql)
         if len(info):
+            log.info('url:{} -> sign:{}'.format(url, info[0]['sign']))
             return info[0]['sign']
+        log.info(f'can\'t find url:{url} sign')

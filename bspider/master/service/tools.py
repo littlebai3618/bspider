@@ -55,17 +55,17 @@ class ToolsService(BaseService, AgentMixIn):
                 info['exception'] = info['exception'].replace('\n', '<br>')
         return GetSuccess(data=infos)
 
-    def get_crawl_detail(self, tag, data):
+    def get_crawl_detail(self, tag, source, data):
         if tag == 'sign':
-            infos = self.impl.get_crawl_detail(data)
+            infos = self.impl.get_crawl_detail(data, source)
         else:
             sign = self.impl.get_sign_by_url(data)
             if sign:
-                infos = self.impl.get_crawl_detail(sign)
+                infos = self.impl.get_crawl_detail(sign, source)
             else:
                 return NotFound(errno=60002, msg=f'NotFound url:{data}')
 
-        for key, info in infos.items():
+        for info in infos:
             self.datetime_to_str(info)
         return GetSuccess(data=infos)
 
