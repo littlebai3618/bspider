@@ -2,10 +2,6 @@
 # @Author  : 白尚林
 # @File    : tools_impl
 # @Use     :
-import base64
-import zlib
-import json
-
 from bspider.core.api import BaseImpl
 from bspider.master import log
 

@@ -5,6 +5,10 @@
 """
 1. 获取node ip列表 /tools/nodelist [{name: , ip:}]
 """
+import base64
+import json
+import zlib
+
 from apscheduler.triggers.cron import CronTrigger
 
 from bspider.core.api import BaseService, GetSuccess, NotFound, AgentMixIn
@@ -67,7 +71,9 @@ class ToolsService(BaseService, AgentMixIn):
 
         for info in infos:
             self.datetime_to_str(info)
-        return GetSuccess(data=infos)
+            if info['response'] is not None:
+                info['response'] = json.loads(zlib.decompress(base64.b64decode(infos[0]['response'])).decode())
+        return GetSuccess(data=infos[0])
 
 
     def get_request_track(self, url=None, sign=None):
