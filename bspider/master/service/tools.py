@@ -77,9 +77,6 @@ class ToolsService(BaseService, AgentMixIn):
         return NotFound(errno=60002, msg=f'NotFound tag:{data}')
 
     def get_node_detail(self):
-        infos = self.impl.get_node_detail()
-        for info in infos:
-            info['cpu'] = int(info['cpu'])
         return GetSuccess(data=self.impl.get_node_detail()[0])
 
 

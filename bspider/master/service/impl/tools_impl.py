@@ -2,8 +2,6 @@
 # @Author  : 白尚林
 # @File    : tools_impl
 # @Use     :
-from decimal import Decimal
-
 from bspider.core.api import BaseImpl
 from bspider.master import log
 
@@ -78,7 +76,7 @@ class ToolsImpl(BaseImpl):
         sql = f'SELECT count(1) AS `node`,' \
               f'SUM(`mem_size`) AS `memory`, ' \
               f'SUM(`disk_size`) AS `disk`, ' \
-              f'SUM(`cpu_num`) AS `cpu` ' \
+              f'convert(SUM(`cpu_num`), signed) AS `cpu` ' \
               f'from {self.node_table} where `status`=1'
-
         return self.handler.select(sql)
+
