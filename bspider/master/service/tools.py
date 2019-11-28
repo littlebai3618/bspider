@@ -80,7 +80,7 @@ class ToolsService(BaseService, AgentMixIn):
         return GetSuccess(data=self.impl.get_node_detail()[0])
 
     def get_exec_project(self):
-        return GetSuccess(data=self.impl.get_node_detail())
+        return GetSuccess(data=self.impl.get_exec_project())
 
 
 

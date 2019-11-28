@@ -62,11 +62,11 @@ def node_detail():
     """返回节点列表"""
     return tools_service.get_node_detail()
 
-@tools.route('/unhealth-project-detail', methods=['GET'])
+@tools.route('/exec-project', methods=['GET'])
 @auth.login_required
-def node_detail():
+def exec_project():
     """返回节点列表"""
-    return tools_service.get_node_detail()
+    return tools_service.get_exec_project()
 
 
 
