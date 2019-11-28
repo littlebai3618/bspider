@@ -79,8 +79,8 @@ class ToolsService(BaseService, AgentMixIn):
     def get_node_detail(self):
         return GetSuccess(data=self.impl.get_node_detail()[0])
 
-    def get_exec_project(self):
-        return GetSuccess(data=self.impl.get_exec_project())
+    def get_exception_project(self):
+        return GetSuccess(data=self.impl.get_exception_project())
 
 
 

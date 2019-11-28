@@ -62,11 +62,11 @@ def node_detail():
     """返回节点列表"""
     return tools_service.get_node_detail()
 
-@tools.route('/exec-project', methods=['GET'])
+@tools.route('/exception-project', methods=['GET'])
 @auth.login_required
-def exec_project():
+def exception_project():
     """返回节点列表"""
-    return tools_service.get_exec_project()
+    return tools_service.get_exception_project()
 
 
 

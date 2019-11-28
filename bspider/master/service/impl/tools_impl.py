@@ -73,7 +73,7 @@ class ToolsImpl(BaseImpl):
               f'from {self.node_table} where `status`=1'
         return self.handler.select(sql)
 
-    def get_exec_project(self):
+    def get_exception_project(self):
         sql = f'select `id`, `name`, `editor`, `rate`, `status` from {self.project_table} where `status` = -1'
         return self.handler.select(sql)
 
