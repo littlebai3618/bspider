@@ -82,6 +82,9 @@ class ToolsService(BaseService, AgentMixIn):
     def get_exception_project(self):
         return GetSuccess(data=self.impl.get_exception_project())
 
+    def get_code_type_detail(self):
+        return GetSuccess(data=self.impl.get_code_type_detail())
+
 
 
     def get_request_track(self, url=None, sign=None):
