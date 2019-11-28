@@ -11,12 +11,6 @@ from bspider.master import log
 class ProjectImpl(BaseImpl):
 
     def __init__(self):
-        super().__init__()
-        self.project_table = self.frame_settings['PROJECT_TABLE']
-        self.code_table = self.frame_settings['CODE_STORE_TABLE']
-        self.cron_table = self.frame_settings['CRON_JOB_STORE_TABLE']
-        self.node_table = self.frame_settings['NODE_TABLE']
-        self.p2c_table = self.frame_settings['P2C_TABLE']
         self.__mq_handler = RabbitMQHandler(self.frame_settings['RABBITMQ_CONFIG'])
 
     def get_project(self, project_id):

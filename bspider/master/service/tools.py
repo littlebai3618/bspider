@@ -79,6 +79,9 @@ class ToolsService(BaseService, AgentMixIn):
     def get_node_detail(self):
         return GetSuccess(data=self.impl.get_node_detail()[0])
 
+    def get_exec_project(self):
+        return GetSuccess(data=self.impl.get_node_detail())
+
 
 
     def get_request_track(self, url=None, sign=None):

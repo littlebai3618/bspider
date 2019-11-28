@@ -8,13 +8,6 @@ from bspider.master import log
 
 class ToolsImpl(BaseImpl):
 
-    def __init__(self):
-        super().__init__()
-        self.node_table = self.frame_settings['NODE_TABLE']
-        self.code_table = self.frame_settings['CODE_STORE_TABLE']
-        self.downloader_status_table  = self.frame_settings['DOWNLOADER_STATUS_TABLE']
-        self.parser_status_table = self.frame_settings['PARSER_STATUS_TABLE']
-
     def get_node_list(self):
         sql = f"select `id`, `name`, `ip` from `{self.node_table}`;"
         return self.handler.select(sql)
@@ -78,5 +71,9 @@ class ToolsImpl(BaseImpl):
               f'SUM(`disk_size`) AS `disk`, ' \
               f'convert(SUM(`cpu_num`), signed) AS `cpu` ' \
               f'from {self.node_table} where `status`=1'
+        return self.handler.select(sql)
+
+    def get_exec_project(self):
+        sql = f'select `id`, `name`, `editor`, `rate`, `status` from {self.project_table} where `status` = -1'
         return self.handler.select(sql)
 

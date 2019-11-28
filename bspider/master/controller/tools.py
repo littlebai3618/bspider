@@ -17,13 +17,13 @@ tools = Blueprint('tools_bp', __name__)
 tools_service = ToolsService()
 
 
-@tools.route('/nodelist', methods=['GET'])
+@tools.route('/node-list', methods=['GET'])
 @auth.login_required
 def node_list():
     """返回节点列表"""
     return tools_service.get_node_list()
 
-@tools.route('/codelist', methods=['GET'])
+@tools.route('/code-list', methods=['GET'])
 @auth.login_required
 def code_list():
     """返回节点列表"""
@@ -57,6 +57,12 @@ def crawl_detail():
     return tools_service.get_crawl_detail(**form.to_dict())
 
 @tools.route('/node-detail', methods=['GET'])
+@auth.login_required
+def node_detail():
+    """返回节点列表"""
+    return tools_service.get_node_detail()
+
+@tools.route('/unhealth-project-detail', methods=['GET'])
 @auth.login_required
 def node_detail():
     """返回节点列表"""

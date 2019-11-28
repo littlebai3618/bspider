@@ -9,15 +9,6 @@ from bspider.utils.database.mysql import prepare_insert_sql
 
 class NodeImpl(BaseImpl):
 
-    def __init__(self):
-        super().__init__()
-        self.node_table = self.frame_settings['NODE_TABLE']
-        self.worker_table = self.frame_settings['WORKER_TABLE']
-        self.node_status_table = self.frame_settings['NODE_STATUS_TABLE']
-        self.project_table = self.frame_settings['PROJECT_TABLE']
-        self.code_table = self.frame_settings['CODE_STORE_TABLE']
-        self.p2c = self.frame_settings['P2C_TABLE']
-
     def get_all_projects(self):
         sql = f'select `id` as `project_id`, `name`, `status`, `r_config` as `config`, `rate` ' \
               f'from {self.project_table} where `type`= "spider"'
@@ -55,7 +46,7 @@ class NodeImpl(BaseImpl):
             return sql,
         return self.handler.delete(sql)
 
-    def delete_worker_by_ip(self, node_ip , get_sql=False):
+    def delete_worker_by_ip(self, node_ip, get_sql=False):
         sql = f"delete from {self.worker_table} where `ip` = '{node_ip}';"
         log.debug(f'SQL:{sql}')
         if get_sql:
