@@ -67,23 +67,34 @@ class ChartService(BaseService):
             'animationDuration': 2800,
             'animationEasing': 'cubicInOut'
         },
-        {
-            'name': legend[1],
-            'smooth': True,
-            'type': 'line',
-            'itemStyle': {
-                'normal': {
-                    'color': '#3888fa',
-                    'lineStyle': {
+            {
+                'name': legend[1],
+                'smooth': True,
+                'type': 'line',
+                'itemStyle': {
+                    'normal': {
                         'color': '#3888fa',
-                        'width': 2
-                    },
-                    'areaStyle': {
-                        'color': '#f3f8ff'
+                        'lineStyle': {
+                            'color': '#3888fa',
+                            'width': 2
+                        },
+                        'areaStyle': {
+                            'color': '#f3f8ff'
+                        }
                     }
-                }
-            },
-            'data': total,
-            'animationDuration': 2800,
-            'animationEasing': 'quadraticOut'
-        }]
+                },
+                'data': total,
+                'animationDuration': 2800,
+                'animationEasing': 'quadraticOut'
+            }]
+
+    def get_code_type_detail(self):
+        infos = self.impl.get_code_type_detail()
+        legend = list()
+        for info in infos:
+            legend.append(info['name'])
+
+        return GetSuccess(data={
+            'data': infos,
+            'legend': legend
+        })

@@ -82,16 +82,6 @@ class ToolsService(BaseService, AgentMixIn):
     def get_exception_project(self):
         return GetSuccess(data=self.impl.get_exception_project())
 
-    def get_code_type_detail(self):
-        infos = self.impl.get_code_type_detail()
-        legend = list()
-        for info in infos:
-            legend.append(info['name'])
-
-        return GetSuccess(data={
-            'data': infos,
-            'legend': legend
-        })
 
 
 

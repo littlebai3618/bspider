@@ -74,9 +74,3 @@ def node_detail():
 def exception_project():
     """返回节点列表"""
     return tools_service.get_exception_project()
-
-@tools.route('/code-type-detail', methods=['GET'])
-@auth.login_required
-def code_type_detail():
-    """返回节点列表"""
-    return tools_service.get_code_type_detail()

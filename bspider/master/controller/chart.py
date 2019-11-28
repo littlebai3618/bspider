@@ -35,3 +35,9 @@ def parser_pv():
 def parser_pv_by_project(project_id):
     """返回节点列表"""
     return chart_service.parser_pv(project_id)
+
+@chart.route('/code-type-detail', methods=['GET'])
+@auth.login_required
+def code_type_detail():
+    """返回节点列表"""
+    return chart_service.get_code_type_detail()

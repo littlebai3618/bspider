@@ -77,7 +77,3 @@ class ToolsImpl(BaseImpl):
         sql = f'select `id`, `name`, `editor`, `rate`, `status` from {self.project_table} where `status` = -1'
         return self.handler.select(sql)
 
-    def get_code_type_detail(self):
-        sql = f'select count(1) as `value`, `type` as `name` from {self.code_table} GROUP BY `type`'
-        return self.handler.select(sql)
-

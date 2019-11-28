@@ -39,3 +39,7 @@ class ChartImpl(BaseImpl):
                   f"FROM {self.parser_status_table} " \
                   f"GROUP BY `time` ORDER BY `time`;"
         return self.handler.select(sql)
+
+    def get_code_type_detail(self):
+        sql = f'select count(1) as `value`, `type` as `name` from {self.code_table} GROUP BY `type`'
+        return self.handler.select(sql)
