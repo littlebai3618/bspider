@@ -71,3 +71,11 @@ class ToolsImpl(BaseImpl):
             log.info('url:{} -> sign:{}'.format(url, info[0]['sign']))
             return info[0]['sign']
         log.info(f'can\'t find url:{url} sign')
+
+    def get_node_detail(self):
+        sql = f'SELECT count(1) AS `node`,' \
+              f'SUM(`mem_size`) AS `memory`, ' \
+              f'SUM(`disk_size`) AS `disk`, ' \
+              f'SUM(`cpu_num`) AS `cpu` ' \
+              f'from {self.node_table} where `status`=1'
+        return self.handler.select(sql)

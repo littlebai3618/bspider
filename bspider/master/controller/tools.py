@@ -56,5 +56,11 @@ def crawl_detail():
     form = GetCrawlDetailForm()
     return tools_service.get_crawl_detail(**form.to_dict())
 
+@tools.route('/node-detail', methods=['GET'])
+@auth.login_required
+def node_detail():
+    """返回节点列表"""
+    return tools_service.get_node_detail()
+
 
 

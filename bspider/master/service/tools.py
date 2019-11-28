@@ -76,6 +76,10 @@ class ToolsService(BaseService, AgentMixIn):
             return GetSuccess(data=info)
         return NotFound(errno=60002, msg=f'NotFound tag:{data}')
 
+    def get_node_detail(self):
+        return GetSuccess(data=self.impl.get_node_detail()[0])
+
+
 
     def get_request_track(self, url=None, sign=None):
         if url:
