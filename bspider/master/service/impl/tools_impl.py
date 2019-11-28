@@ -78,4 +78,8 @@ class ToolsImpl(BaseImpl):
               f'SUM(`disk_size`) AS `disk`, ' \
               f'SUM(`cpu_num`) AS `cpu` ' \
               f'from {self.node_table} where `status`=1'
-        return self.handler.select(sql)
+
+        log.debug(sql)
+        infos = self.handler.select(sql)
+        log.debug(infos)
+        return infos
