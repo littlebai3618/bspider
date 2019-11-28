@@ -2,6 +2,8 @@
 # @Author  : 白尚林
 # @File    : tools_impl
 # @Use     :
+from decimal import Decimal
+
 from bspider.core.api import BaseImpl
 from bspider.master import log
 
@@ -79,7 +81,4 @@ class ToolsImpl(BaseImpl):
               f'SUM(`cpu_num`) AS `cpu` ' \
               f'from {self.node_table} where `status`=1'
 
-        log.debug(sql)
-        infos = self.handler.select(sql)
-        log.debug(infos)
-        return infos
+        return self.handler.select(sql)
