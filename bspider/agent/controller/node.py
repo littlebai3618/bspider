@@ -13,8 +13,8 @@ node = Blueprint('node_bp', __name__)
 node_service = NodeService()
 
 @node.route('/node', methods=['GET'])
-@auth.login_required
 def status():
+    """node-status 路由无需保护"""
     return node_service.node_status()
 
 @node.route('/worker', methods=['POST'])
