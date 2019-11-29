@@ -136,9 +136,9 @@ class AgentMixIn(RemoteMixIn):
     def op_delete_code(self, ip_list: list, code_id: int, token: str = None) -> (bool, dict):
         return self.__op_query(ip_list, 'DELETE', f'/code/{code_id}', token=token)
 
-    def op_get_node_status(self, ip: int, token: str = None):
+    def op_get_node_status(self, ip: int):
         url = self.base_url.format(ip, f'/node')
-        req = self.request(url, method='GET', token=token)
+        req = self.request(url, method='GET', token='operation-token')
         data = req.json()
         if data['errno'] == 0:
             return data['data']
