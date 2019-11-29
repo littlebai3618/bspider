@@ -60,6 +60,17 @@ def change_dict_key(cur_key, replace_key, d: dict) -> dict:
     return d
 
 
+def make_fields_values(data: dict) -> tuple:
+    """
+    给定字典，返回fields 和 values
+    :param info: dict
+    :return:
+    """
+    fields = ','.join([' `%s`=%%s ' % (key) for key in data.keys()])
+    values = [data[key] for key in data.keys()]
+    return fields, tuple(values)
+
+
 def find_class_name_by_content(content):
     reg = re.compile('class (?P<class_name>.*?)\((?P<sub_class_name>.*?)\):').search(content)
     if reg:

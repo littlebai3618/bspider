@@ -4,6 +4,7 @@
 # @Use     :
 from bspider.utils.database.mysql import MysqlHandler
 from bspider.config import FrameSettings
+from bspider.utils.tools import make_fields_values
 
 
 class BaseImpl(object):
@@ -30,9 +31,7 @@ class BaseImpl(object):
         :param info: dict
         :return:
         """
-        fields = ','.join([' `%s`=%%s ' % (key) for key in data.keys()])
-        values = [data[key] for key in data.keys()]
-        return fields, tuple(values)
+        return make_fields_values(data)
 
     @staticmethod
     def make_search(search: str) -> str:
