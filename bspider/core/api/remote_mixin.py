@@ -41,19 +41,19 @@ class AgentMixIn(RemoteMixIn):
     base_url = 'http://{}:' + str(FrameSettings()['AGENT'].get('port', 5001)) + '{}'
     rpc_url = 'http://{username}:{password}@%s:{port}/RPC2'.format(**FrameSettings()['SUPERVISOR_RPC'])
 
-    def op_stop_node(self, ip) -> bool:
+    def op_stop_node(self, ip: str) -> bool:
         with xmlrpc.client.ServerProxy(self.rpc_url % ip) as rpc_server:
             if rpc_server.supervisor.stopProcess('agent:agent'):
                 return True
         return False
 
-    def op_start_node(self, ip) -> bool:
+    def op_start_node(self, ip: str) -> bool:
         with xmlrpc.client.ServerProxy(self.rpc_url % ip) as rpc_server:
             if rpc_server.supervisor.startProcess('agent:agent'):
                 return True
         return False
 
-    def op_get_node(self, ip) -> dict:
+    def op_get_node(self, ip: str) -> dict:
         result = {
             'description': f'Agent {ip} process is not exist!!!',
             'pid': 0,
@@ -75,70 +75,70 @@ class AgentMixIn(RemoteMixIn):
                 return result
         return result
 
-    def op_stop_worker(self, ip: str, worker_id: int) -> bool:
+    def op_stop_worker(self, ip: str, worker_id: int, token: str = None) -> bool:
         url = self.base_url.format(ip, f'/worker/{worker_id}')
-        req = self.request(url, method='DELETE')
+        req = self.request(url, method='DELETE', token=token)
         if req.status_code == 204:
             return True
         raise RemoteOPError('stop work error {}', req.json()['msg'])
 
-    def op_start_worker(self, ip: str, worker_id: int, worker_type: str, coroutine_num: int) -> dict:
+    def op_start_worker(self, ip: str, worker_id: int, worker_type: str, coroutine_num: int, token: str = None) -> dict:
         url = self.base_url.format(ip, '/worker')
         data = {
             'worker_id': worker_id,
             'worker_type': worker_type,
             'coroutine_num': coroutine_num
         }
-        req = self.request(url, method='POST', data=data)
+        req = self.request(url, method='POST', data=data, token=token)
         data = req.json()
         if data['errno'] == 0:
             return data['data']
 
-    def op_get_worker(self, ip: str, worker_id: int) -> dict:
+    def op_get_worker(self, ip: str, worker_id: int, token: str = None) -> dict:
         url = self.base_url.format(ip, f'/worker/{worker_id}')
-        req = self.request(url, method='GET')
+        req = self.request(url, method='GET', token=token)
         data = req.json()
         if data['errno'] == 0:
             return data['data']
         raise RemoteOPError('get worker error {}', data['msg'])
 
-    def __op_query(self, ip_list: list, method: str, uri: str, data: dict = None) -> (bool, dict):
+    def __op_query(self, ip_list: list, method: str, uri: str, data: dict = None, token: str = None) -> (bool, dict):
         result = dict()
         if method == 'DELETE':
             for ip in ip_list:
-                req = self.request(self.base_url.format(ip, uri), method=method, data=data)
+                req = self.request(self.base_url.format(ip, uri), method=method, data=data, token=token)
                 if not (req.status_code >= 200 and req.status_code <= 299):
                     result[ip] = req.json()['msg']
         else:
             for ip in ip_list:
-                data = self.request(self.base_url.format(ip, uri), method=method, data=data).json()
+                data = self.request(self.base_url.format(ip, uri), method=method, data=data, token=token).json()
                 if data['errno'] != 0:
                     result[ip] = data['msg']
         return not len(result), result
 
-    def op_add_project(self, ip_list: list, data: dict) -> (bool, dict):
+    def op_add_project(self, ip_list: list, data: dict, token: str = None) -> (bool, dict):
         # project_id, name, config, rate, status
-        return self.__op_query(ip_list, 'POST', '/project', data)
+        return self.__op_query(ip_list, 'POST', '/project', data, token=token)
 
-    def op_update_project(self, ip_list: list, project_id: int, data: dict) -> (bool, dict):
-        return self.__op_query(ip_list, 'PATCH', f'/project/{project_id}', data)
+    def op_update_project(self, ip_list: list, project_id: int, data: dict, token: str = None) -> (bool, dict):
+        return self.__op_query(ip_list, 'PATCH', f'/project/{project_id}', data, token=token)
 
-    def op_delete_project(self, ip_list: list, project_id: int) -> (bool, dict):
-        return self.__op_query(ip_list, 'DELETE', f'/project/{project_id}')
+    def op_delete_project(self, ip_list: list, project_id: int, token: str = None) -> (bool, dict):
+        return self.__op_query(ip_list, 'DELETE', f'/project/{project_id}', token=token)
 
-    def op_add_code(self, ip_list: list, data: dict) -> (bool, dict):
+    def op_add_code(self, ip_list: list, data: dict, token: str = None) -> (bool, dict):
         # code_id, content
-        return self.__op_query(ip_list, 'POST', '/code', data)
+        return self.__op_query(ip_list, 'POST', '/code', data, token=token)
 
-    def op_update_code(self, ip_list: list, code_id: int, data: dict) -> (bool, dict):
-        return self.__op_query(ip_list, 'PATCH', f'/code/{code_id}', data)
+    def op_update_code(self, ip_list: list, code_id: int, data: dict, token: str = None) -> (bool, dict):
+        return self.__op_query(ip_list, 'PATCH', f'/code/{code_id}', data, token=token)
 
-    def op_delete_code(self, ip_list: list, code_id: int) -> (bool, dict):
-        return self.__op_query(ip_list, 'DELETE', f'/code/{code_id}')
+    def op_delete_code(self, ip_list: list, code_id: int, token: str = None) -> (bool, dict):
+        return self.__op_query(ip_list, 'DELETE', f'/code/{code_id}', token=token)
 
-    def op_get_node_status(self, ip):
+    def op_get_node_status(self, ip: int, token: str = None):
         url = self.base_url.format(ip, f'/node')
-        req = self.request(url, method='GET')
+        req = self.request(url, method='GET', token=token)
         data = req.json()
         if data['errno'] == 0:
             return data['data']
@@ -152,12 +152,12 @@ class MasterMixIn(RemoteMixIn):
 
     base_url = 'http://{ip}:{port}/node'.format(**FrameSettings()['MASTER'])
 
-    def op_add_node(self, data: dict) -> dict:
+    def op_add_node(self, data: dict, token: str = None) -> dict:
         data = self.request(
             self.base_url,
             method='POST',
             data=data,
-            token=make_token(0, 'agent')
+            token=token if token else make_token(0, 'agent')
         ).json()
         if data['errno'] == 0:
             return data['data']

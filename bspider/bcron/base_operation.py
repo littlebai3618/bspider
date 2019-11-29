@@ -3,6 +3,7 @@
 # @File    : base_operation
 # @Use     : 系统运维任务基类
 from bspider.core import ProjectConfigParser
+from bspider.core.api.auth.token import make_token
 from bspider.core.custom_module import BaseCustomModule
 from bspider.utils.exceptions import MethodError
 from bspider.utils.logger import LoggerPool

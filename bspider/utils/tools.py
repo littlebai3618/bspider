@@ -23,6 +23,7 @@ def hump2underline(hunp_str):
     sub = re.sub(p, r'\1_\2', hunp_str).lower()
     return sub
 
+
 def underline2hump(underline_str):
     '''
     下划线形式字符串转成驼峰形式
@@ -30,16 +31,19 @@ def underline2hump(underline_str):
     :return: 驼峰形式字符串
     '''
     # 这里re.sub()函数第二个替换参数用到了一个匿名回调函数，回调函数的参数x为一个匹配对象，返回值为一个处理后的字符串
-    sub = re.sub(r'(_\w)',lambda x:x.group(1)[1].upper(),underline_str)
+    sub = re.sub(r'(_\w)', lambda x: x.group(1)[1].upper(), underline_str)
     return sub
+
 
 def is_ip(ip_str):
     pattern = re.compile(r'((2(5[0-5]|[0-4]\d))|[0-1]?\d{1,2})(\.((2(5[0-5]|[0-4]\d))|[0-1]?\d{1,2})){3}')
     return True if len(pattern.findall(ip_str)) else False
 
+
 def make_sign(project_name, url, salt=''):
     plaintext = '{}{}'.format(url, salt).encode('utf-8')
     return '{}-{}-{}'.format(project_name, hashlib.md5(plaintext).hexdigest(), time.time())
+
 
 def coroutine_result(coroutine, loop=None):
     """a function to get coroutine return"""
@@ -49,10 +53,12 @@ def coroutine_result(coroutine, loop=None):
     loop.run_until_complete(task)
     return task.result()
 
+
 def change_dict_key(cur_key, replace_key, d: dict) -> dict:
     if cur_key in d:
         d[replace_key] = d.pop(cur_key)
     return d
+
 
 def find_class_name_by_content(content):
     reg = re.compile('class (?P<class_name>.*?)\((?P<sub_class_name>.*?)\):').search(content)
@@ -60,4 +66,3 @@ def find_class_name_by_content(content):
         tmp = reg.groupdict()
         return True, tmp['class_name'], tmp['sub_class_name']
     return False, None, None
-
