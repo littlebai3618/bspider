@@ -26,6 +26,16 @@ class DBSession(object):
                              retry_times=retry_times,
                              retry_interval=retry_interval)
 
+    def query(self, sql: str, values: tuple = None, lastrowid: bool = False):
+        """
+        query func
+        :param sql: sql
+        :param values: sql中需要初始化的值
+        :param lastrowid:
+        :return:
+        """
+        return self._query(sql, values=values, lastrowid=lastrowid)
+
     def _query(self, sql: str, values: tuple = None, lastrowid: bool = False):
         if values is None:
             result = self.__cursor.execute(sql)
