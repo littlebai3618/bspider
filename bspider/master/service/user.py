@@ -68,11 +68,11 @@ class UserService(BaseService):
         log.warning(f'user->user_id:{user_id} delete success')
         return DeleteSuccess()
 
-    def update_user(self, user_id, changes):
-        if 'password' in changes:
-            changes['password'] = generate_password_hash(changes['password'])
-        self.impl.update_user(user_id, changes)
-        log.info(f'user->user_id:{user_id}->{changes} update success')
+    def update_user(self, user_id, **kwargs):
+        if 'password' in kwargs:
+            kwargs['password'] = generate_password_hash(kwargs['password'])
+        self.impl.update_user(user_id, kwargs)
+        log.info(f'user->user_id:{user_id}->{kwargs} update success')
         return PatchSuccess(msg='update user success!')
 
     def get_users(self, page, limit, search, sort):
