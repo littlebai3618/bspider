@@ -5,7 +5,7 @@
 """
 1. 获取node ip列表 /tools/nodelist [{name: , ip:}]
 """
-from flask import Blueprint
+from flask import Blueprint, g
 
 from bspider.core.api import auth
 from bspider.master.service.tools import ToolsService
@@ -74,3 +74,8 @@ def node_detail():
 def exception_project():
     """返回节点列表"""
     return tools_service.get_exception_project()
+
+@tools.route('/current_user', methods=['GET'])
+@auth.login_required
+def get_current_user():
+    return tools_service.get_current_user(g.user.user_id)

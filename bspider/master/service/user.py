@@ -30,7 +30,6 @@ class UserService(BaseService):
 
             if check_password_hash(info.pop('password'), password):
                 info['token'] = make_token(info['id'], info['role'])
-                info.pop('identity')
                 log.info(f'user->identity:{identity} login success')
                 return GetSuccess(msg='login success', data=info)
             else:
@@ -96,10 +95,11 @@ class UserService(BaseService):
             })
 
     def get_user(self, user_id):
-        infos = self.impl.get_user_by_id(user_id)
+        infos = self.impl.get_user(user_id)
 
         for info in infos:
             self.datetime_to_str(info)
+            info.pop('password')
 
         if len(infos):
             return GetSuccess(msg='get user success', data=infos[0])

@@ -82,6 +82,16 @@ class ToolsService(BaseService, AgentMixIn):
     def get_exception_project(self):
         return GetSuccess(data=self.impl.get_exception_project())
 
+    def get_current_user(self, user_id):
+        infos = self.impl.get_user_by_id(user_id)
+
+        for info in infos:
+            self.datetime_to_str(info)
+
+        if len(infos):
+            return GetSuccess(msg='get user success', data=infos[0])
+        return NotFound(errno=10006, msg='invalid user')
+
 
 
 

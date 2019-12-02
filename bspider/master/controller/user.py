@@ -56,8 +56,3 @@ def get_users():
 @auth.login_required
 def get_user(user_id):
     return user_service.get_user(user_id)
-
-@user.route('/current_user', methods=['GET'])
-@auth.login_required
-def get_current_user():
-    return user_service.get_user(g.user.user_id)

@@ -77,3 +77,9 @@ class ToolsImpl(BaseImpl):
         sql = f'select `id`, `name`, `editor`, `rate`, `status` from {self.project_table} where `status` = -1'
         return self.handler.select(sql)
 
+    def get_user_by_id(self, id):
+        """暂时先这样，后面增加复杂密码验证"""
+        sql = f'select `id`, `identity`, `username`, `role`, `email`, `phone`, `status`, `create_time`, `update_time`  ' \
+              f'from {self.user_table} where `id`=%s;'
+        return self.handler.select(sql, id)
+
