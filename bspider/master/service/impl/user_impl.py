@@ -8,10 +8,15 @@ from bspider.master import log
 
 class UserImpl(BaseImpl):
 
-    def get_user(self, id):
+    def get_user(self, identity: str):
         sql = f'select `id`, `identity`, `username`, `password`, `role`, `email`, `phone`, `status`, `create_time`, `update_time` ' \
+              f'from {self.user_table} where `identity`=%s;'
+        return self.handler.select(sql, identity)
+
+    def get_user_by_id(self, user_id: int):
+        sql = f'select `id`, `identity`, `username`, `role`, `email`, `phone`, `status`, `create_time`, `update_time` ' \
               f'from {self.user_table} where `id`=%s;'
-        return self.handler.select(sql, id)
+        return self.handler.select(sql, user_id)
 
     def add_user(self, data):
         fields, values = self.make_fv(data)

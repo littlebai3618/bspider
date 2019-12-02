@@ -95,7 +95,7 @@ class UserService(BaseService):
             })
 
     def get_user(self, user_id):
-        infos = self.impl.get_user(user_id)
+        infos = self.impl.get_user_by_id(user_id)
 
         for info in infos:
             self.datetime_to_str(info)
