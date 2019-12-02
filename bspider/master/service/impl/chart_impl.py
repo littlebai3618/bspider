@@ -43,3 +43,13 @@ class ChartImpl(BaseImpl):
     def get_code_type_detail(self):
         sql = f'select count(1) as `value`, `type` as `name` from {self.code_table} GROUP BY `type`'
         return self.handler.select(sql)
+
+    def get_node_pv(self, node_ip: str = None):
+        """获取按小时统计的下载数据"""
+        sql = f"SELECT `create_time`," \
+              f"`memory`," \
+              f"`cpu`, " \
+              f"`disk`, " \
+              f"FROM {self.downloader_status_table} " \
+              f"WHERE `ip`={node_ip} "
+        return self.handler.select(sql)

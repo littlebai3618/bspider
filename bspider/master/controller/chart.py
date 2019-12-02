@@ -39,5 +39,11 @@ def parser_pv_by_project(project_id):
 @chart.route('/code-type-detail', methods=['GET'])
 @auth.login_required
 def code_type_detail():
-    """返回节点列表"""
+    """获取每种code的数量"""
     return chart_service.get_code_type_detail()
+
+@chart.route('/node-detail/<str:node_ip>', methods=['GET'])
+@auth.login_required
+def node_pv(node_ip):
+    """获取节点状态信息"""
+    return chart_service.node_pv(node_ip)

@@ -88,6 +88,55 @@ class ChartService(BaseService):
                 'animationEasing': 'quadraticOut'
             }]
 
+    def get_three_line_chart_series(self, legend, cpu, memory, disk):
+        return [
+            {
+                'name': legend[0],
+                'itemStyle': {
+                    'normal': {
+                        'color': '#5793f3',
+                        'lineStyle': {
+                            'color': '#5793f3',
+                            'width': 2
+                        }
+                    }
+                },
+                'smooth': True,
+                'type': 'line',
+                'data': cpu,
+            },
+            {
+                'name': legend[1],
+                'itemStyle': {
+                    'normal': {
+                        'color': '#d14a61',
+                        'lineStyle': {
+                            'color': '#d14a61',
+                            'width': 2
+                        }
+                    }
+                },
+                'smooth': True,
+                'type': 'line',
+                'data': memory,
+            },
+            {
+                'name': legend[2],
+                'itemStyle': {
+                    'normal': {
+                        'color': '#FF005A',
+                        'lineStyle': {
+                            'color': '#675bba',
+                            'width': 2
+                        }
+                    }
+                },
+                'smooth': True,
+                'type': 'line',
+                'data': disk,
+            }
+        ]
+
     def get_code_type_detail(self):
         infos = self.impl.get_code_type_detail()
         legend = list()
@@ -97,4 +146,25 @@ class ChartService(BaseService):
         return GetSuccess(data={
             'data': infos,
             'legend': legend
+        })
+
+    def node_pv(self, node_ip: str):
+        cpu = list()
+        memory = list()
+        disk = list()
+        legend = ['CPU', 'MEMORY', 'DISK']
+
+        node_metadata = self.impl.get_node_pv(node_ip)
+
+        x_axis = list()
+        for metadata in node_metadata:
+            cpu.append(metadata['cpu'])
+            memory.append(metadata['memory'])
+            disk.append(metadata['disk'])
+            x_axis.append(metadata['create_time'])
+
+        return GetSuccess(data={
+            'xAxis': x_axis,
+            'legend': legend,
+            'series': self.get_three_line_chart_series(legend, cpu, memory, disk)
         })
