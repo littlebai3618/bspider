@@ -51,5 +51,5 @@ class ChartImpl(BaseImpl):
               f"`cpu`, " \
               f"`disk`, " \
               f"FROM {self.node_status_table} " \
-              f"WHERE `ip`={node_ip} "
+              f"WHERE `ip`='{node_ip}' "
         return self.handler.select(sql)
