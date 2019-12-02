@@ -156,6 +156,9 @@ class ChartService(BaseService):
 
         node_metadata = self.impl.get_node_pv(node_ip)
 
+        for info in node_metadata:
+            self.datetime_to_str(info)
+
         x_axis = list()
         for metadata in node_metadata:
             cpu.append(metadata['cpu'])
