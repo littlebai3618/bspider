@@ -49,7 +49,7 @@ class ChartImpl(BaseImpl):
         sql = f"SELECT `create_time`," \
               f"`memory`," \
               f"`cpu`, " \
-              f"`disk`, " \
+              f"`disk` " \
               f"FROM {self.node_status_table} " \
               f"WHERE `ip`='{node_ip}' "
         return self.handler.select(sql)
