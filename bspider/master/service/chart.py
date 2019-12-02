@@ -161,7 +161,7 @@ class ChartService(BaseService):
             cpu.append(metadata['cpu'])
             memory.append(metadata['memory'])
             disk.append(metadata['disk'])
-            x_axis.append(metadata['create_time'])
+            x_axis.append(metadata['time'])
 
         return GetSuccess(data={
             'xAxis': x_axis,

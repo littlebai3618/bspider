@@ -47,11 +47,12 @@ class ChartImpl(BaseImpl):
 
     def get_node_pv(self, node_ip: str = None):
         """获取按小时统计的下载数据"""
-        sql = f"SELECT DATE_FORMAT(`create_time`,'%Y-%m-%d %H:%M:%S') AS `create_time`," \
-              f"`memory`," \
-              f"`cpu`, " \
-              f"`disk` " \
+        sql = f"SELECT DATE_FORMAT(`create_time`,'%Y-%m-%d %H:00:00') AS `time`," \
+              f"avg(`memory`)," \
+              f"avg(`cpu`), " \
+              f"avg(`disk`) " \
               f"FROM {self.node_status_table} " \
-              f"WHERE `ip`='{node_ip}' "
+              f"WHERE `ip`='{node_ip}' " \
+              f"GROUP BY `time` ORDER BY `time`;"
         log.debug(sql)
         return self.handler.select(sql)
