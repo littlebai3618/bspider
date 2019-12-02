@@ -47,7 +47,7 @@ class ChartImpl(BaseImpl):
 
     def get_node_pv(self, node_ip: str = None):
         """获取按小时统计的下载数据"""
-        sql = f"SELECT `create_time`," \
+        sql = f"SELECT DATE_FORMAT(`create_time`,'%Y-%m-%d %H:%M:%S') AS `create_time`," \
               f"`memory`," \
               f"`cpu`, " \
               f"`disk` " \
