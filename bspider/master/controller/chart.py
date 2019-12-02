@@ -42,7 +42,7 @@ def code_type_detail():
     """获取每种code的数量"""
     return chart_service.get_code_type_detail()
 
-@chart.route('/node-detail/<str:node_ip>', methods=['GET'])
+@chart.route('/node-detail/<string:node_ip>', methods=['GET'])
 @auth.login_required
 def node_pv(node_ip):
     """获取节点状态信息"""
