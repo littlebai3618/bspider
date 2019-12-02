@@ -50,6 +50,6 @@ class ChartImpl(BaseImpl):
               f"`memory`," \
               f"`cpu`, " \
               f"`disk`, " \
-              f"FROM {self.downloader_status_table} " \
+              f"FROM {self.node_status_table} " \
               f"WHERE `ip`={node_ip} "
         return self.handler.select(sql)
