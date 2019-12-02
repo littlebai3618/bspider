@@ -94,7 +94,7 @@ class Node(BaseService, AgentMixIn):
                 supervisor_node_info = self.op_get_node(info['ip'])
                 info['description'] = '{}->{}'.format(info.pop('description'), supervisor_node_info.pop('description'))
                 info.update(supervisor_node_info)
-            return GetSuccess(msg='get node:{} status success', data=infos)
+            return GetSuccess(msg='get node:{} status success', data=infos[0])
         log.error(f'this node id={node_id} is not exist')
         return NotFound(msg=f'this node id={node_id} is not exist', errno=20008)
 
