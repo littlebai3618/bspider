@@ -63,7 +63,7 @@ class NodeImpl(BaseImpl):
 
     def get_node(self, node_id):
         sql = f'select `id`, `ip`, `name`, `description`, `cpu_num`, ' \
-              f'`mem_size`, `disk_size`, `status`, `create_time`, `update_time` ' \
+              f'`mem_size`, `disk_size`, `status`, `port`, `create_time`, `update_time` ' \
               f'from {self.node_table} where `id`={node_id}'
         log.debug(f'SQL:{sql}')
         return self.handler.select(sql)
@@ -73,11 +73,11 @@ class NodeImpl(BaseImpl):
         fields = self.make_search(search)
         if len(fields):
             sql = f'select `id`, `ip`, `name`, `description`, `cpu_num`, ' \
-                  f'`mem_size`, `disk_size`, `status`, `create_time`, `update_time` ' \
+                  f'`mem_size`, `disk_size`, `status`, `port`, `create_time`, `update_time` ' \
                   f'from {self.node_table} where {fields} order by `id` {sort} limit {start},{limit};'
         else:
             sql = f'select `id`, `ip`, `name`, `description`, `cpu_num`, ' \
-                  f'`mem_size`, `disk_size`, `status`, `create_time`, `update_time` ' \
+                  f'`mem_size`, `disk_size`, `status`, `port`, `create_time`, `update_time` ' \
                   f'from {self.node_table} order by `id` {sort} limit {start},{limit};'
         log.debug(f'SQL:{sql}')
         return self.handler.select(sql), self.total_num(search, self.node_table)
