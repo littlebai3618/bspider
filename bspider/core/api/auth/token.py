@@ -41,4 +41,4 @@ def verify_token(token):
         return User(data['user_id'], data['role'], token)
     __log.info(
         'user:{}-{} request:{} {} auth failed'.format(data['user_id'], data['role'], request.endpoint, request.method))
-    raise Forbidden(msg='role has no permission!', errno=10004)
+    raise Forbidden(msg='Unauthorized operation', errno=10004)
