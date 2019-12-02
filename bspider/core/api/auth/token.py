@@ -36,7 +36,9 @@ def verify_token(token):
     except SignatureExpired:
         raise AuthFailed(msg='token is expired', errno=10003)
     if e.enforce(data['role'], request.method.upper(), request.blueprint):
-        __log.info('user:{}-{} request:{} pass verify'.format(data['user_id'], data['role'], request.endpoint))
+        __log.info(
+            'user:{}-{} request:{} {} pass verify'.format(data['user_id'], data['role'], request.endpoint, request.method))
         return User(data['user_id'], data['role'], token)
-    __log.info('user:{}-{} request:{} auth failed'.format(data['user_id'], data['role'], request.endpoint))
+    __log.info(
+        'user:{}-{} request:{} {} auth failed'.format(data['user_id'], data['role'], request.endpoint, request.method))
     raise Forbidden(msg='role has no permission!', errno=10004)
