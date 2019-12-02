@@ -10,7 +10,7 @@ class UserImpl(BaseImpl):
 
     def get_user(self, id):
         sql = f'select `id`, `identity`, `username`, `password`, `role`, `email`, `phone`, `status`, `create_time`, `update_time` ' \
-              f'from {self.user_table} where `identity`=%s;'
+              f'from {self.user_table} where `id`=%s;'
         return self.handler.select(sql, id)
 
     def add_user(self, data):
