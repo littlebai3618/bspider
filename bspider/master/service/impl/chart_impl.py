@@ -3,6 +3,7 @@
 # @File    : tools_impl
 # @Use     :
 from bspider.core.api import BaseImpl
+from bspider.master import log
 
 
 class ChartImpl(BaseImpl):
@@ -52,4 +53,5 @@ class ChartImpl(BaseImpl):
               f"`disk` " \
               f"FROM {self.node_status_table} " \
               f"WHERE `ip`='{node_ip}' "
+        log.debug(sql)
         return self.handler.select(sql)
