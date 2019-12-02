@@ -19,6 +19,4 @@ p, work, *, tools_bp
 p, read, GET, chart_bp
 p, read, GET, cron_bp
 p, read, GET, node_bp
-p, read, GET, project_bp
-p, read, GET, rabbitmq_bp
 p, read, GET, tools_bp

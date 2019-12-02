@@ -99,7 +99,6 @@ class UserService(BaseService):
 
         for info in infos:
             self.datetime_to_str(info)
-            info.pop('password')
 
         if len(infos):
             return GetSuccess(msg='get user success', data=infos[0])
