@@ -8,7 +8,9 @@
 import base64
 import json
 import zlib
+from datetime import datetime
 
+import pytz
 from apscheduler.triggers.cron import CronTrigger
 
 from bspider.core.api import BaseService, GetSuccess, NotFound, AgentMixIn
@@ -20,6 +22,7 @@ class ToolsService(BaseService, AgentMixIn):
 
     def __init__(self):
         self.impl = ToolsImpl()
+        self.tz = pytz.timezone(self.frame_settings['TIMEZONE'])
 
     def get_node_list(self):
         """获取节点列表"""
@@ -33,8 +36,16 @@ class ToolsService(BaseService, AgentMixIn):
     def validate(self, valid_type, data):
         if valid_type == 'crontab':
             try:
-                CronTrigger.from_crontab(data)
-                return GetSuccess(msg='validate complete', data={'valid': True})
+                cron = CronTrigger.from_crontab(data)
+                cur_time = None
+                now = datetime.now(self.tz)
+                result = list()
+                for i in range(5):
+                    cur_time = cron.get_next_fire_time(cur_time, now)
+                    now = cur_time
+                    result.append(cur_time.strftime('%Y-%m-%d %H:%M:%S'))
+                cron.get_next_fire_time()
+                return GetSuccess(msg='validate complete', data={'valid': True, 'time': result})
             except Exception:
                 return GetSuccess(msg='validate complete', data={'valid': False})
         return NotFound(msg='unknow validate type', errno=60001)
