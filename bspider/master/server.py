@@ -2,6 +2,7 @@
 # @Author  : 白尚林
 # @File    : server
 # @Use     :
+import os
 import sys
 import traceback
 
@@ -9,6 +10,7 @@ from flask import Flask
 from flask_cors import CORS
 from werkzeug.exceptions import HTTPException
 
+import bspider
 from bspider.config import FrameSettings
 from bspider.core.api import APIException
 from bspider.master import log
@@ -23,7 +25,11 @@ from bspider.master.controller.tools import tools
 
 
 def create_app():
-    app = Flask(__name__)
+    app = Flask(
+        __name__,
+        template_folder=os.path.join(bspider.__path__[0], 'master', 'ui'),
+        static_folder=os.path.join(bspider.__path__[0], 'master', 'ui', 'static')
+    )
     CORS(app)
     frame_settings = FrameSettings()
     app.secret_key = frame_settings['WEB_SECRET_KEY']
