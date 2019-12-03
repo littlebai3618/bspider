@@ -44,7 +44,6 @@ class ToolsService(BaseService, AgentMixIn):
                     cur_time = cron.get_next_fire_time(cur_time, now)
                     now = cur_time
                     result.append(cur_time.strftime('%Y-%m-%d %H:%M:%S'))
-                cron.get_next_fire_time()
                 return GetSuccess(msg='validate complete', data={'valid': True, 'time': result})
             except Exception:
                 return GetSuccess(msg='validate complete', data={'valid': False})
