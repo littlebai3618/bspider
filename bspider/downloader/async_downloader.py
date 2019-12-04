@@ -77,7 +77,7 @@ class AsyncDownloader(object):
             is_req = True
             for mw in self.mws:
                 self.log.debug(f'{mw.__class__.__name__} executing process_request')
-                result = await mw._exec('process_request', request=request)
+                result = await mw._exec('process_request', request)
 
                 if isinstance(result, Request):
                     request = result
@@ -101,7 +101,7 @@ class AsyncDownloader(object):
                 # 执行下载异常中间件
                 for mw in self.mws:
                     self.log.debug(f'{mw.__class__.__name__} executing process_response')
-                    result = await mw._exec('process_exception', request=request, e=e, response=response)
+                    result = await mw._exec('process_exception', request, e, response)
                     if isinstance(result, Response):
                         continue
                     elif result is None:
@@ -109,7 +109,7 @@ class AsyncDownloader(object):
 
             for mw in self.mws:
                 self.log.debug(f'{mw.__class__.__name__} executing process_response')
-                result = await mw._exec('process_response', request=request, response=response)
+                result = await mw._exec('process_response', request, response)
                 if isinstance(result, Response):
                     continue
                 if result is None:
