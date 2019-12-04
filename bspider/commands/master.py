@@ -62,9 +62,9 @@ class Command(BSpiderCommand):
         tplfile = os.path.join(self.templates_dir, 'tools_cfg', 'master_gunicorn.py.tmpl')
         copy2(tplfile, os.path.join(platform_path, 'cache', 'master_gunicorn.py.tmpl'))
         render_templatefile(os.path.join(platform_path, 'cache', 'master_gunicorn.py.tmpl'),
-                            master_port=self.settings['MASTER']['port'],
-                            master_ip=self.settings['MASTER']['ip'],
-                            log_level=self.settings['LOGGER_LEVEL'].lower(),
+                            master_port=self.frame_settings['MASTER']['port'],
+                            master_ip=self.frame_settings['MASTER']['ip'],
+                            log_level=self.frame_settings['LOGGER_LEVEL'].lower(),
                             platform_name=platform_name,
                             platform_path=platform_path)
 
@@ -76,10 +76,10 @@ class Command(BSpiderCommand):
         render_templatefile(config_path,
                             platform_path=platform_path,
                             bin_path=os.path.join(platform_path, 'bin'),
-                            master_ip=self.settings['MASTER']['ip'],
-                            supervisor_rpc_port=self.settings['SUPERVISOR_RPC']['port'],
-                            supervisor_rpc_username=self.settings['SUPERVISOR_RPC']['username'],
-                            supervisor_rpc_password=self.settings['SUPERVISOR_RPC']['password'])
+                            master_ip=self.frame_settings['MASTER']['ip'],
+                            supervisor_rpc_port=self.frame_settings['SUPERVISOR_RPC']['port'],
+                            supervisor_rpc_username=self.frame_settings['SUPERVISOR_RPC']['username'],
+                            supervisor_rpc_password=self.frame_settings['SUPERVISOR_RPC']['password'])
 
         cmd = 'supervisord -c {}'.format(os.path.join(platform_path, 'cache', 'supervisor.conf'))
         print('start supervisor')
