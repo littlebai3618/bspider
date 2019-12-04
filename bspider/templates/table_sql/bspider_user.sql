@@ -4,7 +4,7 @@ CREATE TABLE `bspider_user` (
   `identity` varchar(50) NOT NULL COMMENT '身份ID',
   `username` varchar(50) NOT NULL COMMENT '用户名',
   `password` varchar(100) NOT NULL COMMENT '密码',
-  `role` varchar(20) NOT NULL COMMENT '用户角色 admin, work, rd, anonymous',
+  `role` varchar(20) NOT NULL COMMENT '用户角色 admin, work, read',
   `email` varchar(20) DEFAULT NULL COMMENT 'email',
   `phone` varchar(20) DEFAULT NULL COMMENT 'phone',
   `status` int(2) DEFAULT '1' COMMENT '用户状态',
@@ -13,3 +13,5 @@ CREATE TABLE `bspider_user` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `idx_identity` (`identity`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+INSERT INTO `bspider_user`(`identity`, `username`, `password`, `role`, `status`) VALUES ('admin', 'admin', '${password}', 'admin', 1);

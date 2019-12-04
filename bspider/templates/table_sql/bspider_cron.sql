@@ -21,3 +21,7 @@ CREATE TABLE `bspider_cron` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 SET FOREIGN_KEY_CHECKS = 1;
+
+INSERT INTO `bspider_cron`(`project_id`, `code_id`, `type`, `trigger`, `trigger_type`, `next_run_time`, `func`, `executor`, `status`, `description`) VALUES (0, 4, 'operation', '*/15 * * * *', 'cron', 0, 'bspider.bcron.todo:do', 'thread_pool', 0, '每15分钟检查一次下载任务的健康状况');
+INSERT INTO `bspider_cron`(`project_id`, `code_id`, `type`, `trigger`, `trigger_type`, `next_run_time`, `func`, `executor`, `status`, `description`) VALUES (0, 10, 'operation', '* * * * *', 'cron', 0, 'bspider.bcron.todo:do', 'thread_pool', 0, '工作节点的健康检查，TODO: 改为异步执行');
+INSERT INTO `bspider_cron`(`project_id`, `code_id`, `type`, `trigger`, `trigger_type`, `next_run_time`, `func`, `executor`, `status`, `description`) VALUES (0, 12, 'operation', '3 1 * * *', 'cron', 0, 'bspider.bcron.todo:do', 'thread_pool', 0, '每天凌晨执行一次清理抓取、解析记录');

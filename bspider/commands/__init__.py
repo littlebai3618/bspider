@@ -14,7 +14,7 @@ IGNORE = ignore_patterns('*.pyc', '.svn', '__pycache__')
 
 class BSpiderCommand(object):
     # default settings to be used for this command instead of global defaults
-    default_settings = {}
+    frame_settings = {}
 
     exitcode = 0
 

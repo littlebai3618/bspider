@@ -117,7 +117,7 @@ def execute(argv=None):
     parser.description = cmd.long_desc()
     cmd.add_options(parser)
     opts, args = parser.parse_args(args=argv[1:])
-    cmd.settings = frame_settings
+    cmd.frame_settings = frame_settings
     run_cmd(cmd, parser, args, opts)
     sys.exit(cmd.exitcode)
 
