@@ -51,6 +51,7 @@ class Command(BSpiderCommand):
         master: a web server to manager spiders (by gunicorn and gevent).
         bcorn: a cronjob process to manager cron task.
         scheduler: dispatch all spider project.
+        ** first start master service this cmd will try to create some MySQL table
         """
 
     def init_supervisor(self):
