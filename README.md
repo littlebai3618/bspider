@@ -1,49 +1,80 @@
-# bspider
+======
+Scrapy
+======
 
-#### 介绍 -v 0.1.23 beta
-分布式、高可用的抓取框架
+.. image:: https://img.shields.io/pypi/v/Scrapy.svg
+   :target: https://pypi.python.org/pypi/Scrapy
+   :alt: PyPI Version
 
-#### 软件架构
-参考scrapy、pyspider、k8s设计的一款高可用抓取框架
-依赖如下组件: rabbitmq、mysql、sqlite
+.. image:: https://img.shields.io/badge/python-%3E=3.7-brightgreen.svg
+   :target: https://pypi.python.org/pypi/Scrapy
+   :alt: Supported Python Versions
 
-
-#### 安装教程
-
-1. pip install bspider
-2. 修改config.frame_settings.py 配置
-3. 在projects文件夹下进行开发、调试
-5. bspider master start|stop 启动停止master节点
-6. bspider agent start|stop 启动停止work节点
-7. 登录web ui 启动停止 parser、downloader进程
-
-#### 使用说明
-
-1. bspider startplatform xxx 创建工作台
-2. 本框架可在win/mac/linux 下进行开发
-3. 本框架只可在mac/linux 下进行部署，不支持在win下进行部署
-***
-
-#### 参与贡献
-1. Fork 本仓库
-2. 新建 Feat_xxx 分支
-3. 提交代码
-4. 新建 Pull Request
-
-#### TODO
-* 初次安装自动建表
-* agent.node返回值、逻辑优化。节点状态返回优化 done
-* master.node逻辑优化、mixin方法优化
-* frame_settings supervisor注释优化 done
-* debug队列改为优先队列 done
-* 接口支持表单 done
-* 每个资源增加分页、搜索接口 done
-* User 增加创建时间、修改时间返回、修复total参数显示不正确bug done
-* web全线放弃 使用xx_name 全部使用 xx_id进行通信 done
-* 强化校验 \*Pipeline、\*Task、\*Operation、\*Middleware、\.Extractor
-  1. 取出文档所有类->根据名称校验父类->判断父类合规的数量是否为1->通过校验 done
-  2. 原有预执行检测也放入校验类、返回 (bool, check_report) done
-* 解析器支持迭代器嵌套解析 最高优先级
+.. image:: https://img.shields.io/badge/wheel-yes-brightgreen.svg
+   :target: https://pypi.python.org/pypi/Scrapy
+   :alt: Wheel Status
 
 
+简介
+========
 
+BSpider 是一个纯Python实现的高等级分布式全异步web抓取框架，框架采用多进程 + 
+协程的方式规避 GIL锁带来的不良影响，充分利用多核CPU性能，同时框架设计上尽可能的
+减少框架自身对系统性能的影响，使尽可能多的计算资源用于抓取、解析操作。
+
+前置依赖
+============
+
+* Python 3.7+
+* 框架服务职能部署在 Linux, Mac OSX 系统
+* 可以在 Linux, Windows, Mac OSX 系统进行爬虫开发
+* rabbtmq 3.7+ 并启用 rabbitmq management plugins 提供可访问插件的账号
+* MySQL 5.x+
+
+安装
+=======
+
+快速安装:
+
+    pip install bspider
+
+或从此git仓库自行安装
+
+快速开始
+=============
+启动服务
+1. bspider startplatform ${platform_name} # 初始化工作台
+2. vim ${platform_name}/config/frame_settings.py # 填入配置
+3. bspider master start # 启动master节点 
+========
+
+You can check https://docs.scrapy.org/en/latest/news.html for the release notes.
+
+Community (blog, twitter, mail list, IRC)
+=========================================
+
+See https://scrapy.org/community/ for details.
+
+Contributing
+============
+
+See https://docs.scrapy.org/en/master/contributing.html for details.
+
+Code of Conduct
+---------------
+
+Please note that this project is released with a Contributor Code of Conduct
+(see https://github.com/scrapy/scrapy/blob/master/CODE_OF_CONDUCT.md).
+
+By participating in this project you agree to abide by its terms.
+Please report unacceptable behavior to opensource@scrapinghub.com.
+
+Companies using Scrapy
+======================
+
+See https://scrapy.org/companies/ for a list.
+
+Commercial Support
+==================
+
+See https://scrapy.org/support/ for details.

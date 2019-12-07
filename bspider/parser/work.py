@@ -62,7 +62,7 @@ class ParserManager(BaseManager):
                                 request.sign = make_sign(parser.project_name, request.url, json.dumps(request.data))
                             else:
                                 request.sign = make_sign(parser.project_name, request.url)
-                            await self.broker.set_request(requests.pop(), parser.project_id)
+                            await self.broker.set_request(request, parser.project_id)
                         await self._save_success_result(response, parser.project_name, parser.project_id)
                         self.log.info('project:project_id->{} project_name->{} complete parser: {}'.format(
                             parser.project_id, parser.project_name, response.url))
