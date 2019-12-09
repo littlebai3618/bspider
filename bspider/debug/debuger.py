@@ -37,8 +37,12 @@ class Debuger(object):
     # proority fix rabbitmq 数字越大优先级越高，使用Python优先队列模拟的时候需要进行优先级翻转
 
     def __init__(self):
-        self.log = LoggerPool().get_logger(key=self.project_name, module='debuger',
-                                           project=self.project_name)
+        self.log = LoggerPool().get_logger(
+            key=self.project_name,
+            module='debuger',
+            project=self.project_name,
+            fn='terminal'
+        )
 
         self.settings = ProjectConfigParser(open(abspath('settings.json')).read())
         self.__pipeline = self.settings.pipeline.copy()
