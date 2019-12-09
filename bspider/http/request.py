@@ -28,7 +28,6 @@ class Request(BaseHttp):
                  verify_ssl: bool=False,
                  errback=None):
         """
-
         :param url: 需要请求的链接
         :param method: 请求的方法
         :param callback: Extractor的回调方法
@@ -38,7 +37,7 @@ class Request(BaseHttp):
         :param meta: 元数据，不跟随request发送到服务端
         :param priority: request的优先级
         :param sign: 每个请求的唯一标识，用于debug
-        :param proxy: 请求携带的代理 http://proxy_ip:port
+        :param proxy: {'proxy': http:xxx, 'source': xxxxxx}
         :param allow_redirect: 是否重定向
         :param timeout: 超时时间
         :param verify_ssl: 是否校验证书
