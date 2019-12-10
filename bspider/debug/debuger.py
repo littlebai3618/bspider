@@ -37,11 +37,12 @@ class Debuger(object):
     # proority fix rabbitmq 数字越大优先级越高，使用Python优先队列模拟的时候需要进行优先级翻转
 
     def __init__(self):
+        self.debug_fn = 'terminal'
         self.log = LoggerPool().get_logger(
             key=self.project_name,
             module='debuger',
             project=self.project_name,
-            fn='terminal'
+            fn=self.debug_fn
         )
 
         self.settings = ProjectConfigParser(open(abspath('settings.json')).read())
@@ -101,13 +102,15 @@ class Debuger(object):
                 break
 
             self.log.info(f'start download url:{request.url}')
-            resp = await self.downloader.download(request)
+            response, sign, msg = await self.downloader.download(request)
             self.__cur_download_num += 1
-            if resp is not None:
-                self.log.info(f'start parser url:{resp.url} status:{resp.status}')
-                reqs = await self.parser.parse(resp)
+            if sign:
+                self.log.info(f'start parser url:{response.url} status:{response.status}')
+                reqs = await self.parser.parse(response)
                 for req in reqs:
                     self.put(req)
+            else:
+                self.log.error(msg)
 
             if self.__cur_download_num > self.max_follow_url_num:
                 self.log.info(f'debuger follow url {self.max_follow_url_num} second')
@@ -137,7 +140,7 @@ class Debuger(object):
 
     def parser(self) -> AsyncParser:
         """修复无法debug的bug"""
-        _parser = AsyncParser(self.settings, Sign())
+        _parser = AsyncParser(self.settings, Sign(), log_fn=self.debug_fn)
 
         # 判断调用仓库代码还是本地代码
         for pipeline in self.__pipeline:
@@ -152,7 +155,7 @@ class Debuger(object):
 
     def downloader(self) -> AsyncDownloader:
         # 判断调用仓库代码还是本地代码
-        _downloader = AsyncDownloader(self.settings, Sign())
+        _downloader = AsyncDownloader(self.settings, Sign(), log_fn=self.debug_fn)
 
         # 判断调用仓库代码还是本地代码
         for middleware in self.__middleware:
