@@ -6,7 +6,7 @@ import os
 import sys
 import traceback
 
-from flask import Flask
+from flask import Flask, current_app
 from flask_cors import CORS
 from werkzeug.exceptions import HTTPException
 
@@ -60,5 +60,9 @@ def create_app():
         e_msg = ''.join(traceback.format_exception(tp, msg, tb))
         log.error(e_msg)
         return APIException(msg=str(error))
+
+    @app.route('/favicon.ico', methods=['GET'])
+    def get_fav():
+        return current_app.send_static_file('favicon.ico')
 
     return app
