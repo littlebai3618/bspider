@@ -6,7 +6,7 @@ import os
 import sys
 import traceback
 
-from flask import Flask, current_app
+from flask import Flask, url_for, current_app
 from flask_cors import CORS
 from werkzeug.exceptions import HTTPException
 
@@ -49,6 +49,7 @@ def create_app():
     app.register_blueprint(rabbitmq, url_prefix="/rabbitmq")
     # chart
     app.register_blueprint(chart, url_prefix="/chart")
+
 
     @app.errorhandler(Exception)
     def framework_error(error):
