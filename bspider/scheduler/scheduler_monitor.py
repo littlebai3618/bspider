@@ -8,7 +8,7 @@ import traceback
 
 from bspider.config import FrameSettings
 from bspider.scheduler.async_scheduler import AsyncScheduler
-from bspider.utils.database.mysql import AioMysqlHandler
+from bspider.utils.database.mysql import MysqlHandler
 from bspider.utils.sign import Sign
 
 
@@ -17,21 +17,21 @@ class SchedulerMonitor(object):
     def __init__(self, log, log_fn):
         self.frame_settings = FrameSettings()
         self.project_table = self.frame_settings['PROJECT_TABLE']
-        self.__mysql_handler = AioMysqlHandler.from_settings(self.frame_settings['WEB_STUDIO_DB'])
+        self.__mysql_handler = MysqlHandler.from_settings(self.frame_settings['WEB_STUDIO_DB'])
         self.projects = {}
         self.log = log
         self.log_fn = log_fn
 
-    async def get_projects(self):
+    def get_projects(self):
         sql = f'select `id`, `name`, `rate` from {self.project_table} where `status`=1'
-        return await self.__mysql_handler.select(sql)
+        return self.__mysql_handler.select(sql)
 
     async def sync_config(self):
         while True:
             self.log.info('start sync project!')
             tmp_projects = dict()
             try:
-                infos = await self.get_projects()
+                infos = self.get_projects()
                 self.log.debug(f'read info success: {infos}')
                 for info in infos:
                     project_obj = self.projects.get(info['id'])
