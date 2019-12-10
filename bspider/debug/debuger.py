@@ -102,15 +102,13 @@ class Debuger(object):
                 break
 
             self.log.info(f'start download url:{request.url}')
-            response, sign, msg = await self.downloader.download(request)
+            response, sign, _ = await self.downloader.download(request)
             self.__cur_download_num += 1
             if sign:
                 self.log.info(f'start parser url:{response.url} status:{response.status}')
                 reqs = await self.parser.parse(response)
                 for req in reqs:
                     self.put(req)
-            else:
-                self.log.error(msg)
 
             if self.__cur_download_num > self.max_follow_url_num:
                 self.log.info(f'debuger follow url {self.max_follow_url_num} second')

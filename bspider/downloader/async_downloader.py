@@ -102,9 +102,7 @@ class AsyncDownloader(object):
                 for mw in self.mws:
                     self.log.debug(f'{mw.__class__.__name__} executing process_response')
                     result = await mw._exec('process_exception', request, e, response)
-                    if isinstance(result, Response):
-                        continue
-                    elif result is None:
+                    if result is None:
                         return response, False, e_msg
 
             for mw in self.mws:
@@ -166,7 +164,7 @@ class AsyncDownloader(object):
                     # 是否允许重定向
                     allow_redirects=req.allow_redirect,
                     timeout=temp_timeout,
-                    proxy=None if not isinstance(req.proxy, dict) else req.proxy['proxy'],
+                    proxy=None if not isinstance(req.proxy, dict) else 'http://{}'.format(req.proxy['proxy']),
                     # ssl验证
                     ssl=req.verify_ssl,
             ) as resp:
