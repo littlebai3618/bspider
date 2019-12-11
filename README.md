@@ -1,5 +1,5 @@
 ======
-Scrapy
+BSpider
 ======
 
 .. image:: https://img.shields.io/pypi/v/Scrapy.svg
@@ -26,10 +26,10 @@ BSpider 是一个纯Python实现的高等级分布式全异步web抓取框架，
 ============
 
 * Python 3.7+
-* 框架服务职能部署在 Linux, Mac OSX 系统
-* 可以在 Linux, Windows, Mac OSX 系统进行爬虫开发
-* rabbtmq 3.7+ 并启用 rabbitmq management plugins 提供可访问插件的账号
-* MySQL 5.x+
+* 框架服务只能部署在 Linux, Mac OSX 系统
+* 可以在 Linux, Windows, Mac OSX 系统进行开发
+* rabbtmq >3.7.x 并启用 rabbitmq management plugins 提供可访问插件的账号
+* MySQL >5.x
 
 安装
 =======
@@ -45,36 +45,5 @@ BSpider 是一个纯Python实现的高等级分布式全异步web抓取框架，
 启动服务
 1. bspider startplatform ${platform_name} # 初始化工作台
 2. vim ${platform_name}/config/frame_settings.py # 填入配置
-3. bspider master start # 启动master节点 
-========
-
-You can check https://docs.scrapy.org/en/latest/news.html for the release notes.
-
-Community (blog, twitter, mail list, IRC)
-=========================================
-
-See https://scrapy.org/community/ for details.
-
-Contributing
-============
-
-See https://docs.scrapy.org/en/master/contributing.html for details.
-
-Code of Conduct
----------------
-
-Please note that this project is released with a Contributor Code of Conduct
-(see https://github.com/scrapy/scrapy/blob/master/CODE_OF_CONDUCT.md).
-
-By participating in this project you agree to abide by its terms.
-Please report unacceptable behavior to opensource@scrapinghub.com.
-
-Companies using Scrapy
-======================
-
-See https://scrapy.org/companies/ for a list.
-
-Commercial Support
-==================
-
-See https://scrapy.org/support/ for details.
+3. bspider master start # 启动master节点第一次启动节点会初始化MySQL表
+4. bspider agent start # 根据配置启动工作节点

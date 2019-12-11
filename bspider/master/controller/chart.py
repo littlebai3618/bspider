@@ -15,35 +15,34 @@ chart_service = ChartService()
 @chart.route('/downloader', methods=['GET'])
 @auth.login_required
 def downloader_pv():
-    """返回节点列表"""
     return chart_service.downloader_pv()
+
 
 @chart.route('/downloader/<int:project_id>', methods=['GET'])
 @auth.login_required
 def downloader_pv_by_project(project_id):
-    """返回节点列表"""
     return chart_service.downloader_pv(project_id)
+
 
 @chart.route('/parser', methods=['GET'])
 @auth.login_required
 def parser_pv():
-    """返回节点列表"""
     return chart_service.parser_pv()
+
 
 @chart.route('/parser/<int:project_id>', methods=['GET'])
 @auth.login_required
 def parser_pv_by_project(project_id):
-    """返回节点列表"""
     return chart_service.parser_pv(project_id)
+
 
 @chart.route('/code-type-detail', methods=['GET'])
 @auth.login_required
 def code_type_detail():
-    """获取每种code的数量"""
     return chart_service.get_code_type_detail()
+
 
 @chart.route('/node-detail/<string:node_ip>', methods=['GET'])
 @auth.login_required
 def node_pv(node_ip):
-    """获取节点状态信息"""
     return chart_service.node_pv(node_ip)
