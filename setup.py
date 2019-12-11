@@ -24,7 +24,6 @@ setup(
         'Operating System :: OS Independent',
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: Implementation :: CPython',
-        'Programming Language :: Python :: Implementation :: PyPy',
         'Topic :: Internet :: WWW/HTTP',
         'Topic :: Software Development :: Libraries :: Application Frameworks',
         'Topic :: Software Development :: Libraries :: Python Modules',
@@ -75,7 +74,6 @@ setup(
         'WTForms>=2.2.1',
         'xpinyin>=0.5.6',
         'yarl>=1.3.0',
-
     ],
     extras_require=extras_require,
 )

@@ -1,19 +1,14 @@
-======
-BSpider
-======
-
-.. image:: https://img.shields.io/pypi/v/Scrapy.svg
-   :target: https://pypi.python.org/pypi/Scrapy
-   :alt: PyPI Version
-
-.. image:: https://img.shields.io/badge/python-%3E=3.7-brightgreen.svg
-   :target: https://pypi.python.org/pypi/Scrapy
-   :alt: Supported Python Versions
-
-.. image:: https://img.shields.io/badge/wheel-yes-brightgreen.svg
-   :target: https://pypi.python.org/pypi/Scrapy
-   :alt: Wheel Status
-
+<p align="center">
+  <h1>BSpider</h1>
+</p>
+<p align="center">
+  <a href="https://github.com/python">
+    <img src="https://img.shields.io/badge/Python-3.7.4-brightgreen.svg" alt="Python">
+  </a>
+  <a href="https://github.com/PanJiaChen/vue-admin-template">
+    <img src="https://img.shields.io/badge/vue--admin--template-4.0+-brightgreen.svg" alt="vue-admin-template">
+  </a>
+</p>
 
 简介
 ========
