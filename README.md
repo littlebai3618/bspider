@@ -84,3 +84,5 @@ bspider startspider ${spider_name} # 自动生成模板代码
 > 3. *_middleware.py 下载器中间件。
 > 4. settings.json 当前下载任务的配置
 > 5. *_task.py 定时任务，用于向队列中推送初始url, 相当于scrapy的start_url
+
+`notice: 每个项目只可配置一个extractor， 但可配置多个pipeline 或 middleware` 
