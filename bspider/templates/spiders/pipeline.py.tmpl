@@ -16,7 +16,7 @@ class DemoPipeline(BasePipeline):
         """
         对item进行处理,各个pipeline重写
         可以yield返回也可以return
-        返回类型为自订定义的类型，会传递给后面的pipeline，返回None将会丢弃这个item
+        返回类型为自定义的类型，会传递给后面的pipeline，返回None将会丢弃这个item
         :param item: previous pipeline result
         :return: param to next pipeline
         """
