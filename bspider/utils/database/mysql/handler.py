@@ -30,7 +30,7 @@ class MysqlPoolFactory(object):
             'host': None,
             'port': None,
             'user': None,
-            'passwd': None,
+            'password': None,
             'db': None,
             'charset': self.MYSQL_DEFAULT_CHARSET,
         }
@@ -66,15 +66,15 @@ class MysqlPoolFactory(object):
 class MysqlHandler(object):
     """封装了常用操作的mysql句柄，重试默认3次, 线程安全"""
 
-    def __init__(self, config):
+    def __init__(self, mysql_config):
         self.__pool = MysqlPoolFactory().get_pool(
-                host=config['MYSQL_HOST'],
-                port=int(config['MYSQL_PORT']),
-                user=config['MYSQL_USER'],
-                passwd=config['MYSQL_PASSWD'],
-                db=config['MYSQL_DB'],
-                charset=config['MYSQL_CHARSET'],
-                cursorclass=DictCursor
+            host=mysql_config['host'],
+            port=mysql_config['port'],
+            user=mysql_config['user'],
+            password=mysql_config['password'],
+            db=mysql_config['db'],
+            charset=mysql_config['charset'],
+            cursorclass=DictCursor
         )
 
     @classmethod

@@ -40,11 +40,12 @@ class AioMysqlPoolFactory(object):
             return self.__pools[hashcode]
         else:
             pool = coroutine_result(aiomysql.create_pool(
-                host=mysql_config['MYSQL_HOST'],
-                port=mysql_config['MYSQL_PORT'],
-                user=mysql_config['MYSQL_USER'],
-                password=mysql_config['MYSQL_PASSWD'],
-                db=mysql_config['MYSQL_DB'],
+                host=mysql_config['host'],
+                port=mysql_config['port'],
+                user=mysql_config['user'],
+                password=mysql_config['password'],
+                db=mysql_config['db'],
+                charset=mysql_config['charset'],
                 cursorclass=DictCursor
             ))
             self.__pools[hashcode] = pool

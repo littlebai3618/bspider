@@ -1,41 +1,51 @@
+# 运行模式，本地开发请使用development，服务部署请使用produce
+# development log 输出至终端
+# produce log 输出至文件
 GLOBAL_PATTERN = 'development'
+LOGGER_LEVEL = 'DEBUG'
 
+#################
+# MASTER模块配置 #
+#################
+# 各节点的 AGENT 进程将会通过访问 http://ip:port 和主进程进行通信
+# web studio访问地址：http://ip:port
+# ****************************************************
+# web studio 默认用户: 账号admin，密码admin 请登录后尽快修改
+# ****************************************************
+
+# 时区配置 str
 TIMEZONE = 'Asia/Shanghai'
+
+# JWT Token 生效时间
 WEB_TOKEN_LIVE_TIME = 3600 * 5
 
-#################
-# 节点监控相关配置 #
-#################
-
-#################
-# 定时任务相关配置 #
-#################
+# 定时任务进程启动多少工作线程用以执行定时任务
 CRON_JOB_THREAD_NUM = 20
-# 当前版本弃用
-# CRON_JOB_PROCESS_NUM = 1
+# 多久同步一次定时任务信息，单位s, 数字越小效果越好，数字越大性能消耗越小
 CRON_JOB_REFRESH_TIME = 3
 
 #################
-# 代码加载模块配置 #
+# AGENT  模块配置 #
+#################
+# master节点将通过访问 http://ip:port 和 当前节点agent进行通信
+
+#################
+# RABBITMQ 配置  #
 #################
 
+#################
+# supervisor配置 #
+#################
+SUPERVISOR_RPC_PORT = 9010
+SUPERVISOR_RPC = {
+    'username': 'bspider_node',
+    'password': 'bspider_node',
+    'port': SUPERVISOR_RPC_PORT
+}
 
 #################
 # 消息通知模块配置 #
 #################
-# 重要配置不可为空
-DING = ''
-
-#################
-# 下载器配置 #
-#################
-
-#################
-# 日志模块配置 #
-#################
-LOGGER_EXCHANGE_NAME = 'logger'
-LOGGER_QUEUE_NAME = 'bspider_logger'
-LOGGER_LEVEL = 'DEBUG'
 
 # *** 内置配置
 # 存储抓取任务的表

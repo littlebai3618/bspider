@@ -11,14 +11,15 @@ from bspider.utils.exceptions import UsageError
 from bspider.utils.template import render_templatefile
 
 TEMPLATES_TO_RENDER = (
-    ('__init__.py.tmpl', ),
-    ('extractor.py.tmpl', ),
-    ('middleware.py.tmpl', ),
-    ('pipeline.py.tmpl', ),
-    ('settings.json.tmpl', ),
-    ('debug.py.tmpl', ),
-    ('task.py.tmpl', )
+    ('__init__.py.tmpl',),
+    ('extractor.py.tmpl',),
+    ('middleware.py.tmpl',),
+    ('pipeline.py.tmpl',),
+    ('settings.json.tmpl',),
+    ('debug.py.tmpl',),
+    ('task.py.tmpl',)
 )
+
 
 class Command(BSpiderCommand):
 
@@ -45,7 +46,7 @@ class Command(BSpiderCommand):
             render_templatefile(tplfile, project_name=project_name)
 
         print(f"New spider '{project_name}' init success")
-        print(f"    template directory:\n    '{self.templates_dir}'" )
+        print(f"    template directory:\n    '{self.templates_dir}'")
         print("You can development your spider in:")
         print(f"    cd {project_dir}")
 
