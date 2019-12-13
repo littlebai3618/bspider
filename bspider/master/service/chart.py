@@ -27,7 +27,7 @@ class ChartService(BaseService):
         return GetSuccess(data={
             'xAxis': x_axis,
             'legend': legend,
-            'series': self.get_two_line_chart_series(legend, p_total, p_error)
+            'series': self.get_two_line_chart_series(legend, p_error, p_total)
         })
 
     def downloader_pv(self, project_id: int = None):

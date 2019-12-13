@@ -57,7 +57,6 @@ class DownloaderManager(BaseManager):
                     if e_msg or not sign:
                         self.log.info(
                             f'project:project_id->{downloader.project_id} project_name->{downloader.project_name} fail download: {request}')
-                        self.log.error(e_msg)
                         await self._save_error_result(response, downloader.project_name, downloader.project_id, e_msg)
                     else:
                         # 持久化下载结果
