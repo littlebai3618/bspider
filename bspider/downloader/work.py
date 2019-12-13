@@ -46,7 +46,7 @@ class DownloaderManager(BaseManager):
                             request = Request.loads(json.loads(data))
                             self.log.info(f'success get a new Request: {request}')
                             response, sign, e_msg = await downloader.download(request)
-                        except Exception as e:
+                        except Exception:
                             tp, msg, tb = sys.exc_info()
                             e_msg = ''.join(traceback.format_exception(tp, msg, tb))
                         session.ack(msg_id)

@@ -26,7 +26,8 @@ class Request(BaseHttp):
                  allow_redirect: bool = False,
                  timeout: int = 10,
                  verify_ssl: bool = False,
-                 errback=None):
+                 errback: str = None,
+                 sign: str = None):
         """
         :param url: 需要请求的链接
         :param method: 请求的方法
@@ -41,6 +42,7 @@ class Request(BaseHttp):
         :param timeout: 超时时间
         :param verify_ssl: 是否校验证书
         :param errback: 解析异常时的回调函数
+        :param sign: request唯一标识，用于下载状态回溯
         """
         self.url = self._set_url(url)
         self.headers = self._set_headers(headers)
@@ -55,7 +57,7 @@ class Request(BaseHttp):
         self.verify_ssl = verify_ssl
         self.callback = self._set_callback(callback)
         self.errback = self._set_errback(errback)
-        self.sign = make_sign(self.url, salt='' if data is None else json.dumps(data))
+        self.sign = make_sign(self.url, salt='' if data is None else json.dumps(data)) if sign is None else sign
 
     @classmethod
     def loads(cls, param: dict):
