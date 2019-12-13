@@ -32,9 +32,6 @@ class Command(BSpiderCommand):
             self.exitcode = 1
             return
 
-        if not self._is_valid_name(platform_name):
-            self.exitcode = 1
-            return
         # 停止supervisor
         try:
             with open(os.path.join(platform_path, 'cache', 'supervisord.pid')) as f:
