@@ -12,7 +12,6 @@ from bspider.http import Request
 from bspider.utils.exceptions import MethodError
 from bspider.utils.logger import LoggerPool
 from bspider.utils.rabbitMQ import RabbitMQHandler
-from bspider.utils.tools import make_sign
 
 
 class BaseTask(BaseCustomModule):
@@ -31,12 +30,6 @@ class BaseTask(BaseCustomModule):
 
     def send_request(self, request: Request):
         """发送request 到待下载队列"""
-        # 逐条发送到待队列
-        if request.data:
-            request.sign = make_sign(self.settings.project_id, request.url, json.dumps(request.data))
-        else:
-            request.sign = make_sign(self.settings.project_id, request.url)
-
         # 这里dump方法使用了浅拷贝，会影响一部分性能
         data = json.dumps(request.dumps())
         self.__mq_handler.send_msg(

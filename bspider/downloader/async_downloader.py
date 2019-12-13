@@ -108,14 +108,13 @@ class AsyncDownloader(object):
             for mw in self.mws:
                 self.log.debug(f'{mw.__class__.__name__} executing process_response')
                 result = await mw._exec('process_response', request, response)
-                if isinstance(result, Response):
-                    continue
                 if result is None:
                     break
 
             if response.status == 200 or response.status in self.accept_response_code:
                 return response, True, None
             self.log.info(f'Retry download: url->{request.url} status->{response.status} time:{retry_index}')
+        self.log.info(f'{response.sign}')
         return response, False, None
 
     async def __assemble_response(self, response: ClientResponse, request: Request) -> Response:
@@ -125,12 +124,9 @@ class AsyncDownloader(object):
             url=str(response.url),
             status=response.status,
             headers=dict(response.headers),
-            request=request.dumps(),
+            request=request,
             cookies={i.key: i.value for i in response.cookies.values()},
-            text=text,
-            meta=request.meta,
-            sign=request.sign,
-            method=request.method
+            text=text
         )
 
     async def __do(self, req: Request) -> Response:

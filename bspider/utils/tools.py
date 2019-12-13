@@ -40,9 +40,8 @@ def is_ip(ip_str):
     return True if len(pattern.findall(ip_str)) else False
 
 
-def make_sign(project_name, url, salt=''):
-    plaintext = '{}{}'.format(url, salt).encode('utf-8')
-    return '{}-{}-{}'.format(project_name, hashlib.md5(plaintext).hexdigest(), time.time())
+def make_sign(url, salt=''):
+    return '{}-{}'.format(hashlib.md5(f'{url}{salt}'.encode('utf-8')).hexdigest(), time.time())
 
 
 def coroutine_result(coroutine, loop=None):

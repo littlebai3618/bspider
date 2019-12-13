@@ -9,7 +9,6 @@ import traceback
 
 from bspider.core import BaseManager
 from bspider.http import Response, ERROR_RESPONSE
-from bspider.utils.tools import make_sign
 from bspider.config.default_settings import EXCHANGE_NAME
 
 from .parser_monitor import ParserMonitor
@@ -57,12 +56,7 @@ class ParserManager(BaseManager):
                     else:
                         while len(requests):
                             # 发送request到待下载队列
-                            request = requests.pop()
-                            if request.data:
-                                request.sign = make_sign(parser.project_name, request.url, json.dumps(request.data))
-                            else:
-                                request.sign = make_sign(parser.project_name, request.url)
-                            await self.broker.set_request(request, parser.project_id)
+                            await self.broker.set_request(requests.pop(), parser.project_id)
                         await self._save_success_result(response, parser.project_name, parser.project_id)
                         self.log.info('project:project_id->{} project_name->{} complete parser: {}'.format(
                             parser.project_id, parser.project_name, response.url))

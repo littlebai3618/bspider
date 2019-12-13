@@ -7,6 +7,7 @@
 """
 import json
 
+from bspider.utils.tools import make_sign
 from .base_http import BaseHttp
 
 
@@ -20,12 +21,11 @@ class Request(BaseHttp):
                  data=None,
                  cookies=None,
                  meta=None,
-                 priority: int=3,
+                 priority: int = 3,
                  proxy=None,
-                 sign='',
-                 allow_redirect: bool=False,
-                 timeout: int=10,
-                 verify_ssl: bool=False,
+                 allow_redirect: bool = False,
+                 timeout: int = 10,
+                 verify_ssl: bool = False,
                  errback=None):
         """
         :param url: 需要请求的链接
@@ -36,7 +36,6 @@ class Request(BaseHttp):
         :param cookies: 需要携带的cookie
         :param meta: 元数据，不跟随request发送到服务端
         :param priority: request的优先级
-        :param sign: 每个请求的唯一标识，用于debug
         :param proxy: {'proxy': http:xxx, 'source': xxxxxx}
         :param allow_redirect: 是否重定向
         :param timeout: 超时时间
@@ -47,17 +46,16 @@ class Request(BaseHttp):
         self.headers = self._set_headers(headers)
         self.cookies = self._set_cookies(cookies)
         self.method = self._set_method(method)
-        self.data = data or {}
+        self.data = self._set_data(data)
         self.meta = self._set_meta(meta)
         self.priority = priority
-        self.sign = 'default_sign'
-        self.proxy = proxy # 下载是否需要使用代理
-        self.allow_redirect = allow_redirect # 下载是否需要重定向
+        self.proxy = proxy  # 下载是否需要使用代理
+        self.allow_redirect = allow_redirect  # 下载是否需要重定向
         self.timeout = timeout
         self.verify_ssl = verify_ssl
         self.callback = self._set_callback(callback)
         self.errback = self._set_errback(errback)
-        self.sign = sign
+        self.sign = make_sign(self.url, salt='' if data is None else json.dumps(data))
 
     @classmethod
     def loads(cls, param: dict):
@@ -67,24 +65,6 @@ class Request(BaseHttp):
         return self.__dict__
 
     def __str__(self):
-        return "<Request:%s %s>" % (self.method, self.url)
+        return "<Request:%s %s %s>" % (self.method, self.url, self.sign)
 
     __repr__ = __str__
-
-if __name__ == '__main__':
-    mm = Request.loads({
-            'url': 'zzzz',
-            'headers': {},
-            'cookies': {},
-            'method': 'POST',
-            'data': {},
-            'meta': {},
-            'priority': 2,
-            'sign': 'z',
-            'proxy': 'z', # 下载是否需要使用代理
-            'allow_redirect': False, # 下载是否需要重定向
-            'timeout': 20,
-            'verify_ssl': False
-        })
-
-    print(json.dumps(mm))

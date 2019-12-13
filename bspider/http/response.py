@@ -4,9 +4,7 @@
 # @Use     :
 """
 这里着重参考了scrapy 的response 对象
-相比flanker 的单薄对象新加入callback, errback 两种属性
-
-Response 对象要求实现domps 和 loads 方法来进行 obj <-> 消息之间的转换
+Response 对象要求实现domps 和 loads 方法来完成 obj <-> 消息之间的转换
 """
 import copy
 import json
@@ -26,31 +24,29 @@ class Response(BaseHttp):
     def __init__(self,
                  url,
                  status,
-                 callback='parser',
-                 sign='',
+                 request,
                  headers=None,
                  cookies=None,
-                 text=None,
-                 request=None,
-                 meta=None,
-                 method='GET',
-                 errback=None):
+                 text=None):
         self.url = self._set_url(url)
         self.headers = self._set_headers(headers)
         self.status = status
         self.text = self._set_text(text)
         self.cookies = self._set_cookies(cookies)
-        self.sign = sign
+        self.request = self.__set_request(request)
+        self.callback = self.request.callback
+        self.errback = self.request.errback
+        self.sign = self.request.sign
+        self.meta = self.request.meta
+        self.method = self.request.method
+
+    def __set_request(self, request):
         if isinstance(request, dict):
-            self.request = Request.loads(request)
-            self.callback = self.request.callback
-            self.errback = self.request.errback
+            return Request.loads(request)
+        elif isinstance(request, Request):
+            return request
         else:
-            self.request = None
-            self.errback = self._set_errback(errback)
-            self.callback = self._set_callback(callback)
-        self.meta = meta or {}
-        self.method = method
+            raise TypeError("%s request must be dict or bspider.Request object. " % (type(self).__name__))
 
 
     def dumps(self):
@@ -76,31 +72,3 @@ class Response(BaseHttp):
         return "<Response:%s %s %s>" % (self.method, self.status, self.url)
 
     __repr__ = __str__
-
-
-if __name__ == '__main__':
-    mm = Request.loads({
-        'url': 'zzzz',
-        'headers': {},
-        'cookies': {},
-        'method': 'POST',
-        'data': {},
-        'meta': {},
-        'priority': 2,
-        'sign': 'z',
-        'proxy': 'z',  # 下载是否需要使用代理
-        'allow_redirect': False,  # 下载是否需要重定向
-        'timeout': 20,
-        'verify_ssl': False
-    })
-
-    cc = Response.loads({
-        'url': 'zzz',
-        'status': 200,
-        'request': mm
-    })
-    print(cc.request)
-
-    print(cc.dumps())
-
-    print(cc.request)
