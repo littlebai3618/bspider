@@ -80,3 +80,13 @@ class BaseHttp(object):
             return errback
         else:
             raise TypeError('error callback must be callable or str')
+
+    def _set_proxy(self, proxy):
+        if proxy is None:
+            return
+        elif not isinstance(proxy, dict):
+            raise TypeError("%s proxy must be dict or None. " % (type(self).__name__))
+        elif 'proxy' not in proxy:
+            raise KeyError("%s proxy must have key:\'proxy\'. " % (type(self).__name__))
+        else:
+            return proxy

@@ -9,7 +9,6 @@ Response 对象要求实现domps 和 loads 方法来完成 obj <-> 消息之间�
 import copy
 import json
 
-import lxml.etree
 from lxml import etree
 
 from bspider.http import Request

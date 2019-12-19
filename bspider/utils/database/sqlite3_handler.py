@@ -98,8 +98,6 @@ class SqlLite3Handler(object):
             if values is None:
                 result = cursor.execute(sql)
             else:
-                print('======')
-                print(sql, values)
                 result = cursor.execute(sql, values)
 
             if lastrowid:

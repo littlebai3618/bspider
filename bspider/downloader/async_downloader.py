@@ -160,7 +160,7 @@ class AsyncDownloader(object):
                     # 是否允许重定向
                     allow_redirects=req.allow_redirect,
                     timeout=temp_timeout,
-                    proxy=None if not isinstance(req.proxy, dict) else 'http://{}'.format(req.proxy['proxy']),
+                    proxy=None if not isinstance(req.proxy, dict) else req.proxy['proxy'],
                     # ssl验证
                     ssl=req.verify_ssl,
             ) as resp:
