@@ -71,10 +71,11 @@ class AsyncDownloader(object):
         :return:
         """
         response = Response(url=request.url, status=599, request=request)
+        # 异常占位符
+        e_msg = None
         for retry_index in range(self.retry_times):
-
-            # 下载前中间件
             is_req = True
+            # 下载前中间件
             for mw in self.mws:
                 self.log.debug(f'{mw.__class__.__name__} executing process_request')
                 result = await mw._exec('process_request', request)
@@ -115,7 +116,7 @@ class AsyncDownloader(object):
                 return response, True, None
             self.log.info(f'Retry download: url->{request.url} status->{response.status} time:{retry_index}')
         self.log.info(f'{response.sign}')
-        return response, False, None
+        return response, False, e_msg
 
     async def __assemble_response(self, response: ClientResponse, request: Request) -> Response:
         # 这里只处理 str 类型的数据
@@ -160,7 +161,7 @@ class AsyncDownloader(object):
                     # 是否允许重定向
                     allow_redirects=req.allow_redirect,
                     timeout=temp_timeout,
-                    proxy=None if not isinstance(req.proxy, dict) else req.proxy['proxy'],
+                    proxy=None if not isinstance(req.proxy, dict) else req.proxy.get('proxy'),
                     # ssl验证
                     ssl=req.verify_ssl,
             ) as resp:
