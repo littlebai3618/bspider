@@ -1,11 +1,5 @@
-# @Time    : 2019-08-15 16:22
-# @Author  : 白尚林
-# @File    : server
-# @Use     :
 """
-1. 初始化cache
-2. 向master查询该节点的worker信息、根据信息启动worker进程
-3. 向master注册该节点的信息
+生成用于启动agent服务的app对象，是整个agent服务的入口
 """
 import sqlite3
 import sys

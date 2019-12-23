@@ -1,7 +1,3 @@
-# @Time    : 2019/9/27 5:37 下午
-# @Author  : baii
-# @File    : debuger
-# @Use     : 开发时的调试模块，使用优先队列来模拟rabbitMQ
 import asyncio
 import inspect
 import os
@@ -18,7 +14,7 @@ from bspider.http import Request
 from bspider.utils.conf import PLATFORM_NAME_ENV
 from bspider.utils.exceptions import ModuleExistError
 from bspider.utils.importer import walk_modules, import_module_by_code
-from bspider.utils.database.mysql import MysqlHandler
+from bspider.utils.database import MysqlClient
 from bspider.utils.logger import LoggerPool
 from bspider.utils.sign import Sign
 
@@ -50,7 +46,7 @@ class Debuger(object):
         self.settings.middleware.clear()
 
         self.local_project_class = self.__find_local_class()
-        self.mysql_handler = MysqlHandler.from_settings(self.frame_settings.get('WEB_STUDIO_DB'))
+        self.mysql_client = MysqlClient.from_settings(self.frame_settings.get('WEB_STUDIO_DB'))
         self.max_priority = self.frame_settings['QUEUE_ARG'].get('x-max-priority', 5)
         self.priority_queue = [Queue() for _ in range(self.max_priority)]
 
@@ -123,12 +119,12 @@ class Debuger(object):
     def load_remote_module(self, class_name):
         """加载远程代码"""
         sql = "select `content` from `%s` where `name`='%s';"
-        info = self.mysql_handler.select(sql, (self.frame_settings['CODE_STORE_TABLE'], class_name))
+        info = self.mysql_client.select(sql, (self.frame_settings['CODE_STORE_TABLE'], class_name))
         if len(info):
             self.log.debug(f'success find module:{class_name} from remote')
             return import_module_by_code(class_name, info[0]['content'])
         else:
-            raise ModuleExistError(f'module:{class_name} is not exists')
+            raise ModuleExistError('module:%s is not exists' % (class_name))
 
     def parser(self) -> AsyncParser:
         """修复无法debug的bug"""

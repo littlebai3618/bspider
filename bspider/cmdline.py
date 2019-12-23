@@ -1,14 +1,7 @@
-# @Time    : 2019-09-03 17:07
-# @Author  : 白尚林
-# @File    : cmdline
-# @Use     :
 """
-0. 生成项目
-project_name
-   /config
-   /spiders
-1. 辅助生成project 模板
-2. 启动、停止节点进程
+整个command模块都参考了scrapy 的command模块
+https://github.com/scrapy/scrapy/blob/master/scrapy/cmdline.py
+https://github.com/scrapy/scrapy/tree/master/scrapy/commands
 """
 import inspect
 import optparse

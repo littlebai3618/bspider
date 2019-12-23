@@ -1,14 +1,10 @@
-# @Time    : 2019/7/5 6:20 PM
-# @Author  : 白尚林
-# @File    : scheduler_monitor
-# @Use     :
 import asyncio
 import sys
 import traceback
 
 from bspider.config import FrameSettings
 from bspider.scheduler.async_scheduler import AsyncScheduler
-from bspider.utils.database.mysql import MysqlHandler
+from bspider.utils.database import MysqlClient
 from bspider.utils.sign import Sign
 
 
@@ -17,14 +13,14 @@ class SchedulerMonitor(object):
     def __init__(self, log, log_fn):
         self.frame_settings = FrameSettings()
         self.project_table = self.frame_settings['PROJECT_TABLE']
-        self.__mysql_handler = MysqlHandler.from_settings(self.frame_settings['WEB_STUDIO_DB'])
+        self.__mysql_client = MysqlClient.from_settings(self.frame_settings['WEB_STUDIO_DB'])
         self.projects = {}
         self.log = log
         self.log_fn = log_fn
 
     def get_projects(self):
         sql = f'select `id`, `name`, `rate` from {self.project_table} where `status`=1'
-        return self.__mysql_handler.select(sql)
+        return self.__mysql_client.select(sql)
 
     async def sync_config(self):
         while True:

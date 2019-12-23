@@ -1,7 +1,3 @@
-# @Time    : 2019/11/16 3:10 下午
-# @Author  : baii
-# @File    : custom_module
-# @Use     :
 from asyncio import iscoroutinefunction
 
 

@@ -1,7 +1,3 @@
-# @Time    : 2019/7/8 2:36 PM
-# @Author  : 白尚林
-# @File    : downloader_monitor
-# @Use     :
 from bspider.config.default_settings import EXCHANGE_NAME
 from bspider.core import BaseMonitor, ProjectConfigParser
 from bspider.utils.sign import Sign

@@ -1,8 +1,4 @@
-# @Time    : 2019/6/18 3:47 PM
-# @Author  : 白尚林
-# @File    : base_impl
-# @Use     :
-from bspider.utils.database.mysql import MysqlHandler
+from bspider.utils.database import MysqlClient
 from bspider.config import FrameSettings
 from bspider.utils.tools import make_fields_values
 
@@ -22,7 +18,7 @@ class BaseImpl(object):
     worker_table = frame_settings['WORKER_TABLE']
     node_status_table = frame_settings['NODE_STATUS_TABLE']
 
-    handler = MysqlHandler.from_settings(frame_settings['WEB_STUDIO_DB'])
+    mysql_client = MysqlClient.from_settings(frame_settings['WEB_STUDIO_DB'])
 
     @staticmethod
     def make_fv(data: dict) -> tuple:
@@ -53,7 +49,7 @@ class BaseImpl(object):
             sql = f"select count(1) as total from `{table_name}` where {fields}; "
         else:
             sql = f"select count(1) as total from `{table_name}`; "
-        return self.handler.select(sql)[0]['total']
+        return self.mysql_client.select(sql)[0]['total']
 
 # def remove(self, unique_value, unique_key='id'):
 #     sql = f"update {self.table_name} set `status`=%s where `{unique_key}` = '{unique_value}';"

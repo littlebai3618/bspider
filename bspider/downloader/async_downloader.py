@@ -1,7 +1,3 @@
-# @Time    : 2019/7/2 2:27 PM
-# @Author  : 白尚林
-# @File    : base_downloader
-# @Use     :
 """
 下载器基类
 执行中间件方法
@@ -48,7 +44,7 @@ class AsyncDownloader(object):
                     self.mws.append(mw_instance)
                     self.log.info(f'success load: <{self.project_name}:{cls_name}>!')
                 except Exception as e:
-                    raise DownloaderError(f'<{self.project_name}:{cls_name}> middleware init failed: {e}')
+                    raise DownloaderError('<%s:%s> middleware init failed: %s' % (self.project_name, cls_name, e))
 
             else:
                 msg = f'<{self.project_name}:{cls_name}> middleware init failed: middleware is invalid!'

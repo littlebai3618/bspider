@@ -1,7 +1,3 @@
-# @Time    : 2019/11/12 3:49 下午
-# @Author  : baii
-# @File    : removeplatform
-# @Use     : 移除platform
 import os
 from os import remove
 from shutil import rmtree

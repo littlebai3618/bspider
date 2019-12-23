@@ -1,7 +1,3 @@
-# @Time    : 2019/6/12 2:25 PM
-# @Author  : 白尚林
-# @File    : response
-# @Use     :
 """
 这里着重参考了scrapy 的response 对象
 Response 对象要求实现domps 和 loads 方法来完成 obj <-> 消息之间的转换
@@ -16,10 +12,6 @@ from bspider.http.base_http import BaseHttp
 
 
 class Response(BaseHttp):
-    """
-    自建response类型,仿照scrapy的response
-    暂时只是存放一些属性
-    """
     def __init__(self,
                  url,
                  status,

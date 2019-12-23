@@ -1,7 +1,6 @@
-# @Time    : 2019-08-13 16:52
-# @Author  : 白尚林
-# @File    : project
-# @Use     :
+"""
+    封装对cache中project信息的操作为api
+"""
 from flask import Blueprint
 
 from bspider.core.api import auth

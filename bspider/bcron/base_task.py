@@ -11,7 +11,7 @@ from bspider.core.custom_module import BaseCustomModule
 from bspider.http import Request
 from bspider.utils.exceptions import MethodError
 from bspider.utils.logger import LoggerPool
-from bspider.utils.rabbitMQ import RabbitMQHandler
+from bspider.utils.rabbitMQ import RabbitMQClient
 
 
 class BaseTask(BaseCustomModule):
@@ -21,18 +21,17 @@ class BaseTask(BaseCustomModule):
         self.log = LoggerPool().get_logger(key=f'task_{self.settings.project_id}', fn='bcorn', module='bcorn',
                                            project=self.settings.project_name)
         self.frame_settings = FrameSettings()
-        self.__mq_handler = RabbitMQHandler(self.frame_settings['RABBITMQ_CONFIG'])
+        self.__mq_client = RabbitMQClient(self.frame_settings['RABBITMQ_CONFIG'])
 
     def execute_task(self):
         raise MethodError('you must rebuild execute_task()')
 
     # Public API
-
     def send_request(self, request: Request):
         """发送request 到待下载队列"""
         # 这里dump方法使用了浅拷贝，会影响一部分性能
         data = json.dumps(request.dumps())
-        self.__mq_handler.send_msg(
+        self.__mq_client.send_msg(
             self.frame_settings['EXCHANGE_NAME'][0],
             str(self.settings.project_id),
             data,

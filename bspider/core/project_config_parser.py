@@ -1,7 +1,3 @@
-# @Time    : 2019/10/30 2:27 下午
-# @Author  : baii
-# @File    : project_config_parser
-# @Use     :
 import json
 
 from bspider.utils.exceptions import ProjectConfigError
@@ -13,7 +9,7 @@ class ProjectConfigParser(object):
         try:
             self.__config = json.loads(config)
         except Exception as e:
-            raise ProjectConfigError(f'this config is illegal json str:{e}')
+            raise ProjectConfigError('this config is illegal json str: %s' % (e))
 
         # 设置默认属性
         self.project_name: str = 'default'
@@ -47,22 +43,22 @@ class ProjectConfigParser(object):
 
     def __valid_key_in_dict(self, key: str, key_type: type, data: dict):
         if key not in data:
-            raise ProjectConfigError(f'{key} is not exist')
+            raise ProjectConfigError('%s is not exist' % (key))
 
         if not isinstance(data[key], key_type):
-            raise ProjectConfigError(f'{key} is must be {key_type}')
+            raise ProjectConfigError('%s is must be %s' % (key, key_type))
 
         return data[key]
 
     def __valid_key_in_list(self, name, element_type: type, data: list):
         if not isinstance(data, list):
-            raise ProjectConfigError(f'{name} is must be list')
+            raise ProjectConfigError('%s is must be list' % (name))
 
         for d in data:
             if not isinstance(d, element_type):
-                raise ProjectConfigError(f'{name}\' elenent is must be {element_type}')
+                raise ProjectConfigError('\'%s\' elenent is must be %s' % (name, element_type))
 
         if not (len(data) == len(set(data))):
-            raise ProjectConfigError(f'{name} is must be unique')
+            raise ProjectConfigError(f'%s is must be unique' % (name))
 
         return data

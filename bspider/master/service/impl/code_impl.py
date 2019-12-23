@@ -1,7 +1,3 @@
-# @Time    : 2019/6/21 10:49 AM
-# @Author  : 白尚林
-# @File    : code_impl
-# @Use     :
 from bspider.core.api import BaseImpl
 from bspider.master import log
 
@@ -15,13 +11,13 @@ class CodeImpl(BaseImpl):
 
     def get_nodes(self):
         sql = f'select `ip` from {self.node_table} where `status` = 1;'
-        return [info['ip'] for info in self.handler.select(sql)]
+        return [info['ip'] for info in self.mysql_client.select(sql)]
 
     def get_project_by_code_id(self, cid):
         sql = f'SELECT `p2c`.`project_id` AS `id`, `project`.`name` AS `project_name` FROM {self.project_table} AS `project` ' \
               f'LEFT JOIN {self.p2c_table} AS `p2c` ON `project`.`id`=`p2c`.`project_id` ' \
               f'WHERE `p2c`.`customcode_id`={cid};'
-        return self.handler.select(sql)
+        return self.mysql_client.select(sql)
 
     def update_code(self, code_id, data):
         fields, values = self.make_fv(data)
@@ -43,7 +39,7 @@ class CodeImpl(BaseImpl):
               f'FROM {self.table_name} AS `code` ' \
               f'LEFT JOIN bspider_project_customcode AS `p2c` ON `code`.`id` = `p2c`.`customcode_id` ' \
               f'WHERE `p2c`.`project_id` = {project_id};'
-        return self.handler.select(sql)
+        return self.mysql_client.select(sql)
 
     def get_code(self, code_id):
         sql = f'SELECT `project`.`name` AS `project_name`,`project`.`id` AS `project_id`,' \
@@ -53,13 +49,13 @@ class CodeImpl(BaseImpl):
               f'LEFT JOIN bspider_project_customcode AS `p2c` ON `code`.`id`=`p2c`.`customcode_id` ' \
               f'LEFT JOIN bspider_project AS `project` ON `project`.`id`=`p2c`.`project_id` ' \
               f'WHERE `code`.`id`={code_id}'
-        return self.handler.select(sql)
+        return self.mysql_client.select(sql)
 
     def get_code_by_type(self, code_type):
         sql = f'select `id`, `name`, `description`, `type`, `editor`, `content` ' \
               f'from {self.code_table} ' \
               f'where `type` = "{code_type}";'
-        return self.handler.select(sql)
+        return self.mysql_client.select(sql)
 
     def get_codes(self, page, limit, search, sort):
         start = (page - 1) * limit
@@ -71,4 +67,4 @@ class CodeImpl(BaseImpl):
             sql = f'select `id`, `name`, `description`, `type`, `editor`, `create_time`, `update_time` ' \
                   f'from {self.code_table} order by `id` {sort} limit {start},{limit};'
         log.debug(f'SQL:{sql}')
-        return self.handler.select(sql), self.total_num(search, self.code_table)
+        return self.mysql_client.select(sql), self.total_num(search, self.code_table)

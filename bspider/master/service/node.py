@@ -1,7 +1,3 @@
-# @Time    : 2019/7/1 11:09 AM
-# @Author  : 白尚林
-# @File    : node
-# @Use     :
 from bspider.core.api import BaseService, Conflict, NotFound, PostSuccess, DeleteSuccess, PatchSuccess, GetSuccess, \
     ParameterException
 from bspider.core.api import AgentMixIn

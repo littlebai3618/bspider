@@ -1,7 +1,3 @@
-# @Time    : 2019/6/21 1:23 PM
-# @Author  : 白尚林
-# @File    : project
-# @Use     :
 from flask import Blueprint
 
 from bspider.core.api import auth

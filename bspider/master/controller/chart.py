@@ -1,7 +1,3 @@
-# @Time    : 2019/11/22 7:49 下午
-# @Author  : baii
-# @File    : chart
-# @Use     :
 from flask import Blueprint
 
 from bspider.core.api import auth

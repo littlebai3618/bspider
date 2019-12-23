@@ -1,7 +1,3 @@
-# @Time    : 2019/7/17 3:02 PM
-# @Author  : 白尚林
-# @File    : work
-# @Use     :
 import asyncio
 import json
 import sys

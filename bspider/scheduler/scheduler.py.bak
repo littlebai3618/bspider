@@ -1,7 +1,3 @@
-# @Time    : 2019-08-06 14:54
-# @Author  : 白尚林
-# @File    : scheduler
-# @Use     :
 import datetime
 import json
 

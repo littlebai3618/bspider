@@ -1,7 +1,3 @@
-# @Time    : 2019/9/20 10:59 上午
-# @Author  : baii
-# @File    : agent
-# @Use     : agent 终端命令
 """
 ** 检查是否有supervisor.pid文件确认supervisor是否启动，启动则调用rpc接口启动进程 否则：初始化supervisor.conf 启动进程
 1. web service
@@ -67,7 +63,7 @@ class Command(BSpiderCommand):
         self.init_supervisor()
         op = args[0]
         if op not in ('start', 'stop'):
-            raise UsageError(f'unknow op: {op}')
+            raise UsageError('unknow op: %s' % (op))
         rpc_socket = os.path.join(os.environ[PLATFORM_PATH_ENV], 'cache', 'supervisor.conf')
         cmd = f'supervisorctl -c {rpc_socket} {op} agent'
         print(cmd)

@@ -1,7 +1,3 @@
-# @Time    : 2019/10/30 7:17 下午
-# @Author  : baii
-# @File    : sign
-# @Use     : 标志位，标志下载器解析器等对象是否需要更新
 import hashlib
 import json
 

@@ -1,10 +1,3 @@
-# @Time    : 2019/7/12 11:25 AM
-# @Author  : 白尚林
-# @File    : tools
-# @Use     :
-"""
-1. 获取node ip列表 /tools/nodelist [{name: , ip:}]
-"""
 from flask import Blueprint, g
 
 from bspider.core.api import auth

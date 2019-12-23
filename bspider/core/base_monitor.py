@@ -1,14 +1,10 @@
-# @Time    : 2019/7/5 5:54 PM
-# @Author  : 白尚林
-# @File    : base_monitor
-# @Use     :
 import asyncio
 import random
 import sys
 import traceback
 
 from bspider.config.default_settings import EXCHANGE_NAME
-from bspider.utils.rabbitMQ import AioRabbitMQHandler
+from bspider.utils.rabbitMQ import AioRabbitMQClient
 from bspider.utils.sign import Sign
 from bspider.utils.tools import find_class_name_by_content
 
@@ -19,11 +15,11 @@ from .project_config_parser import ProjectConfigParser
 class BaseMonitor(object):
     exchange = ''
 
-    def __init__(self, log, log_fn, mq_handler: AioRabbitMQHandler):
+    def __init__(self, log, log_fn, mq_client: AioRabbitMQClient):
         self.log = log
         self.__cache = AgentCache()
         self.log.info(f'init cache success! {self.__cache}')
-        self.__mq_handler = mq_handler
+        self.mq_client = mq_client
         self.projects = dict()
         self.__weight = None
         self.__total_sum = 0
@@ -54,7 +50,7 @@ class BaseMonitor(object):
 
         while len(projects):
             info = projects.pop()
-            if await self.__mq_handler.get_queue_message_count(queue='{}_{}'.format(self.exchange, info['id'])) != 0:
+            if await self.mq_client.get_queue_message_count(queue='{}_{}'.format(self.exchange, info['id'])) != 0:
                 tmp_weight[info['id']] = info['rate']
                 total_sum += info['rate']
 

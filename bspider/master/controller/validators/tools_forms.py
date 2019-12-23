@@ -1,7 +1,3 @@
-# @Time    : 2019-08-01 15:26
-# @Author  : 白尚林
-# @File    : forms
-# @Use     :
 from enum import Enum
 from wtforms import StringField, IntegerField
 

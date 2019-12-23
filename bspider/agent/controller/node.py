@@ -1,7 +1,6 @@
-# @Time    : 2019/7/17 2:23 PM
-# @Author  : 白尚林
-# @File    : node
-# @Use     :
+"""
+    封装查看节点信息操作为api
+"""
 from flask import Blueprint
 
 from bspider.agent.service.node import NodeService

@@ -1,7 +1,3 @@
-# @Time    : 2019-09-04 11:10
-# @Author  : baii
-# @File    : __init__.py
-# @Use     :
 import os
 import re
 from optparse import OptionGroup

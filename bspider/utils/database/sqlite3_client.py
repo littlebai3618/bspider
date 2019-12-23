@@ -1,14 +1,10 @@
-# @Time    : 2019-07-31 11:40
-# @Author  : 白尚林
-# @File    : sqlite3
-# @Use     :
 import sqlite3
 
 from bspider.utils import singleton
 
 
 @singleton
-class SqlLite3Handler(object):
+class SqlLite3Client(object):
 
     def __init__(self, path):
         self.conn = sqlite3.connect(path)

@@ -1,7 +1,3 @@
-# @Time    : 2019/7/18 3:51 PM
-# @Author  : 白尚林
-# @File    : remote_mixin
-# @Use     :
 import json
 import xmlrpc.client
 
@@ -30,7 +26,7 @@ class RemoteMixIn(object):
         try:
             req = requests.request(method, url, headers=headers, data=data, params=params)
         except ConnectionError as e:
-            raise RemoteOPError(f'Call Remote failed please check!, error:{e}')
+            raise RemoteOPError('Call Remote failed please check!, error:%s' % (e))
         return req
 
 
@@ -80,7 +76,7 @@ class AgentMixIn(RemoteMixIn):
         req = self.request(url, method='DELETE', token=token)
         if req.status_code == 204:
             return True
-        raise RemoteOPError('stop work error {}', req.json()['msg'])
+        raise RemoteOPError('stop work error %s' % (req.json()['msg']))
 
     def op_start_worker(self, ip: str, worker_id: int, worker_type: str, coroutine_num: int, token: str = None) -> dict:
         url = self.base_url.format(ip, '/worker')
@@ -100,7 +96,7 @@ class AgentMixIn(RemoteMixIn):
         data = req.json()
         if data['errno'] == 0:
             return data['data']
-        raise RemoteOPError('get worker error {}', data['msg'])
+        raise RemoteOPError('get worker error %s' % (req.json()['msg']))
 
     def __op_query(self, ip_list: list, method: str, uri: str, data: dict = None, token: str = None) -> (bool, dict):
         result = dict()
@@ -142,7 +138,7 @@ class AgentMixIn(RemoteMixIn):
         data = req.json()
         if data['errno'] == 0:
             return data['data']
-        raise RemoteOPError('get worker error {}', data['msg'])
+        raise RemoteOPError('get worker error %s' % (req.json()['msg']))
 
 
 class MasterMixIn(RemoteMixIn):
@@ -162,7 +158,7 @@ class MasterMixIn(RemoteMixIn):
         if data['errno'] == 0:
             return data['data']
 
-        raise RemoteOPError('Call Master Failed to reg node msg {}', data['msg'])
+        raise RemoteOPError('Call Master Failed to reg node msg %s' % (data['msg']))
 
 
 class RabbitMQMixIn(object):
@@ -178,7 +174,7 @@ class RabbitMQMixIn(object):
         try:
             req = requests.request(method, url, headers=headers, data=data, params=params, auth=self.authorization)
         except ConnectionError as e:
-            raise RemoteOPError(f'Call RabbitMQ Management plug-in failed please check!, error:{e}')
+            raise RemoteOPError(f'Call RabbitMQ Management plug-in failed please check!, error:%s' % (e))
         return req
 
     def op_get_project_queue_detail(self, project_id: int):
@@ -187,13 +183,13 @@ class RabbitMQMixIn(object):
         req = self.request(self.base_url % uri, 'GET', params={'name': f'_{project_id}'})
         if req.status_code == 200:
             return req.json()
-        raise RemoteOPError('get queue info Failed {}', req.text)
+        raise RemoteOPError('get queue info Failed %s' % (req.text))
 
     def op_purge_queue_msg(self, project_id: int):
         uri = f'api/queues/bspider/candidate_{project_id}/contents'
         req = self.request(self.base_url % uri, 'DELETE', params={"vhost": self.virtual_host,"name":f"candidate_{project_id}","mode":"purge"})
         if req.status_code == 204:
             return None
-        raise RemoteOPError('purge queue info Failed {}', req.text)
+        raise RemoteOPError('purge queue info Failed %s' % (req.text))
 
 

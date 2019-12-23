@@ -1,7 +1,3 @@
-# @Time    : 2019/7/8 4:31 PM
-# @Author  : 白尚林
-# @File    : base_middleware
-# @Use     :
 from logging import Logger
 
 from bspider.core.custom_module import BaseCustomModule

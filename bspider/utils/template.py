@@ -1,7 +1,3 @@
-# @Time    : 2019/9/23 3:37 下午
-# @Author  : baii
-# @File    : template
-# @Use     : 模板处理相关工具类
 import os
 import string
 

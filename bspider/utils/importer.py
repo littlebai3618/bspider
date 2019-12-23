@@ -1,7 +1,3 @@
-# @Time    : 2018/10/15 上午11:46
-# @Author  : 白尚林
-# @File    : importer
-# @Use     : 负责加载执行mysql中的代码
 """给定str 代码，加载成为对象"""
 import importlib.machinery
 import importlib.util

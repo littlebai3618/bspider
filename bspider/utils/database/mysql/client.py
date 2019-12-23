@@ -1,7 +1,3 @@
-# @Time    : 2019-07-29 11:56
-# @Author  : 白尚林
-# @File    : async_handler
-# @Use     : 
 import hashlib
 
 import time
@@ -63,7 +59,7 @@ class MysqlPoolFactory(object):
             return pool
 
 
-class MysqlHandler(object):
+class MysqlClient(object):
     """封装了常用操作的mysql句柄，重试默认3次, 线程安全"""
 
     def __init__(self, mysql_config):

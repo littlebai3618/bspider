@@ -1,7 +1,3 @@
-# @Time    : 2019/6/18 3:45 PM
-# @Author  : 白尚林
-# @File    : base_service
-# @Use     :
 from datetime import datetime
 
 from bspider.config import FrameSettings

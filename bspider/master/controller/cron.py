@@ -1,7 +1,3 @@
-# @Time    : 2019/6/20 7:22 PM
-# @Auth    : 白尚林
-# @File    : cron
-# @Use     :
 from flask import Blueprint
 
 from bspider.core.api import auth

@@ -1,7 +1,3 @@
-# @Time    : 2019/11/6 4:01 下午
-# @Author  : baii
-# @File    : base_item
-# @Use     : 解析对象
 
 
 class Item(object):

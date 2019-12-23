@@ -1,9 +1,3 @@
-# @Time    : 2019/6/12 5:21 PM
-# @Author  : 白尚林
-# @File    : base_http
-# @Use     :
-
-
 class BaseHttp(object):
 
     def _set_url(self, url):

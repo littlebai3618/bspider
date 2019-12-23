@@ -1,7 +1,3 @@
-# @Time    : 2019/7/9 2:29 PM
-# @Author  : 白尚林
-# @File    : async_parser
-# @Use     :
 """初始化解析器类 加上异步mysql 的处理
    2019-08-29 增加callback 参数处理 - 需要单独抽象出extractor类
    将Request 对象发送到待下载队列

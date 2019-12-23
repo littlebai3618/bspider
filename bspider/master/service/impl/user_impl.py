@@ -1,7 +1,3 @@
-# @Time    : 2019/6/19 2:36 PM
-# @Author  : 白尚林
-# @File    : user_impl
-# @Use     :
 from bspider.core.api import BaseImpl
 from bspider.master import log
 
@@ -11,26 +7,26 @@ class UserImpl(BaseImpl):
     def get_user(self, identity: str):
         sql = f'select `id`, `identity`, `username`, `password`, `role`, `email`, `phone`, `status`, `create_time`, `update_time` ' \
               f'from {self.user_table} where `identity`=%s;'
-        return self.handler.select(sql, identity)
+        return self.mysql_client.select(sql, identity)
 
     def get_user_by_id(self, user_id: int):
         sql = f'select `id`, `identity`, `username`, `role`, `email`, `phone`, `status`, `create_time`, `update_time` ' \
               f'from {self.user_table} where `id`=%s;'
-        return self.handler.select(sql, user_id)
+        return self.mysql_client.select(sql, user_id)
 
     def add_user(self, data):
         fields, values = self.make_fv(data)
         sql = f'insert into {self.user_table} set {fields};'
-        return self.handler.insert(sql, values, lastrowid=True)
+        return self.mysql_client.insert(sql, values, lastrowid=True)
 
     def remove_user(self, user_id):
         sql = f"update {self.user_table} set `status`=-1 where `id` = '{user_id}';"
-        return self.handler.update(sql)
+        return self.mysql_client.update(sql)
 
     def update_user(self, user_id, data):
         fields, values = self.make_fv(data)
         sql = f"update {self.user_table} set {fields} where `id` = '{user_id}';"
-        return self.handler.update(sql, values)
+        return self.mysql_client.update(sql, values)
 
     def get_users(self, page, limit, search, sort):
         start = (page - 1) * limit
@@ -42,4 +38,4 @@ class UserImpl(BaseImpl):
             sql = f'select `id`, `identity`, `username`, `password`, `role`, `email`, `phone`, `status`, `create_time`, `update_time` ' \
                   f'from {self.user_table} order by `id` {sort} limit {start},{limit};'
         log.debug(f'SQL:{sql}')
-        return self.handler.select(sql), self.total_num(search, self.user_table)
+        return self.mysql_client.select(sql), self.total_num(search, self.user_table)

@@ -1,7 +1,3 @@
-# @Time    : 2019/7/17 2:52 PM
-# @Author  : 白尚林
-# @File    : work
-# @Use     :
 import asyncio
 import json
 import traceback
@@ -22,7 +18,7 @@ def run_downloader(unique_sign, coro_num=1):
 
 
 class DownloaderManager(BaseManager):
-    """全aio操作的下载器管理器"""
+    """全异步操作的下载器管理器"""
     manager_type = 'downloader'
     exchange = EXCHANGE_NAME[1]
 

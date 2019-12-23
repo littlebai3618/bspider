@@ -1,7 +1,3 @@
-# @Time    : 2019-08-15 11:19
-# @Author  : 白尚林
-# @File    : cron_job_forms
-# @Use     :
 from wtforms import StringField, IntegerField
 
 from bspider.core.api import BaseForm, ParamRequired

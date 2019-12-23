@@ -1,7 +1,3 @@
-# @Time    : 2019/7/2 3:01 PM
-# @Author  : 白尚林
-# @File    : handler
-# @Use     :
 from functools import wraps
 
 import pika
@@ -11,7 +7,7 @@ from bspider.utils import singleton
 
 
 def retry(func):
-    """重试失败的rpc 操作 最大三次"""
+    """重试失败的操作 最大三次"""
     @wraps(func)
     def _retry(self, *args, **kwargs):
         for i in range(3):
@@ -20,14 +16,13 @@ def retry(func):
             except Exception as e:
                 self.close()
                 self.__init__(self.mq_config)
+
     return _retry
 
 
 @singleton
-class RabbitMQHandler(object):
-    """
-    mq handler 基类
-    """
+class RabbitMQClient(object):
+
     def __init__(self, mq_config):
         self.mq_config = mq_config
         if 'username' in mq_config and 'password' in mq_config:
@@ -112,14 +107,3 @@ class RabbitMQHandler(object):
     def report_unacknowledgment(self, tag):
         if isinstance(tag, int):
             self.channel.basic_nack(delivery_tag=tag)
-
-if __name__ == '__main__':
-    had = RabbitMQHandler({
-        'host': '172.20.32.192',
-        'port': 5672,
-        'username': 'bspider',
-        'password': 'CuPeG809jQd3cmfl',
-        'vhost': 'bspider',
-    })
-    mm = had.pull_new_message('candidate_Test')
-    print()

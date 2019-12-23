@@ -1,10 +1,6 @@
-# @Time    : 2019/7/9 3:51 PM
-# @Author  : 白尚林
-# @File    : base_manager
-# @Use     :
 """
 上报下载结果 -> log
-监听配置变化 -> 磁盘文件
+监听配置变化 -> sqlite
 """
 import asyncio
 import base64
@@ -13,8 +9,8 @@ import json
 import signal
 import zlib
 
-from bspider.http import Request, Response
-from bspider.utils.database.mysql import AioMysqlHandler
+from bspider.http import Response
+from bspider.utils.database import AioMysqlClient
 from bspider.utils.exceptions import MethodError
 from bspider.utils.logger import LoggerPool
 
@@ -55,7 +51,7 @@ class BaseManager(object):
             self.status_table = self.broker.frame_settings['PARSER_STATUS_TABLE']
 
         if self.manager_type != 'scheduler':
-            self.mysql_handler = AioMysqlHandler(self.broker.frame_settings['WEB_STUDIO_DB'])
+            self.mysql_client = AioMysqlClient(self.broker.frame_settings['WEB_STUDIO_DB'])
 
         # 注册信号量保证程序安全退出
         self.sign = signal.signal(signal.SIGTERM, handler=self.close)
@@ -110,7 +106,7 @@ class BaseManager(object):
             data['data'] = None
         fields, values = BaseImpl.make_fv(data)
         sql = f'insert into {self.status_table} set {fields};'.replace('`url_sign`=%s', '`url_sign`=md5(%s)')
-        await self.mysql_handler.insert(sql, values)
+        await self.mysql_client.insert(sql, values)
         self.log.info('send success info [{}]'.format(fields % values))
 
     async def _save_error_result(self,
@@ -136,5 +132,5 @@ class BaseManager(object):
             data['data'] = None
         fields, values = BaseImpl.make_fv(data)
         sql = f'insert into {self.status_table} set {fields};'.replace('`url_sign`=%s', '`url_sign`=md5(%s)')
-        await self.mysql_handler.insert(sql, values)
+        await self.mysql_client.insert(sql, values)
         self.log.info('send error info [{}]'.format(fields % values))

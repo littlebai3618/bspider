@@ -1,7 +1,3 @@
-# @Time    : 2019/10/29 4:01 下午
-# @Author  : baii
-# @File    : validate_code
-# @Use     : 第三方代码检测
 from bspider.utils.tools import find_class_name_by_content
 
 

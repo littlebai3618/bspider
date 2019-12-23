@@ -1,7 +1,3 @@
-# @Time    : 2019/7/11 6:55 PM
-# @Author  : 白尚林
-# @File    : tools_impl
-# @Use     :
 from bspider.core.api import BaseImpl
 from bspider.master import log
 
@@ -23,7 +19,7 @@ class ChartImpl(BaseImpl):
                   f"COUNT(*) AS total " \
                   f"FROM {self.downloader_status_table} " \
                   f"GROUP BY `time` ORDER BY `time`;"
-        return self.handler.select(sql)
+        return self.mysql_client.select(sql)
 
     def get_project_parser_pv(self, project_id: int = None):
         if project_id:
@@ -39,11 +35,11 @@ class ChartImpl(BaseImpl):
                   f"COUNT(*) AS total " \
                   f"FROM {self.parser_status_table} " \
                   f"GROUP BY `time` ORDER BY `time`;"
-        return self.handler.select(sql)
+        return self.mysql_client.select(sql)
 
     def get_code_type_detail(self):
         sql = f'select count(1) as `value`, `type` as `name` from {self.code_table} GROUP BY `type`'
-        return self.handler.select(sql)
+        return self.mysql_client.select(sql)
 
     def get_node_pv(self, node_ip: str = None):
         """获取按小时统计的下载数据"""
@@ -55,4 +51,4 @@ class ChartImpl(BaseImpl):
               f"WHERE `ip`='{node_ip}' " \
               f"GROUP BY `time` ORDER BY `time`;"
         log.debug(sql)
-        return self.handler.select(sql)
+        return self.mysql_client.select(sql)

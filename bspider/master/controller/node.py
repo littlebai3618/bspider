@@ -1,20 +1,16 @@
-# @Time    : 2019/7/1 5:41 PM
-# @Author  : 白尚林
-# @File    : node
-# @Use     : 节点控制层
 """
 所有和 Agent 进行交互的操作收缩到 node 蓝图下
 1. 提供注册接口用于注册新 node
-2. 删除接口删除节点 node /delete => 停止节点下所有work => 删除worker 表中节点对应的所有信息 => 停止Agent进程(supervisor)
-4. 查询接口查询 节点信息 /get =>  返回节点和节点下已经注册的所有worker信息
+2. 删除接口删除节点 node 停止节点下所有work => 删除worker 表中节点对应的所有信息 => 停止Agent进程(supervisor)
+4. 查询接口查询 节点信息 返回节点和节点下已经注册的所有worker信息
 5. 停止节点
 6. 启动节点
 
-5. 在节点下启动并在master注册一个worker /agent/start => 启动进程 => 成功后注册进表单
-6. 在节点下停止一个 worker /agent/stop => 停止进程 status 设置为0
-7. 在节点下重启一个 worker /agent/restart => 停止进程、启动进程
-8. 删除一个 worker /agent/delete => 停止进程并删除注册信息
-9. 查询 worker /agent/get/ => 得到节点下所有 worker 信息
+5. 在节点下启动并在master注册一个worker 启动进程 => 成功后注册进表单
+6. 在节点下停止一个 worker 停止进程 status 设置为0
+7. 在节点下重启一个 worker 停止进程、启动进程
+8. 删除一个 worker 停止进程并删除注册信息
+9. 查询 worker 得到节点下所有 worker 信息
 """
 from flask import Blueprint
 

@@ -1,7 +1,3 @@
-# @Time    : 2019/9/25 11:05 上午
-# @Author  : baii
-# @File    : conf
-# @Use     : 获取配置的工具类
 import os
 import sys
 from configparser import ConfigParser

@@ -1,7 +1,3 @@
-# @Time    : 2019/6/23 11:48 AM
-# @Author  : 白尚林
-# @File    : code
-# @Use     :
 from pymysql import IntegrityError
 
 from bspider.core.api import BaseService, Conflict, NotFound, PostSuccess, PatchSuccess, PartialSuccess, DeleteSuccess, \

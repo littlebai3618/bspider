@@ -11,13 +11,13 @@ import traceback
 
 from bspider.config import FrameSettings
 from bspider.core import ProjectConfigParser
-from bspider.utils.database.mysql import MysqlHandler
+from bspider.utils.database import MysqlClient
 from bspider.utils.logger import LoggerPool
 from bspider.utils.importer import import_module_by_code
 from bspider.utils.notify import ding
 
 __frame_settings = FrameSettings()
-__handler = MysqlHandler.from_settings(__frame_settings['WEB_STUDIO_DB'])
+__mysql_client = MysqlClient.from_settings(__frame_settings['WEB_STUDIO_DB'])
 __log = LoggerPool().get_logger(key='bcorn-todo', fn='bcorn', module='bcorn')
 
 
@@ -67,7 +67,7 @@ def run_spider_project(project_id, code_id, **kwargs):
     PROJECT_TABLE = __frame_settings['PROJECT_TABLE']
     sql = f'select `id`, `name`, `config`, `status` from {PROJECT_TABLE} where `id`="{project_id}"'
 
-    infos = __handler.select(sql)
+    infos = __mysql_client.select(sql)
     __log.debug(f'run spider_project cron_job select sql:{sql}')
 
     if not len(infos):
@@ -104,7 +104,7 @@ def run_operation_project(code_id, **kwargs):
 def run_corn_job_code(code_id, project_id, project_name, config):
     CODE_STORE_TABLE = __frame_settings['CODE_STORE_TABLE']
     sql = f'select `name`, `content` from {CODE_STORE_TABLE} where `id`="{code_id}"'
-    tmp = __handler.select(sql)
+    tmp = __mysql_client.select(sql)
     if not len(tmp):
         return False, f'{code_id} is not exist in remote code store'
     content = tmp[0]['content']

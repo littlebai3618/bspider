@@ -1,7 +1,3 @@
-# @Time    : 2019-08-29 19:50
-# @Author  : 白尚林
-# @File    : base_extractor
-# @Use     :
 """
 extractor 方法 如果传入Response 匹配到callback 那么执行self.callback 否则 抛出异常
 extractor 也是Pipeline中的一种，通过执行Response 中的callback方法返回item
@@ -23,8 +19,8 @@ class BaseExtractor(BasePipeline):
                         yield getattr(self, response.errback)(response, e)
                     raise e
             else:
-                raise ExtractorCallbackError('Cannot find callback {callback} in extractor {name}',
-                                             name=self.__class__.__name__, callback=response.callback)
+                raise ExtractorCallbackError('Cannot find callback %s in extractor %s' %
+                                             (self.__class__.__name__, response.callback))
         yield response
 
     def parser(self, response: Response):

@@ -1,10 +1,6 @@
-# @Time    : 2019/6/18 11:40 AM
-# @Author  : baii
-# @File    : work
-# @Use     :
 """
+整个定时任务模块基于APSchedule 定制化开发而来
 解决 gunicorn + Flask 启动多次实例化APSchedule导致定时任务多次执行的bug
-
 这里采用单独进程处理任务调度
 """
 import sys
@@ -22,7 +18,7 @@ from bspider.bcron import do
 from bspider.bcron.jobstore import MySQLJobStore
 from bspider.bcron.scheduler import MySQLScheduler
 from bspider.utils.logger import LoggerPool
-from bspider.utils.database.mysql import MysqlHandler
+from bspider.utils.database import MysqlClient
 
 def run_bcorn():
     """A factory to make a download process"""
@@ -35,12 +31,12 @@ class BCronManager(object):
     def __init__(self):
         self.frame_settings = FrameSettings()
         self.log = LoggerPool().get_logger(key='bcorn_manager', fn='bcorn', module='bcorn')
-        self.handler = MysqlHandler.from_settings(self.frame_settings['WEB_STUDIO_DB'])
+        self.mysql_client = MysqlClient.from_settings(self.frame_settings['WEB_STUDIO_DB'])
         self.table_name = self.frame_settings['CRON_JOB_STORE_TABLE']
         self.tz = pytz.timezone(self.frame_settings['TIMEZONE'])
         self.interval = self.frame_settings['CRON_JOB_REFRESH_TIME']
 
-        store = MySQLJobStore(self.handler, self.tz, self.log, self.table_name)
+        store = MySQLJobStore(self.mysql_client, self.tz, self.log, self.table_name)
 
         executors = {
             'thread_pool': ThreadPoolExecutor(self.frame_settings['CRON_JOB_THREAD_NUM'])
@@ -66,7 +62,7 @@ class BCronManager(object):
               f'`description`, `next_run_time`, `status` from {self.table_name} ' \
               f'where update_time >= date_sub(now(), interval {self.interval} second)         ' \
               f'and `status` != 0;'
-        infos = self.handler.select(sql)
+        infos = self.mysql_client.select(sql)
 
         for info in infos:
             if info['status'] == 1:

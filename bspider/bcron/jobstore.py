@@ -1,7 +1,3 @@
-# @Time    : 2019/6/15 4:23 PM
-# @Author  : 白尚林
-# @File    : jobstore
-# @Use     :
 import datetime
 from apscheduler.jobstores.base import BaseJobStore, JobLookupError
 from apscheduler.triggers.cron import CronTrigger
@@ -9,25 +5,25 @@ from apscheduler.triggers.cron import CronTrigger
 from apscheduler.util import utc_timestamp_to_datetime, datetime_to_utc_timestamp
 
 from bspider.bcron.job import MySQLJob
-from bspider.utils.database.mysql import MysqlHandler
+from bspider.utils.database import MysqlClient
 
 
 class MySQLJobStore(BaseJobStore):
     """
     Stores jobs in a database table using pymysql.
     if table doesn't exist in the database, you must build it by yourself.
-    :param handler: a pymysql conn obj
+    :param mysql_client: a pymysql conn obj
     :param str tablename: name of the table to store jobs in
     """
 
     TABLE_FIELDS = ('`id`', '`project_id`', '`code_id`', '`trigger`', '`trigger_type`', '`type`',
                     '`next_run_time`', '`executor`', '`func`', '`status`', '`description`')
 
-    def __init__(self, handler: MysqlHandler, tz, log, tablename='bspider_cronjob'):
+    def __init__(self, mysql_client: MysqlClient, tz, log, table_name='bspider_cronjob'):
         super().__init__()
         # 重构获取一个mysql连接池
-        self.handler = handler
-        self.table_name = tablename
+        self.mysql_client = mysql_client
+        self.table_name = table_name
         self.tz = tz
         self.log = log
 
@@ -80,12 +76,12 @@ class MySQLJobStore(BaseJobStore):
     def add_job(self, job: MySQLJob):
         """因为拆分问题，增加job 的操作交给API模块完成"""
         update = f"update {self.table_name} set `status`=%s where `id` = '{job.id}';"
-        self.handler.update(update, (0,))
+        self.mysql_client.update(update, (0,))
         self.log.info(f'sync job:{job.name} success')
 
     def lookup_job(self, job_id):
         sql = f"select * from {self.table_name} where `id` = '{job_id}'"
-        job_state = self.handler.select(sql)
+        job_state = self.mysql_client.select(sql)
         return self._reconstitute_job(job_state[0]) if len(job_state) else None
 
     def get_due_jobs(self, now):
@@ -96,7 +92,7 @@ class MySQLJobStore(BaseJobStore):
         selectable = f'select `next_run_time` from {self.table_name} ' \
             f'where `next_run_time` is not null ' \
             f'order by `next_run_time` limit 1'
-        info = self.handler.select(selectable)
+        info = self.mysql_client.select(selectable)
 
         return utc_timestamp_to_datetime(info[0]['next_run_time']) if len(info) else None
 
@@ -109,7 +105,7 @@ class MySQLJobStore(BaseJobStore):
         fields, values = self.__make_fv(job)
         update = f"update {self.table_name} set {fields} where `id` = '{job.id}';"
         self.log.debug(update % values)
-        result = self.handler.update(update, values)
+        result = self.mysql_client.update(update, values)
         if result == 0:
             self.log.debug(f'job: {job.name} is nothing to change！')
         else:
@@ -117,13 +113,13 @@ class MySQLJobStore(BaseJobStore):
 
     def remove_job(self, job_id):
         delete = f'DELETE FROM {self.table_name} WHERE `id` = {job_id};'
-        result = self.handler.delete(delete)
+        result = self.mysql_client.delete(delete)
         if result == 0:
             raise JobLookupError(job_id)
 
     def remove_all_jobs(self):
         delete = f'DELETE FROM {self.table_name};'
-        self.handler.delete(delete)
+        self.mysql_client.delete(delete)
 
     def shutdown(self):
         self.log.warning('mysql job store shutdown the conn pool!')
@@ -141,7 +137,7 @@ class MySQLJobStore(BaseJobStore):
             selectable = f'select {fields} from {self.table_name} ' \
                 f'order by `next_run_time`;'
 
-        for row in self.handler.select(selectable):
+        for row in self.mysql_client.select(selectable):
             try:
                 jobs.append(self._reconstitute_job(row))
             except BaseException:

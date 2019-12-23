@@ -1,7 +1,3 @@
-# @Time    : 2019-09-05 17:18
-# @Author  : baii
-# @File    : start_spider
-# @Use     :
 import os
 from os.path import join, exists
 

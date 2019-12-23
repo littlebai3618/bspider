@@ -1,7 +1,3 @@
-# @Time    : 2019-07-31 18:40
-# @Author  : 白尚林
-# @File    : work
-# @Use     :
 import asyncio
 
 from bspider.config import FrameSettings

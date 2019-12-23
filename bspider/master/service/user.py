@@ -1,7 +1,3 @@
-# @Time    : 2019/6/19 1:54 PM
-# @Author  : 白尚林
-# @File    : user
-# @Use     :
 from pymysql import IntegrityError
 from werkzeug.security import generate_password_hash, check_password_hash
 

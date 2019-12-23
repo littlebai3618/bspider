@@ -1,22 +1,18 @@
-# @Time    : 2019/6/21 10:32 AM
-# @Author  : 白尚林
-# @File    : project_impl
-# @Use     :
 from bspider.config.default_settings import EXCHANGE_NAME
 from bspider.core.api import BaseImpl
-from bspider.utils.rabbitMQ import RabbitMQHandler
+from bspider.utils.rabbitMQ import RabbitMQClient
 from bspider.master import log
 
 
 class ProjectImpl(BaseImpl):
 
     def __init__(self):
-        self.__mq_handler = RabbitMQHandler(self.frame_settings['RABBITMQ_CONFIG'])
+        self.__mq_client = RabbitMQClient(self.frame_settings['RABBITMQ_CONFIG'])
 
     def get_project(self, project_id):
         sql = f'select `id`, `name`, `status`, `type`, `group`, `description`, `editor`, `rate`, `config`, `create_time`, `update_time` ' \
               f'from {self.project_table} where `id`="{project_id}";'
-        return self.handler.select(sql)
+        return self.mysql_client.select(sql)
 
     def get_projects(self, page, limit, search, sort):
         start = (page - 1) * limit
@@ -28,7 +24,7 @@ class ProjectImpl(BaseImpl):
             sql = f'select `id`, `name`, `status`, `type`, `group`, `description`, `editor`, `rate`, `create_time`, `update_time` ' \
                   f'from {self.project_table} order by `id` {sort} limit {start},{limit};'
         log.debug(f'SQL:{sql}')
-        return self.handler.select(sql), self.total_num(search, self.code_table)
+        return self.mysql_client.select(sql), self.total_num(search, self.code_table)
 
     def add_project(self, data):
         fields, values = self.make_fv(data)
@@ -62,7 +58,7 @@ class ProjectImpl(BaseImpl):
             cl = ', '.join(["'%s'" % code for code in code_names])
             sql = f'select `id`, `name` from {self.code_table} ' \
                   f'where `name` in ({cl}) and `type`="middleware"'
-            return self.handler.select(sql)
+            return self.mysql_client.select(sql)
         return []
 
     def get_pipeline_by_code_name(self, code_names):
@@ -71,7 +67,7 @@ class ProjectImpl(BaseImpl):
             cl = ', '.join(["'%s'" % code for code in code_names])
             sql = f'select `id`, `name` from {self.code_table} ' \
                   f'where `name` in ({cl}) and `type`="pipeline" or `type`="extractor"'
-            return self.handler.select(sql)
+            return self.mysql_client.select(sql)
         return []
 
     def get_job_id_by_project_name(self, code_names):
@@ -79,14 +75,14 @@ class ProjectImpl(BaseImpl):
         cl = ', '.join(["'%s'" % code for code in code_names])
         sql = f'select `id`, `name`, `description`, `type`, `content`, `editor` from {self.code_table} ' \
               f'where `name` in ({cl}) and `type`="crontask"'
-        return self.handler.select(sql)
+        return self.mysql_client.select(sql)
 
     def show_bind_project_code(self, project_id):
         sql = f'SELECT `code`.`name` AS `code_name`,`code`.`type` AS `code_type` ' \
               f'FROM {self.code_table} AS `code` ' \
               f'LEFT JOIN bspider_project_customcode AS `p2c` ON `code`.`id` = `p2c`.`customcode_id` ' \
               f'WHERE `p2c`.`project_id` = {project_id};'
-        return self.handler.select(sql)
+        return self.mysql_client.select(sql)
 
     def delete_project(self, project_id):
         sql = f'delete from {self.project_table} where `id`={project_id};'
@@ -99,16 +95,16 @@ class ProjectImpl(BaseImpl):
         return True
 
     def __bind(self, exchange, queue_name, routing_key):
-        self.__mq_handler.exchange_declare(exchange)
-        self.__mq_handler.queue_declare(queue_name)
-        self.__mq_handler.queue_bind(queue_name, exchange, routing_key)
+        self.__mq_client.exchange_declare(exchange)
+        self.__mq_client.queue_declare(queue_name)
+        self.__mq_client.queue_bind(queue_name, exchange, routing_key)
 
     def unbind_queue(self, project_id):
         for exchange in EXCHANGE_NAME:
-            res = self.__mq_handler.queue_delete(queue=f'{exchange}_{project_id}')
+            res = self.__mq_client.queue_delete(queue=f'{exchange}_{project_id}')
             log.debug(f'delete queue: {exchange}_{project_id} => res:{res}')
         return True
 
     def get_nodes(self):
         sql = f'select `ip` from {self.node_table} where `status` = 1'
-        return [info['ip'] for info in self.handler.select(sql)]
+        return [info['ip'] for info in self.mysql_client.select(sql)]

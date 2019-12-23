@@ -1,7 +1,3 @@
-# @Time    : 2019/6/20 1:28 PM
-# @Author  : 白尚林
-# @File    : __init__.py
-# @Use     :
 from flask import g
 from flask_httpauth import HTTPTokenAuth
 from .token import verify_token

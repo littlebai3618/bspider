@@ -1,7 +1,3 @@
-# @Time    : 2019-09-04 11:15
-# @Author  : baii
-# @File    : start_platform
-# @Use     :
 """
 1. 初始化config文件
 2. 初始化cache文件夹
@@ -20,10 +16,13 @@ from bspider.utils.template import render_templatefile
 
 TEMPLATES_TO_RENDER = (
     ('config', 'frame_settings.py.tmpl'),
+    ('config', '__init__.py.tmpl'),
     ('bin', 'agent_manager.py.tmpl'),
     ('bin', 'bcorn_manager.py.tmpl'),
     ('bin', 'scheduler_manager.py.tmpl'),
-    ('bin', 'master_manager.py.tmpl')
+    ('bin', 'master_manager.py.tmpl'),
+    ('bin', '__init__.py.tmpl'),
+    ('.', '__init__.py.tmpl'),
 )
 
 

@@ -1,8 +1,3 @@
-# @Time    : 2019-08-01 18:26
-# @Author  : 白尚林
-# @File    : resp
-# @Use     :
-
 from .exception import APIException
 
 

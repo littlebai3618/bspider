@@ -1,7 +1,3 @@
-# @Time    : 2019/11/16 11:18 上午
-# @Author  : baii
-# @File    : session
-# @Use     : rabbitmq 异步链接的session会话，用于确保手动ack 使用相同信道返回
 import typing
 from aiormq.types import ConfirmationFrameType, DrainResult
 from pamqp import specification as spec

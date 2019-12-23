@@ -1,12 +1,8 @@
-# @Time    : 2019-08-15 16:24
-# @Author  : 白尚林
-# @File    : server
-# @Use     :
 import os
 import sys
 import traceback
 
-from flask import Flask, url_for, current_app
+from flask import Flask, current_app
 from flask_cors import CORS
 from werkzeug.exceptions import HTTPException
 

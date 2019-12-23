@@ -1,7 +1,9 @@
-# @Time    : 2019-07-25 18:22
-# @Author  : 白尚林
-# @File    : pool
-# @Use     :
+"""
+此处沿用
+    https://github.com/mosquito/aio-pika/blob/master/aio_pika/pool.py 中的代码
+    本项目中 采用 aiormq 作为底层库 而非 aio_pika
+仅仅去掉 log句柄
+"""
 import asyncio
 from typing import Callable, TypeVar, Any
 from typing import AsyncContextManager, Coroutine
@@ -11,7 +13,8 @@ T = TypeVar("T")
 ItemType = Coroutine[Any, None, T]
 ConstructorType = Callable[..., ItemType]
 
-class Pool:
+
+class Pool(object):
     __slots__ = (
         'loop', '__max_size', '__items',
         '__constructor', '__created', '__lock',

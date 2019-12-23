@@ -1,10 +1,3 @@
-# @Time    : 2019/7/19 11:11 AM
-# @Author  : 白尚林
-# @File    : async_handler
-# @Use     :
-"""
-    实现关闭方法
-"""
 import asyncio
 import hashlib
 import time
@@ -12,7 +5,7 @@ import typing
 
 import aiormq
 
-from aiormq.types import ConfirmationFrameType, DrainResult
+from aiormq.types import ConfirmationFrameType
 from pamqp import specification as spec
 
 from bspider.config.default_settings import QUEUE_ARG
@@ -57,7 +50,7 @@ class RabbitMQPoolFactory(object):
             return await connection.channel()
 
 
-class AioRabbitMQHandler(object):
+class AioRabbitMQClient(object):
 
     def __init__(self, config: dict, max_size: int = 3):
         self.__pool = RabbitMQPoolFactory().get_pool(mq_config=config, max_size=max_size)

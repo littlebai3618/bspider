@@ -1,10 +1,3 @@
-# @Time    : 2019/7/11 6:51 PM
-# @Author  : 白尚林
-# @File    : tools
-# @Use     : 工具类
-"""
-1. 获取node ip列表 /tools/nodelist [{name: , ip:}]
-"""
 import base64
 import json
 import zlib

@@ -1,7 +1,3 @@
-# @Time    : 2019/11/5 10:28 下午
-# @Author  : baii
-# @File    : base_operation
-# @Use     : 系统运维任务基类
 from bspider.core import ProjectConfigParser
 from bspider.core.api.auth.token import make_token
 from bspider.core.custom_module import BaseCustomModule

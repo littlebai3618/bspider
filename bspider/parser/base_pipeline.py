@@ -1,7 +1,3 @@
-# @Time    : 2019/7/11 11:46 AM
-# @Author  : 白尚林
-# @File    : base_pipeline
-# @Use     :
 import logging
 
 from bspider.core.custom_module import BaseCustomModule

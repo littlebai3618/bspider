@@ -7,7 +7,7 @@ CREATE TABLE `bspider_user` (
   `role` varchar(20) NOT NULL COMMENT '用户角色 admin, work, read',
   `email` varchar(20) DEFAULT NULL COMMENT 'email',
   `phone` varchar(20) DEFAULT NULL COMMENT 'phone',
-  `status` int(2) DEFAULT '1' COMMENT '用户状态',
+  `status` int(2) DEFAULT 1 COMMENT '用户状态 1 正常 0 关闭',
   `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (`id`),

@@ -1,7 +1,3 @@
-# @Time    : 2019/11/22 7:06 下午
-# @Author  : baii
-# @File    : chart
-# @Use     : 用于生成图表数据
 from bspider.core.api import BaseService, GetSuccess
 from .impl.chart_impl import ChartImpl
 

@@ -1,7 +1,3 @@
-# @Time    : 2019-07-26 11:56
-# @Author  : 白尚林
-# @File    : async_handler
-# @Use     :
 """
 mysql 的异步封装
 """
@@ -52,7 +48,7 @@ class AioMysqlPoolFactory(object):
             return pool
 
 
-class AioMysqlHandler(object):
+class AioMysqlClient(object):
     """封装了常用操作的mysql句柄，重试默认3次"""
 
     def __init__(self, config):

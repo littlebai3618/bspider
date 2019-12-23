@@ -1,7 +1,3 @@
-# @Time    : 2019/11/19 2:11 下午
-# @Author  : baii
-# @File    : rabbitmq
-# @Use     : 队列信息接口
 from flask import Blueprint
 
 from bspider.core.api import auth

@@ -1,11 +1,6 @@
-# @Time    : 2019-08-13 17:35
-# @Author  : 白尚林
-# @File    : project_form
-# @Use     :
-
 from wtforms import IntegerField, StringField
 
-from bspider.core.api import ParameterException, BaseForm, ParamRequired
+from bspider.core.api import BaseForm, ParamRequired
 
 
 class AddForm(BaseForm):

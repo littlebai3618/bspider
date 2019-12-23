@@ -1,7 +1,3 @@
-# @Time    : 2019-08-01 15:01
-# @Author  : 白尚林
-# @File    : api_exception
-# @Use     :
 import json
 
 from flask import request

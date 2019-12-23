@@ -1,7 +1,5 @@
-# @Time    : 2019-07-29 12:43
-# @Author  : 白尚林
-# @File    : session
-# @Use     :
+
+
 class DBSession(object):
 
     def __init__(self, pool, select_func):
@@ -10,7 +8,7 @@ class DBSession(object):
         self.__cursor = self.__conn.cursor()
         self.__select = select_func
 
-    def insert(self, sql: str, values: tuple = None, lastrowid: bool=False) -> int:
+    def insert(self, sql: str, values: tuple = None, lastrowid: bool = False) -> int:
         return self._query(sql, values, lastrowid)
 
     def update(self, sql: str, values: tuple = None) -> int:

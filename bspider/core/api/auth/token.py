@@ -1,7 +1,3 @@
-# @Time    : 2019-08-01 16:32
-# @Author  : 白尚林
-# @File    : token
-# @Use     :
 import os
 from collections import namedtuple
 

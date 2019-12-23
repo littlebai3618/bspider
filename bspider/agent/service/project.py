@@ -1,7 +1,3 @@
-# @Time    : 2019-08-13 16:51
-# @Author  : 白尚林
-# @File    : project
-# @Use     :
 from bspider.agent import log
 from bspider.core.api import BaseService, GetSuccess, PostSuccess, DeleteSuccess, PatchSuccess
 from bspider.core import AgentCache

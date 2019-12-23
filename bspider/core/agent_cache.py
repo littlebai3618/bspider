@@ -6,13 +6,13 @@ import os
 
 from bspider.core.api import BaseImpl
 from bspider.utils.conf import PLATFORM_PATH_ENV
-from bspider.utils.database import SqlLite3Handler
+from bspider.utils.database import SqlLite3Client
 
 
 class AgentCache(object):
 
     def __init__(self):
-        self.handler = SqlLite3Handler(os.path.join(os.environ[PLATFORM_PATH_ENV], 'cache', 'meta.db'))
+        self.sqlite3_client = SqlLite3Client(os.path.join(os.environ[PLATFORM_PATH_ENV], 'cache', 'meta.db'))
         self.project_table = 'project_cache'
         self.project_weight_table = 'project_weight_cache'
         self.code_table = 'code_table'
@@ -49,52 +49,52 @@ class AgentCache(object):
             project_table=self.project_table
         )
         for sql in sqls.split(';'):
-            self.handler.query(sql)
+            self.sqlite3_client.query(sql)
         return True, 'ok'
 
     def get_projects(self):
         sql = f'select `id`, `name`, `config`, `rate`, `timestamp` from {self.project_table} where `status`=1;'
         return [{'id': project_id, 'name': name, 'config': config,
                  'rate': rate, 'timestamp': timestamp} for project_id, name, config, rate, timestamp in
-                self.handler.select(sql)]
+                self.sqlite3_client.select(sql)]
 
     def get_project(self, project_id):
         sql = f'select `id`, `name`, `config`, `rate`, `timestamp`, `status` from project_cache where `id`={project_id};'
         return [{'id': project_id, 'name': name, 'config': config,
                  'rate': rate, 'timestamp': timestamp, 'status': status} for
                 project_id, name, config, rate, timestamp, status in
-                self.handler.select(sql)]
+                self.sqlite3_client.select(sql)]
 
     def set_project(self, project_id: int, name: str, config: str, rate: int, status: int):
         sql = f"insert or replace into {self.project_table} values(?, ?, ?, ?, ?, datetime('now'))"
-        return self.handler.insert(sql, (project_id, name, rate, config, status))
+        return self.sqlite3_client.insert(sql, (project_id, name, rate, config, status))
 
     def delete_project(self, project_id: int):
         sql = f'delete from {self.project_table} where `id`={project_id}'
-        return self.handler.delete(sql)
+        return self.sqlite3_client.delete(sql)
 
     def update_project(self, project_id, data):
         fields, values = BaseImpl.make_fv(data)
         sql = f"update project_cache set {fields} where `id` = {project_id};".replace('%s', '?')
-        return self.handler.update(sql, values)
+        return self.sqlite3_client.update(sql, values)
 
     def get_codes(self):
         sql = f'select `id`, `content` from {self.code_table};'
-        return [{'id': code_id, 'content': content} for code_id, content in self.handler.select(sql)]
+        return [{'id': code_id, 'content': content} for code_id, content in self.sqlite3_client.select(sql)]
 
     def get_code(self, code_id):
         sql = f'select `id`, `content` from {self.code_table} where `id`={code_id};'
-        return [{'id': code_id, 'content': content} for code_id, content in self.handler.select(sql)]
+        return [{'id': code_id, 'content': content} for code_id, content in self.sqlite3_client.select(sql)]
 
     def set_code(self, code_id: int, content: str):
         sql = f"insert or replace into {self.code_table} values(?, ?, datetime('now'))"
-        return self.handler.insert(sql, (code_id, content))
+        return self.sqlite3_client.insert(sql, (code_id, content))
 
     def delete_code(self, code_id: str):
         sql = f'delete from {self.code_table} where `id`={code_id}'
-        return self.handler.delete(sql)
+        return self.sqlite3_client.delete(sql)
 
     def update_code(self, code_id, data):
         fields, values = BaseImpl.make_fv(data)
         sql = f"update {self.code_table} set {fields} where `id` = {code_id};".replace('%s', '?')
-        return self.handler.update(sql, values)
+        return self.sqlite3_client.update(sql, values)

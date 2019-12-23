@@ -1,7 +1,3 @@
-# @Time    : 2019/6/17 1:12 PM
-# @Author  : 白尚林
-# @File    : notify
-# @Use     : 通知方法
 import datetime
 import json
 

@@ -1,7 +1,3 @@
-# @Time    : 2019/7/17 2:23 PM
-# @Author  : 白尚林
-# @File    : node
-# @Use     :
 import multiprocessing
 import time
 

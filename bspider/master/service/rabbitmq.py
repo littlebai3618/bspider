@@ -1,7 +1,3 @@
-# @Time    : 2019/11/19 2:58 下午
-# @Author  : baii
-# @File    : rabbitmq
-# @Use     :
 from bspider.core.api import BaseService, RabbitMQMixIn, GetSuccess, DeleteSuccess
 
 

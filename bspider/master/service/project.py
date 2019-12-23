@@ -1,7 +1,3 @@
-# @Time    : 2019/6/20 8:06 PM
-# @Author  : 白尚林
-# @File    : project
-# @Use     :
 from pymysql import IntegrityError
 
 from bspider.core import ProjectConfigParser

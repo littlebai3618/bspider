@@ -1,10 +1,3 @@
-# @Time    : 2019/6/12 4:23 PM
-# @Author  : 白尚林
-# @File    : request
-# @Use     :
-"""
-集成callback errback 方法的request
-"""
 import json
 
 from bspider.utils.tools import make_sign
@@ -37,7 +30,7 @@ class Request(BaseHttp):
         :param cookies: 需要携带的cookie
         :param meta: 元数据，不跟随request发送到服务端
         :param priority: request的优先级
-        :param proxy: {'proxy': http:xxx, 'source': xxxxxx}
+        :param proxy: {'proxy': http://xxx, 'source': xxxxxx}
         :param allow_redirect: 是否重定向
         :param timeout: 超时时间
         :param verify_ssl: 是否校验证书

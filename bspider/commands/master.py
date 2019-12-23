@@ -1,7 +1,3 @@
-# @Time    : 2019/9/20 10:59 上午
-# @Author  : baii
-# @File    : master
-# @Use     :
 """
 ** 检查是否有supervisor.pid文件确认supervisor是否启动，启动则调用rpc接口启动进程 否则：初始化supervisor.conf 启动进程
 1. web service
@@ -11,6 +7,7 @@
 # 如果MySQL表是空的实例化表和初始数据
 """
 import os
+import re
 import string
 import time
 from shutil import ignore_patterns, copy2
@@ -19,10 +16,30 @@ from werkzeug.security import generate_password_hash
 
 from bspider.commands import BSpiderCommand
 from bspider.utils.conf import PLATFORM_PATH_ENV, PLATFORM_NAME_ENV
+from bspider.utils.database import prepare_insert_sql
 from bspider.utils.exceptions import UsageError
 from bspider.utils.template import render_templatefile
 
 IGNORE = ignore_patterns('*.pyc', '.svn')
+
+def init_custom_code(templates_dir, table):
+    sql = list()
+    desc = re.compile('@([A-Za-z]+)=(.*?)\n')
+
+    for dirpath, _, _ in os.walk(os.path.join(templates_dir, 'inner_module')):
+        with open(dirpath) as f:
+            text = f.read()
+            result_dict = dict(content=f.read())
+            param = desc.findall(text)
+            for k,v in param:
+                result_dict[k] = v
+
+        sql.append(prepare_insert_sql(table, data=result_dict))
+    return sql
+
+
+
+
 
 PLAIN_TABLE = [
     ('bspider_cron', dict()),
@@ -51,8 +68,7 @@ class Command(BSpiderCommand):
         master: a web server to manager spiders (by gunicorn and gevent).
         bcorn: a cronjob process to manager cron task.
         scheduler: dispatch all spider project.
-        ** first start master service this cmd will try to create some MySQL table
-        """
+        ** first start master service this cmd will try to create some MySQL table"""
 
     def init_supervisor(self):
         """查看supervisor是否已经启动"""
@@ -89,12 +105,12 @@ class Command(BSpiderCommand):
         return True
 
     def init_database(self):
-        from bspider.utils.database.mysql import MysqlHandler
-        mysql = MysqlHandler.from_settings(self.frame_settings['WEB_STUDIO_DB'])
+        from bspider.utils.database import MysqlClient
+        mysql_client = MysqlClient.from_settings(self.frame_settings['WEB_STUDIO_DB'])
 
         sql = 'show tables;'
         remote_table = set()
-        for table in mysql.select(sql):
+        for table in mysql_client.select(sql):
             for table_name in table.values():
                 if table_name.startswith('bspider_'):
                     remote_table.add(table_name)
@@ -117,8 +133,13 @@ class Command(BSpiderCommand):
                     sql_list = string.Template(f.read().strip()).substitute(**param)
                     for sql in sql_list.split(';\n'):
                         if len(sql):
-                            mysql.query(sql)
+                            mysql_client.query(sql)
                 print(f'init table:{table} success')
+
+            print('insert inner module')
+            sqls = init_custom_code(self.templates_dir, 'bspider_parser_status')
+            for sql, value in sqls:
+                mysql_client.insert(sql, value)
         return True
 
     def run(self, args, opts):
@@ -128,7 +149,7 @@ class Command(BSpiderCommand):
         self.init_supervisor()
         op = args[0]
         if op not in ('start', 'stop'):
-            raise UsageError(f'unknow op: {op}')
+            raise UsageError('unknow op: %s' % (op))
         rpc_socket = os.path.join(os.environ[PLATFORM_PATH_ENV], 'cache', 'supervisor.conf')
 
         print('=======supervisor output ========')
@@ -138,16 +159,3 @@ class Command(BSpiderCommand):
         print('=================================')
         print(f'A new BSpider master node {op}!')
         print(f'see /platform/logs/supervisor/{module}.log to check process status!')
-
-
-if __name__ == '__main__':
-    cmd = Command()
-    cmd.frame_settings = dict(WEB_STUDIO_DB={
-        'MYSQL_HOST': 'rm-2zeg7l8d36b6q7q7d.mysql.rds.aliyuncs.com',
-        'MYSQL_PORT': 3306,
-        'MYSQL_USER': 'bspider',
-        'MYSQL_PASSWD': 'YabYMrj4SFwSFFLZiA',
-        'MYSQL_CHARSET': 'utf8',
-        'MYSQL_DB': 'bspider',
-    })
-    cmd.run(['start'], [])
