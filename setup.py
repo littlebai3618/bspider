@@ -4,7 +4,7 @@ extras_require = {}
 
 setup(
     name='bspider',
-    version='0.1.1',
+    version=open('./bspider/VERSION').read().strip(),
     description='A high-level distributed crawling framework',
     author='baii',
     author_email='2624386844@qq.com',
@@ -59,7 +59,7 @@ setup(
         'meld3>=1.0.2',
         'multidict>=4.5.2',
         'pamqp>=2.3.0',
-        'pika>=1.1.0',
+        'pika==1.1.0',
         'psutil>=5.6.3',
         'pycparser>=2.19',
         'PyMySQL==0.9.2',
@@ -74,6 +74,7 @@ setup(
         'WTForms>=2.2.1',
         'xpinyin>=0.5.6',
         'yarl>=1.3.0',
+        'redis>=3.3.11'
     ],
     extras_require=extras_require,
 )

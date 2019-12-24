@@ -1,8 +1,8 @@
 """
-@name='BProxyPoolMiddleware',
-@description='使用 bproxypool服务 为请求头添加proxy',
-@type='middleware',
-@editor='bspider'
+@name=BProxyPoolMiddleware
+@description=使用 bproxypool服务 为请求头添加proxy
+@type=middleware
+@editor=bspider
 """
 import json
 

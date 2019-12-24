@@ -4,8 +4,13 @@
 2. 调度器
 3. 定时任务管理
 
-# 如果MySQL表是空的实例化表和初始数据
+# 如果MySQL表未创建的实例化表和初始数据
 """
+# 忽略PyMySQL警告
+from warnings import filterwarnings
+import pymysql
+filterwarnings('ignore', category = pymysql.Warning)
+
 import os
 import re
 import string
@@ -22,23 +27,25 @@ from bspider.utils.template import render_templatefile
 
 IGNORE = ignore_patterns('*.pyc', '.svn')
 
+
 def init_custom_code(templates_dir, table):
     sql = list()
     desc = re.compile('@([A-Za-z]+)=(.*?)\n')
 
-    for dirpath, _, _ in os.walk(os.path.join(templates_dir, 'inner_module')):
-        with open(dirpath) as f:
-            text = f.read()
-            result_dict = dict(content=f.read())
-            param = desc.findall(text)
-            for k,v in param:
-                result_dict[k] = v
+    for dirpath, _, filenames in os.walk(os.path.join(templates_dir, 'inner_module')):
+        for filename in filenames:
+            if filename.startswith('__'):
+                continue
 
-        sql.append(prepare_insert_sql(table, data=result_dict))
+            if filename.endswith('.module'):
+                with open(os.path.join(dirpath, filename)) as f:
+                    text = f.read()
+                    result_dict = dict(content=text)
+                    param = desc.findall(text)
+                    for k, v in param:
+                        result_dict[k] = v.strip()
+            sql.append(prepare_insert_sql(table, data=result_dict))
     return sql
-
-
-
 
 
 PLAIN_TABLE = [
@@ -136,20 +143,23 @@ class Command(BSpiderCommand):
                             mysql_client.query(sql)
                 print(f'init table:{table} success')
 
-            print('insert inner module')
-            sqls = init_custom_code(self.templates_dir, 'bspider_parser_status')
-            for sql, value in sqls:
+            sql_list = init_custom_code(self.templates_dir, 'bspider_customcode')
+            print(f'insert {len(sql_list)} inner module')
+            for sql, value in sql_list:
                 mysql_client.insert(sql, value)
+
         return True
 
     def run(self, args, opts):
         if len(args) != 1:
             raise UsageError('args error')
-        self.init_database()
-        self.init_supervisor()
         op = args[0]
         if op not in ('start', 'stop'):
             raise UsageError('unknow op: %s' % (op))
+
+        if op == 'start':
+            self.init_database()
+            self.init_supervisor()
         rpc_socket = os.path.join(os.environ[PLATFORM_PATH_ENV], 'cache', 'supervisor.conf')
 
         print('=======supervisor output ========')

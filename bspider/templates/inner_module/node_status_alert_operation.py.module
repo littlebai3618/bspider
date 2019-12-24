@@ -1,8 +1,8 @@
 """
-@name='NodeStatusAlertOperation',
-@description='各个节点探活和状态回报脚本，每执行一次轮询所有节点状态',
-@type='operation',
-@editor='bspider'
+@name=NodeStatusAlertOperation
+@description=各个节点探活和状态回报脚本，每执行一次轮询所有节点状态
+@type=operation
+@editor=bspider
 """
 import sys
 import traceback

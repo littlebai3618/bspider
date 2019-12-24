@@ -1,8 +1,8 @@
 """
-@name='ProjectHealthAlertOperation',
-@description='各个抓取任务健康检查',
-@type='operation',
-@editor='bspider'
+@name=ProjectHealthAlertOperation
+@description=各个抓取任务健康检查
+@type=operation
+@editor=bspider
 """
 from bspider.bcron import BaseOperation
 from bspider.config import FrameSettings

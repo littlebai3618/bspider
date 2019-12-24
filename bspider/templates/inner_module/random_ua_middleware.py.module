@@ -1,8 +1,8 @@
 """
-@name='RandomUAMiddleware',
-@description='为请求头添加随机User-Agent',
-@type='middleware',
-@editor='bspider'
+@name=RandomUAMiddleware
+@description=为请求头添加随机User-Agent
+@type=middleware
+@editor=bspider
 """
 import random
 
