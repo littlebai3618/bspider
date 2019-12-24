@@ -47,7 +47,7 @@ class AsyncScheduler(object):
 
     async def __is_full_queue(self, broker, queue_name, rate):
         """检查任务的下载队列是否阻塞"""
-        msg_count = await broker.mq_handler.get_queue_message_count(queue_name)
+        msg_count = await broker.mq_client.get_queue_message_count(queue_name)
         threshold = rate // 12
         if threshold < 2:
             threshold = 1

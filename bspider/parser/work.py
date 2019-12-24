@@ -30,7 +30,7 @@ class ParserManager(BaseManager):
                 e_msg = None
                 response = ERROR_RESPONSE
 
-                async with self.broker.mq_handler.session() as session:
+                async with self.broker.mq_client.session() as session:
                     msg_id, data = await session.recv_msg(f'{self.exchange}_{parser.project_id}')
                     if msg_id:
                         try:

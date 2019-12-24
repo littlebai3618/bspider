@@ -41,7 +41,7 @@ class Node(BaseService, AgentMixIn):
         node = nodes[0]
         try:
             # 整个删除操作是一个事务
-            with self.impl.handler.session() as session:
+            with self.impl.mysql_client.session() as session:
                 session.delete(*self.impl.delete_node(node_id, get_sql=True))
                 session.delete(*self.impl.delete_worker_by_ip(node['ip'], get_sql=True))
                 self.op_stop_node(node['ip'])
@@ -65,7 +65,7 @@ class Node(BaseService, AgentMixIn):
                     break
 
             if remote_change:
-                with self.impl.handler.session() as session:
+                with self.impl.mysql_client.session() as session:
                     if len(kwargs):
                         session.update(*self.impl.update_node(node_id, kwargs, get_sql=True))
                     if kwargs['status'] == 1:
@@ -119,7 +119,7 @@ class Node(BaseService, AgentMixIn):
     def add_worker(self, ip, name, worker_type, description, status):
         """携程数量更新很麻烦所以这里写死"""
         try:
-            with self.impl.handler.session() as session:
+            with self.impl.mysql_client.session() as session:
                 coroutine_num = 50 if worker_type == 'downloader' else 4
                 data = {
                     'ip': ip,
@@ -162,7 +162,7 @@ class Node(BaseService, AgentMixIn):
                     break
 
             if remote_change:
-                with self.impl.handler.session() as session:
+                with self.impl.mysql_client.session() as session:
                     session.update(*self.impl.update_worker(worker_id, kwargs, get_sql=True))
                     if worker['status'] == 1:
                         self.op_stop_worker(worker['ip'], worker_id)
@@ -198,7 +198,7 @@ class Node(BaseService, AgentMixIn):
 
         try:
             # 整个删除操作是一个事务
-            with self.impl.handler.session() as session:
+            with self.impl.mysql_client.session() as session:
                 session.delete(*self.impl.delete_worker_by_id(worker_id, get_sql=True))
                 self.op_stop_worker(worker['ip'], worker_id)
             return DeleteSuccess()

@@ -49,7 +49,7 @@ class ProjectService(BaseService, AgentMixIn):
         log.debug(f'pc_opj->pipeline:{pc_obj.pipeline}, middleware:{pc_obj.middleware}')
 
         try:
-            with self.impl.handler.session() as session:
+            with self.impl.mysql_client.session() as session:
                 data = {
                     'name': name,
                     'status': status,
@@ -99,7 +99,7 @@ class ProjectService(BaseService, AgentMixIn):
                     remote_param[key] = changes[key]
 
         if len(remote_param):
-            with self.impl.handler.session() as session:
+            with self.impl.mysql_client.session() as session:
                 session.update(*self.impl.update_project(project_id, changes))
                 pc_obj = remote_param.get('config')
                 if pc_obj:
@@ -112,14 +112,14 @@ class ProjectService(BaseService, AgentMixIn):
                     log.warning(f'not all node update project:project_id->{project_id} =>{result}')
                     return Conflict(msg=f'not all node update this project change', data=result, errno=30007)
         else:
-            with self.impl.handler.session() as session:
+            with self.impl.mysql_client.session() as session:
                 session.update(*self.impl.update_project(project_id, changes))
 
         log.info(f'update project:project_id->{project_id} success')
         return PatchSuccess(msg=f'update project success')
 
     def delete(self, project_id):
-        with self.impl.handler.session() as session:
+        with self.impl.mysql_client.session() as session:
             session.delete(*self.impl.delete_project(project_id))
             session.delete(*self.impl.delete_project_binds(project_id))
             session.delete(*self.impl.delete_job(project_id))

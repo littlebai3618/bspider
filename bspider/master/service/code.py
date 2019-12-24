@@ -18,7 +18,7 @@ class CodeService(BaseService, AgentMixIn):
         if not sign:
             return Conflict(msg=msg, errno=40005)
         try:
-            with self.impl.handler.session() as session:
+            with self.impl.mysql_client.session() as session:
                 data = {
                     'name': name,
                     'description': description,
@@ -45,7 +45,7 @@ class CodeService(BaseService, AgentMixIn):
 
         info = infos[0]
 
-        with self.impl.handler.session() as session:
+        with self.impl.mysql_client.session() as session:
             if 'content' in changes:
                 sign, msg = valid_code(
                     name=changes.get('name', info['name']),
@@ -69,7 +69,7 @@ class CodeService(BaseService, AgentMixIn):
             log.error(f'delete code:{code_id} failed: can\'t delete in use code')
             return Conflict(msg='can\'t delete in use code', data=data, errno=40004)
         else:
-            with self.impl.handler.session() as session:
+            with self.impl.mysql_client.session() as session:
                 sign, result = self.op_delete_code(self.impl.get_nodes(), code_id)
                 if not sign:
                     log.warning(f'code:code_id->:{code_id} delete exec')
