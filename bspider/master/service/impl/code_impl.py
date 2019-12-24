@@ -26,13 +26,7 @@ class CodeImpl(BaseImpl):
 
     def delete_code(self, code_id):
         sql = f'delete from {self.code_table} where `id`={code_id};'
-        return sql
-
-    def add_bind_project_code(self, binds):
-        values = ', '.join([f'({pid}, {cid})' for pid, cid in binds])
-        sql = f'insert into bspider_project_customcode(`project_id`, `customcode_id`)' \
-              f' values {values};'
-        return sql
+        return sql, ()
 
     def show_bind_project_code(self, project_id):
         sql = f'SELECT `code`.`name` AS `code_name`,`code`.`type` AS `code_type` ' \

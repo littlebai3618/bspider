@@ -105,6 +105,8 @@ class ProjectService(BaseService, AgentMixIn):
                 if pc_obj:
                     cids = pc_obj.middleware.copy() + pc_obj.pipeline.copy()
                     log.debug(f'code num: {cids}')
+                    # 20191224 bug修复，修复无法删除module引用
+                    session.delete(*self.impl.delete_project_binds(project_id))
                     session.insert(*self.impl.add_project_binds(cids, project_id))
                     remote_param['config'] = pc_obj.dumps()
                 sign, result = self.op_update_project(self.impl.get_nodes(), project_id, remote_param)
