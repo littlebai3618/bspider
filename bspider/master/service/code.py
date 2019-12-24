@@ -65,9 +65,8 @@ class CodeService(BaseService, AgentMixIn):
     def delete(self, code_id):
         project_list = self.impl.get_project_by_code_id(code_id)
         if len(project_list):
-            data = [{'id': info['project_id'], 'name': info['project_name']} for info in project_list]
             log.error(f'delete code:{code_id} failed: can\'t delete in use code')
-            return Conflict(msg='can\'t delete in use code', data=data, errno=40004)
+            return Conflict(msg='can\'t delete in use code', data=project_list, errno=40004)
         else:
             with self.impl.mysql_client.session() as session:
                 sign, result = self.op_delete_code(self.impl.get_nodes(), code_id)

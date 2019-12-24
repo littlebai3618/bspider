@@ -14,7 +14,7 @@ class CodeImpl(BaseImpl):
         return [info['ip'] for info in self.mysql_client.select(sql)]
 
     def get_project_by_code_id(self, cid):
-        sql = f'SELECT `p2c`.`project_id` AS `id`, `project`.`name` AS `project_name` FROM {self.project_table} AS `project` ' \
+        sql = f'SELECT `p2c`.`project_id` AS `id`, `project`.`name` AS `name` FROM {self.project_table} AS `project` ' \
               f'LEFT JOIN {self.p2c_table} AS `p2c` ON `project`.`id`=`p2c`.`project_id` ' \
               f'WHERE `p2c`.`customcode_id`={cid};'
         return self.mysql_client.select(sql)
