@@ -40,7 +40,7 @@ class BaseManager(object):
                 module=self.manager_type,
                 name=unique_tag)
             self.broker = RabbitMQBroker(self.log, self.coro_num)
-            self.monitor = monitor_cls(self.log, f'{self.manager_type}-{unique_tag}', self.broker.mq_handler)
+            self.monitor = monitor_cls(self.log, f'{self.manager_type}-{unique_tag}', self.broker.mq_client)
 
         self.log.info('manager init success')
         # 注册 任务中间人
