@@ -42,13 +42,19 @@ class Response(BaseHttp):
 
     def dumps(self):
         """解决序列化的嵌套问题"""
-        resp = copy.copy(self.__dict__)
-        if isinstance(resp['request'], Request):
-            resp['request'] = resp['request'].dumps()
+        resp = dict(
+            url = self.url,
+            status = self.status,
+            request = self.request if not isinstance(self.request, Request) else self.request.dumps(),
+            headers = self.headers,
+            cookies = self.cookies,
+            text = self.text
+        )
         return resp
 
     @classmethod
     def loads(cls, param: dict):
+
         return cls(**param)
 
     def json(self):

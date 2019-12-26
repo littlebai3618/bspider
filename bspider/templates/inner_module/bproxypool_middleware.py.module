@@ -32,6 +32,7 @@ class BProxyPoolMiddleware(BaseMiddleware):
             self.proxy_url = f'{bproxypool_url}{virtual_pool}'
         else:
             self.proxy_url = bproxypool_url
+        self.log.info(f'Proxy URL\'s is {self.proxy_url}')
 
     # by coroutine
     # async process_request(self, request):
