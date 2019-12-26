@@ -84,7 +84,7 @@ class NodeService(BaseService):
     def get_worker(self, worker_id):
         unique_id = f'worker_{worker_id}'
         worker = self.module_list.get(unique_id)
-        if worker:
+        if worker and worker.is_alive():
             return GetSuccess(data={'pid': worker.pid, 'status': 1})
         log.error(f'worker:worker_id->{worker_id} is not run')
         return GetSuccess(data={'pid': 0, 'status': -1})
