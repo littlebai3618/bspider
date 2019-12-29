@@ -27,7 +27,6 @@ class AsyncParser(object):
         for cls, params in project.parser_settings.pipeline:
             cls_name, code = cls
             mod = import_module_by_code('parser_pipeline', code)
-            self.log.info(f'success load: <{self.project_name}:{cls_name}>!')
             if mod:
                 if hasattr(mod, cls_name):
                     try:

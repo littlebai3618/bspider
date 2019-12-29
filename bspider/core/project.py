@@ -155,16 +155,16 @@ class BaseModuleSettings(object):
         self.__data = data
         self.__serializer_method = serializer_method
         self.__end = len(data)
-        self.__cur = 0
+        self.__cur = -1
 
     def __iter__(self):
         return self
 
     def __next__(self) -> (str, dict):
+        self.__cur += 1
         if self.__cur == self.__end:
             raise StopIteration()
 
-        self.__cur += 1
         for cls, params in self.__data[self.__cur].items():
             if self.__serializer_method:
                 return self.__serializer_method(cls), params
