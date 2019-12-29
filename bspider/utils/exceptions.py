@@ -2,7 +2,7 @@ class MethodError(Exception):
     pass
 
 
-class ProjectConfigError(Exception):
+class ProjectSettingsError(Exception):
     pass
 
 

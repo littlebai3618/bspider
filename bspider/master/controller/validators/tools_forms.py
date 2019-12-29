@@ -1,5 +1,5 @@
 from enum import Enum
-from wtforms import StringField, IntegerField
+from wtforms import StringField
 
 from bspider.core.api import BaseForm, ParamRequired
 

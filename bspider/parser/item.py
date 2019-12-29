@@ -1,5 +1,3 @@
-
-
 class Item(object):
     """
     item对象,
@@ -23,6 +21,10 @@ class Item(object):
     def __delitem__(self, key):
         del self.capacity[key]
 
+    # 对象可迭代
+    def __iter__(self):
+        return self.capacity.items()
+
     def pop(self, key):
         return self.capacity.pop(key)
 
@@ -43,16 +45,46 @@ class Item(object):
 
     __str__ = __repr__
 
+
 class MySQLSaverItem(Item):
 
-    def __init__(self, table: str, db: str, auto_update: bool=True, **kwargs):
+    def __init__(self, table: str, database: str, auto_update: bool = True, **kwargs):
         """
-        构造函数
+        准备存入MySQL 的Item
+        :param table: 存入mysql 的表名
+        :param auto_update: 如果为true, 当插入数据已经存在会自动更新已经存在的数据
+        :param kwargs: 要插入table的数据
         """
         self.table = table
-        self.db = db
+        self.database = database
         self.auto_update = auto_update
         super().__init__(**kwargs)
 
     def __repr__(self):
-        return f'<MySQLSaverItem: {self.db}{self.table} {len(self.capacity)} field>'
+        return f'<MySQLSaverItem: {self.database}->{self.table} {len(self.capacity)} field>'
+
+
+class RedisSaverItem(Item):
+
+    def __init__(self, db: int = 0, **kwargs):
+        """
+        Beta Item
+        """
+        self.db = db
+        super().__init__(**kwargs)
+
+    def __repr__(self):
+        return f'<RedisSaverItem: {self.db} {len(self.capacity)} field>'
+
+
+class RabbitMQSaverItem(Item):
+
+    def __init__(self, exchange: str, **kwargs):
+        """
+        Beta Item
+        """
+        self.exchange = exchange
+        super().__init__(**kwargs)
+
+    def __repr__(self):
+        return f'<RabbitMQSaverItem: {self.exchange} {len(self.capacity)} field>'

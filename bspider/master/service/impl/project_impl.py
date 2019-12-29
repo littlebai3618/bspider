@@ -31,15 +31,6 @@ class ProjectImpl(BaseImpl):
         sql = f"insert into {self.project_table} set {fields};"
         return sql, values
 
-    def delete_project_binds(self, project_id):
-        sql = f'delete from {self.p2c_table} where `project_id`={project_id};'
-        return sql,
-
-    def delete_job(self, project_id: int):
-        sql = f"update {self.cron_table} set `status`=%s where `project_id` = '{project_id}';"
-        log.debug(f'SQL:{sql}')
-        return sql, (3)
-
     def add_project_binds(self, cids, pid):
         values = ', '.join([f'({pid}, {cid})' for cid in cids])
         sql = f'replace into `{self.p2c_table}`(`project_id`, `customcode_id`) ' \
@@ -52,37 +43,18 @@ class ProjectImpl(BaseImpl):
         sql = f"update {self.project_table} set {fields} where `{unique_key}` = '{unique_value}';"
         return sql, values
 
-    def get_middleware_by_code_name(self, code_names):
-        """通过名称返回中间件的id 方便进行多对多绑定"""
-        if code_names:
-            cl = ', '.join(["'%s'" % code for code in code_names])
-            sql = f'select `id`, `name` from {self.code_table} ' \
-                  f'where `name` in ({cl}) and `type`="middleware"'
-            return self.mysql_client.select(sql)
-        return []
-
-    def get_pipeline_by_code_name(self, code_names):
-        """通过名称返回中间件的id 方便进行多对多绑定"""
-        if len(code_names):
-            cl = ', '.join(["'%s'" % code for code in code_names])
-            sql = f'select `id`, `name` from {self.code_table} ' \
-                  f'where `name` in ({cl}) and `type`="pipeline" or `type`="extractor"'
-            return self.mysql_client.select(sql)
-        return []
-
-    def get_job_id_by_project_name(self, code_names):
-        """通过名称返回定时任务的id 方便进行多对多绑定"""
-        cl = ', '.join(["'%s'" % code for code in code_names])
-        sql = f'select `id`, `name`, `description`, `type`, `content`, `editor` from {self.code_table} ' \
-              f'where `name` in ({cl}) and `type`="crontask"'
+    def get_module_id_by_name_and_type(self, code_name, code_type):
+        sql = f'select `id` from {self.code_table} where `name`="{code_name}" and `type`="{code_type}"'
         return self.mysql_client.select(sql)
 
-    def show_bind_project_code(self, project_id):
-        sql = f'SELECT `code`.`name` AS `code_name`,`code`.`type` AS `code_type` ' \
-              f'FROM {self.code_table} AS `code` ' \
-              f'LEFT JOIN bspider_project_customcode AS `p2c` ON `code`.`id` = `p2c`.`customcode_id` ' \
-              f'WHERE `p2c`.`project_id` = {project_id};'
-        return self.mysql_client.select(sql)
+    def delete_project_binds(self, project_id):
+        sql = f'delete from {self.p2c_table} where `project_id`={project_id};'
+        return sql,
+
+    def delete_cron_job(self, project_id: int):
+        sql = f"update {self.cron_table} set `status`=%s where `project_id` = '{project_id}';"
+        log.debug(f'SQL:{sql}')
+        return sql, (3)
 
     def delete_project(self, project_id):
         sql = f'delete from {self.project_table} where `id`={project_id};'

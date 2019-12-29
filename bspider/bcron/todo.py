@@ -10,7 +10,7 @@ import traceback
 
 
 from bspider.config import FrameSettings
-from bspider.core import ProjectConfigParser
+from bspider.core import Project
 from bspider.utils.database import MysqlClient
 from bspider.utils.logger import LoggerPool
 from bspider.utils.importer import import_module_by_code
@@ -79,7 +79,7 @@ def run_spider_project(project_id, code_id, **kwargs):
         __log.warning(f'project_id:{project_id} is not run')
         # ding(f'spider project job:{project_name} is not run')
 
-    run_status, run_msg = run_corn_job_code(code_id, info['id'], info['name'], info['config'])
+    run_status, run_msg = run_corn_job_code(code_id, info['id'], info['config'])
     __log.debug(info['config'])
     if run_status:
         __log.info(run_msg)
@@ -92,7 +92,6 @@ def run_operation_project(code_id, **kwargs):
     run_status, run_msg = run_corn_job_code(
         code_id,
         0,
-        f'operation-{code_id}',
         '{"downloader": {"middleware": [], "settings": {}}, "parser": {"pipeline": [], "settings": {}}}')
     if run_status:
         __log.info(run_msg)
@@ -101,7 +100,7 @@ def run_operation_project(code_id, **kwargs):
         ding(run_msg, 'operation task')
 
 
-def run_corn_job_code(code_id, project_id, project_name, config):
+def run_corn_job_code(code_id, project_id, config):
     CODE_STORE_TABLE = __frame_settings['CODE_STORE_TABLE']
     sql = f'select `name`, `content` from {CODE_STORE_TABLE} where `id`="{code_id}"'
     tmp = __mysql_client.select(sql)
@@ -112,15 +111,16 @@ def run_corn_job_code(code_id, project_id, project_name, config):
     mod = import_module_by_code(class_name, content)
     if hasattr(mod, class_name):
         try:
-            project_config = ProjectConfigParser(config)
-            project_config.project_id = project_id
-            project_config.project_name = project_name
+            project = Project(config)
+            project.project_id = project_id
         except Exception:
             tp, msg, tb = sys.exc_info()
             e_msg = '> '.join(traceback.format_exception(tp, msg, tb))
             return False, f'{project_id}-{code_id}:\n > {e_msg}'
+
+        log = LoggerPool().get_logger(key=project.project_name, fn='bcorn', module='bcorn', project=project.project_name)
         try:
-            instance = getattr(mod, class_name)(project_config)
+            instance = getattr(mod, class_name)(project, project.global_settings, log)
             # await instance._exec(func_name='execute_task')
             instance.execute_task()
             return True, f'{project_id}-{code_id} run succeed'

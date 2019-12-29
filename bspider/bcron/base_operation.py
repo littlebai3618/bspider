@@ -1,15 +1,8 @@
-from bspider.core import ProjectConfigParser
-from bspider.core.api.auth.token import make_token
 from bspider.core.custom_module import BaseCustomModule
 from bspider.utils.exceptions import MethodError
-from bspider.utils.logger import LoggerPool
 
 
 class BaseOperation(BaseCustomModule):
-
-    def __init__(self, settings: ProjectConfigParser):
-        self.project_name = settings.project_name
-        self.log = LoggerPool().get_logger(key=self.project_name, fn='bcorn', module='bcorn', project=self.project_name)
 
     def execute_task(self):
         raise MethodError('you must rebuild execute_task()')

@@ -10,7 +10,7 @@ import aiohttp
 
 from aiohttp import ClientResponse
 
-from bspider.core import ProjectConfigParser
+from bspider.core import Project
 from bspider.http import Request, Response
 from bspider.utils.exceptions import DownloaderError
 from bspider.utils.importer import import_module_by_code
@@ -20,28 +20,24 @@ from bspider.utils.sign import Sign
 
 class AsyncDownloader(object):
 
-    def __init__(self, config: ProjectConfigParser, sign: Sign, log_fn: str):
+    def __init__(self, project: Project, sign: Sign, log_fn: str):
         """传入下载器的配置文件"""
         self.sign = sign
-        self.project_name = config.project_name
-        self.project_id = config.project_id
+        self.project_name = project.project_name
+        self.project_id = project.project_id
 
-        self.log = LoggerPool().get_logger(key=f'project_downloader->{self.project_id}', fn=log_fn, module='downloader', project=self.project_name)
+        self.log = LoggerPool().get_logger(
+            key=f'project_downloader->{self.project_id}', fn=log_fn, module='downloader', project=self.project_name)
         # 加载重试次数
-        if 'RETRY_TIMES' in config.downloader_settings and isinstance(config.downloader_settings['RETRY_TIMES'], int):
-            self.retry_times = config.downloader_settings['RETRY_TIMES']
-            self.log.debug(f'{self.project_name} init retry time from settings: {self.retry_times}')
-        else:
-            self.retry_times = 3
-            self.log.debug(f'{self.project_name} init default retry time: {self.retry_times}')
+        self.retry_times = project.downloader_settings.max_retry_times
+        self.log.debug(f'{self.project_name} init retry time from settings: {self.retry_times}')
         self.mws = []
-        for cls_name, code in config.middleware:
+        for cls, params in project.downloader_settings.middleware:
+            cls_name, code = cls
             mod = import_module_by_code('downloader_middleware', code)
             if mod and hasattr(mod, cls_name):
                 try:
-                    # 通过中间件类名实例化，放入中间件list中
-                    mw_instance = getattr(mod, cls_name)(config.downloader_settings, self.log)
-                    self.mws.append(mw_instance)
+                    self.mws.append(getattr(mod, cls_name)(project, {**project.global_settings, **params}, self.log))
                     self.log.info(f'success load: <{self.project_name}:{cls_name}>!')
                 except Exception as e:
                     raise DownloaderError('<%s:%s> middleware init failed: %s' % (self.project_name, cls_name, e))
@@ -50,13 +46,11 @@ class AsyncDownloader(object):
                 msg = f'<{self.project_name}:{cls_name}> middleware init failed: middleware is invalid!'
                 raise DownloaderError(msg)
 
-        if 'ACCEPT_RESPONSE_CODE' in config.downloader_settings and isinstance(
-                config.downloader_settings['ACCEPT_RESPONSE_CODE'], list):
-            self.accept_response_code = set(config.downloader_settings['ACCEPT_RESPONSE_CODE'])
-            self.log.debug(f'{self.project_name} init accept response code from settings: {self.accept_response_code}')
-        else:
-            self.accept_response_code = set()
-            self.log.debug(f'{self.project_name} init default accept response code: {self.accept_response_code}')
+            project.downloader_settings.ignore_retry_http_code.append(599)
+            self.ignore_retry_http_code = project.downloader_settings.ignore_retry_http_code
+            self.log.debug(
+                f'{self.project_name} init accept response code from settings: {self.ignore_retry_http_code}')
+
 
     async def download(self, request: Request) -> (Response, bool, str):
         """
@@ -108,7 +102,7 @@ class AsyncDownloader(object):
                 if result is None:
                     break
 
-            if response.status == 200 or response.status in self.accept_response_code:
+            if response.status == 200 or response.status in self.ignore_retry_http_code:
                 return response, True, None
             self.log.info(f'Retry download: url->{request.url} status->{response.status} time:{retry_index}')
         self.log.info(f'{response.sign}')

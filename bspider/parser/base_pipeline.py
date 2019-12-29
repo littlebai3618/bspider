@@ -5,10 +5,6 @@ from bspider.core.custom_module import BaseCustomModule
 
 class BasePipeline(BaseCustomModule):
 
-    def __init__(self, settings: dict, log: logging.Logger):
-        self.settings = settings
-        self.log = log
-
     def process_item(self, item):
         """
         对item进行处理,各个pipeline重写

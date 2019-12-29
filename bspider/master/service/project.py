@@ -1,7 +1,6 @@
 from pymysql import IntegrityError
 
-from bspider.core import ProjectConfigParser
-from bspider.utils.exceptions import ProjectConfigError
+from bspider.core import Project
 from bspider.master import log
 from bspider.master.service.impl.project_impl import ProjectImpl
 from bspider.core.api import BaseService, Conflict, NotFound, PostSuccess, DeleteSuccess, GetSuccess, \
@@ -13,102 +12,102 @@ class ProjectService(BaseService, AgentMixIn):
     def __init__(self):
         self.impl = ProjectImpl()
 
-    def __get_config_obj(self, config: str) -> ProjectConfigParser:
-        try:
-            pc_obj = ProjectConfigParser.loads(config)
-        except ProjectConfigError as e:
-            raise Conflict(errno=30003, msg=f'{e}')
-
-        # 检测中间件是否存在并将code_name 映射为code_id
-        middleware_dict = {info['name']: info['id'] for info in
-                           self.impl.get_middleware_by_code_name(pc_obj.middleware)}
-        if len(middleware_dict) != len(pc_obj.middleware):
-            raise Conflict(
-                msg='lack of necessary middleware!',
-                data=[code_name for code_name in pc_obj.middleware if code_name not in middleware_dict],
-                errno=30003)
-
-        pipeline_dict = {info['name']: info['id'] for info in self.impl.get_pipeline_by_code_name(pc_obj.pipeline)}
-        if len(pipeline_dict) != len(pc_obj.pipeline):
-            raise Conflict(
-                msg='lack of necessary pipeline!',
-                data=[code_name for code_name in pc_obj.pipeline if code_name not in pipeline_dict],
-                errno=30003)
-
-        pc_obj.pipeline = [str(pipeline_dict[code_name]) for code_name in pc_obj.pipeline]
-        pc_obj.middleware = [str(middleware_dict[code_name]) for code_name in pc_obj.middleware]
-        return pc_obj
-
-    def add(self, name, status, type, group, description, editor, rate, config):
-        """
-        1. 预执行配置文件方法
-        2. 通知节点接收配置文件 调用接口
-        2. 持久化project配置
-        """
-        pc_obj = self.__get_config_obj(config)
-        log.debug(f'pc_opj->pipeline:{pc_obj.pipeline}, middleware:{pc_obj.middleware}')
+    def add(self, editor: str, config: dict, status: int = 1):
+        project = Project(config,
+                          middleware_serializer_method=self.get_middleware_id_by_name,
+                          pipeline_serializer_method=self.get_pipeline_id_by_name)
+        log.debug(
+            f'pc_opj->pipeline:{project.parser_settings.pipeline}, middleware:{project.downloader_settings.middleware}')
 
         try:
             with self.impl.mysql_client.session() as session:
+                r_config = project.dumps()
                 data = {
-                    'name': name,
+                    'name': project.project_name,
                     'status': status,
-                    'type': type,
-                    'group': group,
-                    'description': description,
+                    'type': 'spider',
+                    'group': project.group,
+                    'description': project.description,
                     'editor': editor,
-                    'rate': rate,
+                    'rate': project.rate,
                     'config': config,
-                    'r_config': pc_obj.dumps()
+                    'r_config': r_config
                 }
+
                 project_id = session.insert(*self.impl.add_project(data), lastrowid=True)
                 self.impl.bind_queue(project_id=project_id)
-                log.debug(f'bind new project=>{name} queue success!')
-
-                cids = pc_obj.middleware.copy() + pc_obj.pipeline.copy()
+                log.debug(f'bind new project=>{project.project_name} queue success!')
+                cids = [cid for cid, _ in r_config['downloader']['middleware']]
+                cids.extend([cid for cid, _ in r_config['parser']['pipeline']])
                 log.debug(f'code num: {cids}')
                 session.insert(*self.impl.add_project_binds(cids, project_id))
                 info = {
                     'project_id': project_id,
-                    'name': name,
-                    'rate': rate,
-                    'config': data['r_config'],
+                    'name': project.project_name,
+                    'rate': project.rate,
+                    'config': r_config,
                     'status': status
                 }
                 node_list = self.impl.get_nodes()
                 sign, result = self.op_add_project(node_list, info)
                 if not sign:
-                    log.error(f'not all node add project:{name} =>{result}')
-                    return Conflict(msg=f'not all node add project:{name}', data=result, errno=30007)
-                log.info(f'add project:{name} success')
-                return PostSuccess(msg=f'add project:{name} success', data={'project_id': project_id})
+                    log.error(f'not all node add project:{project.project_name} =>{result}')
+                    return Conflict(msg=f'not all node add project:{project.project_name}', data=result, errno=30007)
+                log.info(f'add project:{project.project_name} success')
+                return PostSuccess(msg=f'add project:{project.project_name} success', data={'project_id': project_id})
         except IntegrityError as e:
             if e.args[0] == 1062:
-                log.error(f'all project add failed:{name} =>project is already exist')
+                log.error(f'all project add failed:{project.project_name} =>project is already exist')
                 return Conflict(errno=30002, msg='project is already exist')
             raise e
 
     def update(self, project_id, changes):
-        remote_param = {}
-        for key in ('name', 'config', 'rate', 'status'):
-            if key in changes:
-                if key == 'config':
-                    remote_param['config'] = self.__get_config_obj(changes['config'])
-                    changes['r_config'] = remote_param['config'].dumps()
-                else:
-                    remote_param[key] = changes[key]
+        remote_param = dict()
+        if 'status' in changes:
+            remote_param['status'] = changes['status']
+
+        if 'config' in changes:
+
+            infos = self.impl.get_project(project_id)
+            if not len(infos):
+                return NotFound(msg='project not exist', errno=30001)
+
+            old_project = Project(infos[0]['config'])
+            new_project = Project(changes['config'])
+
+            if old_project.project_name != new_project.project_name:
+                remote_param['name'] = new_project.project_name
+                changes['name'] = new_project.project_name
+
+            if old_project.rate != new_project.rate:
+                remote_param['rate'] = new_project.rate
+                changes['rate'] = new_project.rate
+
+            if old_project.group != new_project.group:
+                changes['group'] = new_project.group
+
+            if old_project.description != new_project.description:
+                changes['description'] = new_project.description
+
+            sign = [
+                old_project.downloader_settings == new_project.downloader_settings,
+                old_project.parser_settings == new_project.parser_settings
+            ]
+            if False in sign:
+                remote_param['config'] = new_project.dumps()
+                changes['r_config'] = remote_param['config']
 
         if len(remote_param):
             with self.impl.mysql_client.session() as session:
                 session.update(*self.impl.update_project(project_id, changes))
-                pc_obj = remote_param.get('config')
-                if pc_obj:
-                    cids = pc_obj.middleware.copy() + pc_obj.pipeline.copy()
+                r_config = changes.get('r_config')
+                if r_config:
+                    cids = [cid for cid, _ in r_config['downloader']['middleware']]
+                    cids.extend([cid for cid, _ in r_config['parser']['pipeline']])
                     log.debug(f'code num: {cids}')
                     # 20191224 bug修复，修复无法删除module引用
                     session.delete(*self.impl.delete_project_binds(project_id))
                     session.insert(*self.impl.add_project_binds(cids, project_id))
-                    remote_param['config'] = pc_obj.dumps()
                 sign, result = self.op_update_project(self.impl.get_nodes(), project_id, remote_param)
                 if not sign:
                     log.warning(f'not all node update project:project_id->{project_id} =>{result}')
@@ -124,7 +123,7 @@ class ProjectService(BaseService, AgentMixIn):
         with self.impl.mysql_client.session() as session:
             session.delete(*self.impl.delete_project(project_id))
             session.delete(*self.impl.delete_project_binds(project_id))
-            session.delete(*self.impl.delete_job(project_id))
+            session.delete(*self.impl.delete_cron_job(project_id))
             sign, result = self.op_delete_project(self.impl.get_nodes(), project_id)
             if not sign:
                 log.error(f'all project delete failed:{project_id} =>{result}')
@@ -162,3 +161,19 @@ class ProjectService(BaseService, AgentMixIn):
                 'page': page,
                 'limit': limit
             })
+
+    def get_middleware_id_by_name(self, cls_name) -> int:
+        data = self.impl.get_module_id_by_name_and_type(cls_name, 'middleware')
+        if len(data):
+            return data[0]['id']
+        raise Conflict(
+            msg=f'lack of necessary middleware <{cls_name}>!',
+            errno=30003)
+
+    def get_pipeline_id_by_name(self, cls_name) -> int:
+        data = self.impl.get_module_id_by_name_and_type(cls_name, 'pipeline')
+        if len(data):
+            return data[0]['id']
+        raise Conflict(
+            msg=f'lack of necessary pipeline <{cls_name}>!',
+            errno=30003)

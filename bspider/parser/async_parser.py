@@ -4,7 +4,7 @@
 """
 from types import GeneratorType
 
-from bspider.core import ProjectConfigParser
+from bspider.core import Project
 from bspider.http import Response, Request
 from bspider.utils.exceptions import ParserError
 from bspider.utils.logger import LoggerPool
@@ -14,24 +14,25 @@ from bspider.utils.sign import Sign
 
 class AsyncParser(object):
 
-    def __init__(self, config: ProjectConfigParser, sign: Sign, log_fn: str):
+    def __init__(self, project: Project, sign: Sign, log_fn: str):
         """传入下载器的配置文件"""
         self.sign = sign
-        self.project_name = config.project_name
-        self.project_id = config.project_id
+        self.project_name = project.project_name
+        self.project_id = project.project_id
 
-        self.log = LoggerPool().get_logger(key=f'project_parser->{self.project_id}', fn=log_fn, module='parser',
-                                           project=self.project_name)
+        self.log = LoggerPool().get_logger(
+            key=f'project_parser->{self.project_id}', fn=log_fn, module='parser', project=self.project_name)
 
         self.pipes = []
-        for cls_name, code in config.pipeline:
-            mod = import_module_by_code(cls_name, code)
+        for cls, params in project.parser_settings.pipeline:
+            cls_name, code = cls
+            mod = import_module_by_code('parser_pipeline', code)
             self.log.info(f'success load: <{self.project_name}:{cls_name}>!')
             if mod:
                 if hasattr(mod, cls_name):
                     try:
-                        # 通过中间件类名实例化，放入中间件list中
-                        self.pipes.append(getattr(mod, cls_name)(config.parser_settings, self.log))
+                        self.pipes.append(getattr(mod, cls_name)(project, {**project.global_settings, **params}, self.log))
+                        self.log.info(f'success load: <{self.project_name}:{cls_name}>!')
                     except Exception as e:
                         raise ParserError(
                             '%s pipeline init failed: %s like: %s' % (self.project_name, cls_name, e))

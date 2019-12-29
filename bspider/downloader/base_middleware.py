@@ -1,19 +1,8 @@
-from logging import Logger
-
 from bspider.core.custom_module import BaseCustomModule
 from bspider.http import Request, Response
 
 
 class BaseMiddleware(BaseCustomModule):
-
-    def __init__(self, settings: dict, log: Logger):
-        """
-        构造方法
-        如果需要设置配置，由各个中间件自己重写
-        :param settings:
-        """
-        self.settings = settings
-        self.log = log
 
     def process_request(self, request: Request):
         """

@@ -1,11 +1,18 @@
-"""a pipeline template"""
+"""
+@name=MySQLSaverPipeline
+@description=MySQL 存储Pipeline, 将MySQLSaverItem 存储至mysql表中
+@type=middleware
+@editor=bspider
+"""
 from bspider.parser import BasePipeline, MySQLSaverItem
 from bspider.utils.exceptions import ParserError
 from bspider.utils.database import MysqlClient, prepare_insert_sql
 
 
 class MySQLSaverPipeline(BasePipeline):
-    """因为异步handler时间循环有问题暂时修改为同步循环"""
+    """
+    因为异步handler事件循环有问题暂时修改为同步方式
+    """
 
     def __init__(self, settings, log):
         super().__init__(settings, log)

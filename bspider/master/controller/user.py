@@ -1,4 +1,4 @@
-from flask import Blueprint, g
+from flask import Blueprint
 
 from bspider.core.api import auth
 from bspider.core.api import NotFound

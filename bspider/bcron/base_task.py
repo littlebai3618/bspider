@@ -4,9 +4,10 @@
 # @Use     :
 """定时任务的基础类，所有定时任务类必须继承"""
 import json
+import logging
 
 from bspider.config import FrameSettings
-from bspider.core import ProjectConfigParser
+from bspider.core import Project
 from bspider.core.custom_module import BaseCustomModule
 from bspider.http import Request
 from bspider.utils.exceptions import MethodError
@@ -16,10 +17,8 @@ from bspider.utils.rabbitMQ import RabbitMQClient
 
 class BaseTask(BaseCustomModule):
 
-    def __init__(self, settings: ProjectConfigParser):
-        self.settings = settings
-        self.log = LoggerPool().get_logger(key=f'task_{self.settings.project_id}', fn='bcorn', module='bcorn',
-                                           project=self.settings.project_name)
+    def __init__(self, project: Project, settings: dict, log: logging.Logger):
+        super().__init__(project, settings, log=log)
         self.frame_settings = FrameSettings()
         self.__mq_client = RabbitMQClient(self.frame_settings['RABBITMQ_CONFIG'])
 

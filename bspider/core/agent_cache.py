@@ -4,7 +4,7 @@
 # @Use     :
 import os
 
-from bspider.core.api import BaseImpl
+from bspider.core.api import BaseImpl, json
 from bspider.utils.conf import PLATFORM_PATH_ENV
 from bspider.utils.database import SqlLite3Client
 
@@ -54,7 +54,7 @@ class AgentCache(object):
 
     def get_projects(self):
         sql = f'select `id`, `name`, `config`, `rate`, `timestamp` from {self.project_table} where `status`=1;'
-        return [{'id': project_id, 'name': name, 'config': config,
+        return [{'id': project_id, 'name': name, 'config': json.loads(config),
                  'rate': rate, 'timestamp': timestamp} for project_id, name, config, rate, timestamp in
                 self.sqlite3_client.select(sql)]
 

@@ -1,22 +1,20 @@
 import asyncio
-import inspect
 import os
 from os.path import abspath
 from queue import Queue
 
 from bspider.config import FrameSettings
-from bspider.core import ProjectConfigParser
-from bspider.downloader import BaseMiddleware
+from bspider.core import Project
+from bspider.master.controller.validators.project_form import schema
 from bspider.downloader.async_downloader import AsyncDownloader
-from bspider.parser import BasePipeline, BaseExtractor
 from bspider.parser.async_parser import AsyncParser
 from bspider.http import Request
-from bspider.utils.conf import PLATFORM_NAME_ENV
+from bspider.utils.conf import PLATFORM_PATH_ENV
 from bspider.utils.exceptions import ModuleExistError
-from bspider.utils.importer import walk_modules, import_module_by_code
 from bspider.utils.database import MysqlClient
 from bspider.utils.logger import LoggerPool
 from bspider.utils.sign import Sign
+from bspider.utils.tools import find_class_name_by_content
 
 
 class Debuger(object):
@@ -31,30 +29,32 @@ class Debuger(object):
     # proority fix rabbitmq 数字越大优先级越高，使用Python优先队列模拟的时候需要进行优先级翻转
 
     def __init__(self):
-        self.debug_fn = 'terminal'
+        self.debug_log_fn = 'terminal'
         self.log = LoggerPool().get_logger(
             key=self.project_name,
             module='debuger',
             project=self.project_name,
-            fn=self.debug_fn
+            fn=self.debug_log_fn
         )
-
-        self.settings = ProjectConfigParser(open(abspath('settings.json')).read())
-        self.__pipeline = self.settings.pipeline.copy()
-        self.__middleware = self.settings.middleware.copy()
-        self.settings.pipeline.clear()
-        self.settings.middleware.clear()
-
-        self.local_project_class = self.__find_local_class()
         self.mysql_client = MysqlClient.from_settings(self.frame_settings.get('WEB_STUDIO_DB'))
+        self.local_project_class = self.__find_local_class()
+
         self.max_priority = self.frame_settings['QUEUE_ARG'].get('x-max-priority', 5)
         self.priority_queue = [Queue() for _ in range(self.max_priority)]
 
         self.put(self.start_request)
 
+        with open(abspath('settings.yaml')) as f:
+            self.project = Project(schema(f.read()),
+                                   middleware_serializer_method=self.check_module,
+                                   pipeline_serializer_method=self.check_module)
+            self.project.project_id = 0
+
+        self.parser = AsyncParser(self.project, Sign(), self.debug_log_fn)
+        self.log.info('init parser success')
+        self.downloader = AsyncDownloader(self.project, Sign(), self.debug_log_fn)
+        self.log.info('init downloader success')
         self.__cur_download_num = 1
-        self.parser = self.parser()
-        self.downloader = self.downloader()
 
     @property
     def project_name(self):
@@ -107,13 +107,18 @@ class Debuger(object):
     def __find_local_class(self):
         # 将模块名称转换为模块代码
         local_project_class = dict()
-        for mod in walk_modules(f'{os.environ[PLATFORM_NAME_ENV]}.projects.{self.project_name}'):
-            for obj in vars(mod).values():
-                if inspect.isclass(obj):
-                    if issubclass(obj, BasePipeline) and not obj in (BasePipeline, BaseExtractor):
-                        local_project_class[obj.__name__] = mod
-                    if issubclass(obj, BaseMiddleware) and not obj in (BaseMiddleware,):
-                        local_project_class[obj.__name__] = mod
+
+        project_path = os.path.join(os.environ[PLATFORM_PATH_ENV], 'projects', self.project_name)
+        for file in os.listdir(project_path):
+            file_path = os.path.join(project_path, file)
+            with open(file_path) as f:
+                content = f.read().strip()
+                sign, class_name, _ = find_class_name_by_content(content)
+                if sign:
+                    self.log.debug(f'success find module:{class_name} from local')
+                    local_project_class[class_name] = content
+                else:
+                    raise ModuleExistError('load module from file %s failed, unrecognized class name' % (file))
         return local_project_class
 
     def load_remote_module(self, class_name):
@@ -122,39 +127,14 @@ class Debuger(object):
         info = self.mysql_client.select(sql, (self.frame_settings['CODE_STORE_TABLE'], class_name))
         if len(info):
             self.log.debug(f'success find module:{class_name} from remote')
-            return import_module_by_code(class_name, info[0]['content'])
+            return class_name, info[0]['content']
         else:
-            raise ModuleExistError('module:%s is not exists' % (class_name))
+            raise ModuleExistError('load module from remote failed %s is not exists' % (class_name))
 
-    def parser(self) -> AsyncParser:
-        """修复无法debug的bug"""
-        _parser = AsyncParser(self.settings, Sign(), log_fn=self.debug_fn)
-
-        # 判断调用仓库代码还是本地代码
-        for pipeline in self.__pipeline:
-            if pipeline in self.local_project_class:
-                _parser.pipes.append(
-                    getattr(self.local_project_class[pipeline], pipeline)(self.settings.parser_settings, self.log))
-            else:
-                _parser.pipes.append(
-                    getattr(self.load_remote_module(pipeline), pipeline)(self.settings.parser_settings, self.log))
-
-        return _parser
-
-    def downloader(self) -> AsyncDownloader:
-        # 判断调用仓库代码还是本地代码
-        _downloader = AsyncDownloader(self.settings, Sign(), log_fn=self.debug_fn)
-
-        # 判断调用仓库代码还是本地代码
-        for middleware in self.__middleware:
-            if middleware in self.local_project_class:
-                _downloader.mws.append(
-                    getattr(self.local_project_class[middleware], middleware)(self.settings.parser_settings, self.log))
-            else:
-                _downloader.mws.append(
-                    getattr(self.load_remote_module(middleware), middleware)(self.settings.parser_settings, self.log))
-
-        return _downloader
+    def check_module(self, cls_name):
+        if cls_name in self.local_project_class:
+            return cls_name, self.local_project_class[cls_name]
+        return self.load_remote_module(cls_name)
 
 
 if __name__ == '__main__':

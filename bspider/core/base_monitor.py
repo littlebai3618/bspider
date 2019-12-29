@@ -9,7 +9,7 @@ from bspider.utils.sign import Sign
 from bspider.utils.tools import find_class_name_by_content
 
 from .agent_cache import AgentCache
-from .project_config_parser import ProjectConfigParser
+from .project import Project
 
 
 class BaseMonitor(object):
@@ -54,29 +54,30 @@ class BaseMonitor(object):
                 tmp_weight[info['id']] = info['rate']
                 total_sum += info['rate']
 
-            project_obj = self.projects.get(info['id'])
-            pc_obj = ProjectConfigParser.loads(info['config'])
+            worker_obj = self.projects.get(info['id'])
+            project = Project(
+                info['config'],
+                pipeline_serializer_method=self.code_id_to_content,
+                middleware_serializer_method=self.code_id_to_content
+            )
+            project.project_id = info['id']
 
-            pc_obj.project_name = info['name']
-            pc_obj.project_id = info['id']
             # code_id映射为中间件代码
             if self.exchange == EXCHANGE_NAME[2]:
-                pc_obj.pipeline = self.code_id_to_content(pc_obj.pipeline)
-                sign = Sign(project_timestamp=info['timestamp'], module=pc_obj.pipeline)
+                sign = Sign(project_timestamp=info['timestamp'], module=str(project.parser_settings.pipeline))
             else:
-                pc_obj.middleware = self.code_id_to_content(pc_obj.middleware)
-                sign = Sign(project_timestamp=info['timestamp'], module=pc_obj.middleware)
+                sign = Sign(project_timestamp=info['timestamp'], module=str(project.downloader_settings.middleware))
 
-            if project_obj is None or project_obj.sign != sign:
-                tmp_projects[info['id']] = self.get_work_obj(pc_obj, sign=sign)
+            if worker_obj is None or worker_obj.sign != sign:
+                tmp_projects[info['id']] = self.get_work_obj(project, sign=sign)
             else:
-                tmp_projects[info['id']] = project_obj
+                tmp_projects[info['id']] = worker_obj
 
         self.projects = tmp_projects
-        self.log.info('sync projects success {}'.format(len(self.projects)))
+        self.log.debug('sync projects success {}'.format(len(self.projects)))
         self.__weight = sorted(tmp_weight.items(), key=lambda d: d[1], reverse=False)
         self.__total_sum = total_sum
-        self.log.info('sync weight success {} total num {}'.format(len(self.__weight), self.__total_sum))
+        self.log.debug('sync weight success {} total num {}'.format(len(self.__weight), self.__total_sum))
 
     async def choice_project(self) -> int:
         """
@@ -88,19 +89,13 @@ class BaseMonitor(object):
             for project_id, weight in self.__weight:
                 seed -= weight
                 if seed < 0:
-                    # self.log.debug(f'choice project:project_id->{project_id}')
                     return project_id
-        # self.log.debug('project weight is empty')
 
-    def code_id_to_content(self, code_ids: list):
-        res = list()
-        for code_id in code_ids:
-            content = self.__cache.get_code(code_id)[0]['content']
-            _, cls_name, _ = find_class_name_by_content(content)
-            res.append((cls_name, content))
+    def code_id_to_content(self, code_id):
+        content = self.__cache.get_code(code_id)[0]['content']
+        _, cls_name, _ = find_class_name_by_content(content)
+        return cls_name, content
 
-        return res
-
-    def get_work_obj(self, config: ProjectConfigParser, sign: Sign):
+    def get_work_obj(self, project: Project, sign: Sign):
         """继承重写 -> 根据配置返回对象"""
         pass
