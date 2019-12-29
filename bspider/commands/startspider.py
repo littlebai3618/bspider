@@ -11,7 +11,7 @@ TEMPLATES_TO_RENDER = (
     ('extractor.py.tmpl',),
     ('middleware.py.tmpl',),
     ('pipeline.py.tmpl',),
-    ('settings.json.tmpl',),
+    ('settings.yaml.tmpl',),
     ('debug.py.tmpl',),
     ('task.py.tmpl',)
 )

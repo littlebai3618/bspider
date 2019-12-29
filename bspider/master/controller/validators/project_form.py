@@ -7,43 +7,24 @@ from bspider.utils.exceptions import ProjectSettingsError
 
 
 def valid_middleware(middleware: list) -> list:
-    for module in middleware:
-        if not isinstance(module, dict):
-            raise Invalid('Middleware Invalid, must like [{cls: dict(cls_param)}]')
-        for cls, param in module.items():
-            if not isinstance(cls, str):
-                raise Invalid('Middleware %s name Invalid, must be str' % (cls))
-            if not isinstance(param, dict):
-                raise Invalid('Middleware %s param Invalid, must be dict' % (cls))
-    return middleware
+    return valid_module('Middleware', middleware)
 
 def valid_pipeline(pipeline: list) -> list:
-    for module in pipeline:
-        if not isinstance(module, dict):
-            raise Invalid('Pipeline Invalid, must like [{cls: dict(cls_param)}]')
-        for cls, param in module.items():
-            if not isinstance(cls, str):
-                raise Invalid('Pipeline cls %s name Invalid, must be str' % (cls))
-            if not isinstance(param, dict):
-                raise Invalid('Pipeline %s param Invalid, must be dict' % (cls))
-    return pipeline
+    return valid_module('Pipeline', pipeline)
 
-def valid_task(tasks: list) -> list:
-    for task in tasks:
-        if not isinstance(task, dict):
-            raise Invalid('Task Invalid, must like [{cls: dict(cls_param)}]')
-        for cls, param in task.items():
-            if not isinstance(cls, str):
-                raise Invalid('Task cls %s name Invalid, must be str' % (cls))
-
-            if not isinstance(param, dict):
-                raise Invalid('Task cls %s param Invalid, must be dict' % (cls))
-
-            for key in ['crontab', 'description']:
-                if key not in param:
-                    raise Invalid('Task %s param Invalid, must have %s' % (cls, key))
-    return tasks
-
+def valid_module(module_type, data):
+    for index, module in enumerate(data):
+        if isinstance(module, str):
+            data[index] = { module: dict() }
+        elif isinstance(module, dict):
+            for cls, param in module.items():
+                if not isinstance(cls, str):
+                    raise Invalid('%s cls %s name Invalid, must be str' % (module_type, cls))
+                if not isinstance(param, dict):
+                    raise Invalid('%s %s param Invalid, must be dict or None' % (module_type, cls))
+        else:
+            raise Invalid('Module %s Invalid, must like \'cls\' or [{cls: dict(cls_param)}]' % (module_type))
+    return data
 
 schema = Schema({
     Required('project_name'): All(str, Length(min=1, max=99)),
@@ -58,8 +39,7 @@ schema = Schema({
     },
     Required('parser'): {
         Required('pipeline', default=list()): valid_pipeline
-    },
-    Required('bcron', default=list()): valid_task
+    }
 })
 
 class AddForm(BaseForm):
