@@ -16,8 +16,8 @@ class BProxyPoolMiddleware(BaseMiddleware):
     使用 bproxypool服务 为请求头添加proxy
     """
 
-    def __init__(self, settings, log):
-        super().__init__(settings, log)
+    def __init__(self, project, settings, log):
+        super().__init__(project, settings, log)
         bproxypool_url = self.settings.get('PROXY_POOL_API')
         if bproxypool_url is None:
             raise MiddleWareParamError('\'PROXY_POOL_API\' is Required like http://127.0.0.1:80/proxy/')

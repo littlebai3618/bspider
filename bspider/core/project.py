@@ -29,7 +29,6 @@ class Project(object):
         self.__description = settings['description']
         self.__downloader = settings['downloader']
         self.__parser = settings['parser']
-        self.__bcorn = settings['bcorn']
 
         self.__global_settings = settings['global_settings']
 
@@ -44,7 +43,7 @@ class Project(object):
 
     @property
     def project_id(self):
-        if self.__project_id:
+        if self.__project_id is not None:
             return self.__project_id
         if self.__project_id_serializer_method:
             self.__project_id = self.__project_id_serializer_method(self.project_name)
@@ -159,7 +158,7 @@ class BaseModuleSettings(object):
         self.__cur = 0
 
     def __iter__(self):
-        return self.__data
+        return self
 
     def __next__(self) -> (str, dict):
         if self.__cur == self.__end:

@@ -3,6 +3,8 @@ import os
 from os.path import abspath
 from queue import Queue
 
+import yaml
+
 from bspider.config import FrameSettings
 from bspider.core import Project
 from bspider.master.controller.validators.project_form import schema
@@ -45,7 +47,7 @@ class Debuger(object):
         self.put(self.start_request)
 
         with open(abspath('settings.yaml')) as f:
-            self.project = Project(schema(f.read()),
+            self.project = Project(schema(yaml.safe_load(f)),
                                    middleware_serializer_method=self.check_module,
                                    pipeline_serializer_method=self.check_module)
             self.project.project_id = 0
@@ -110,10 +112,14 @@ class Debuger(object):
 
         project_path = os.path.join(os.environ[PLATFORM_PATH_ENV], 'projects', self.project_name)
         for file in os.listdir(project_path):
+            if not file.endswith('.py'):
+                continue
             file_path = os.path.join(project_path, file)
             with open(file_path) as f:
                 content = f.read().strip()
-                sign, class_name, _ = find_class_name_by_content(content)
+                sign, class_name, sub_class = find_class_name_by_content(content)
+
+            if sub_class in ('BaseMiddleware', 'BaseExtractor', 'BasePipeline'):
                 if sign:
                     self.log.debug(f'success find module:{class_name} from local')
                     local_project_class[class_name] = content
@@ -123,8 +129,8 @@ class Debuger(object):
 
     def load_remote_module(self, class_name):
         """加载远程代码"""
-        sql = "select `content` from `%s` where `name`='%s';"
-        info = self.mysql_client.select(sql, (self.frame_settings['CODE_STORE_TABLE'], class_name))
+        sql = "select `content` from `{}` where `name`=%s;".format(self.frame_settings['CODE_STORE_TABLE'])
+        info = self.mysql_client.select(sql, (class_name))
         if len(info):
             self.log.debug(f'success find module:{class_name} from remote')
             return class_name, info[0]['content']

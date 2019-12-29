@@ -1,7 +1,7 @@
 """
 @name=MySQLSaverPipeline
 @description=MySQL 存储Pipeline, 将MySQLSaverItem 存储至mysql表中
-@type=middleware
+@type=pipeline
 @editor=bspider
 """
 from bspider.parser import BasePipeline, MySQLSaverItem
@@ -10,17 +10,15 @@ from bspider.utils.database import MysqlClient, prepare_insert_sql
 
 
 class MySQLSaverPipeline(BasePipeline):
-    """
-    因为异步handler事件循环有问题暂时修改为同步方式
-    """
+    """因为异步handler时间循环有问题暂时修改为同步循环"""
 
-    def __init__(self, settings, log):
-        super().__init__(settings, log)
+    def __init__(self, project, settings, log):
+        super().__init__(project, settings, log)
         # 实例化MySQL操作对象
-        db_config = settings.get("MYSQL_SAVER_CONFIG")
+        db_config = settings.get("mysql_config")
         self.mysql_handler = dict()
         if db_config is None:
-            raise ParserError('MYSQL_SAVER_CONFIG must be set in settings.')
+            raise ParserError('\'mysql_config\' must be set in settings.')
 
         for config in db_config:
             self.mysql_handler[config['db']] = MysqlClient(config)
