@@ -49,7 +49,7 @@ class AddForm(BaseForm):
 
     def validate_config(self, value):
         try:
-            schema(yaml.safe_load(value.data))
+            value.data = (schema(yaml.safe_load(value.data)), value.data)
         except MultipleInvalid as e:
             raise ProjectSettingsError(e.error_message)
 
@@ -60,7 +60,7 @@ class UpdateForm(BaseForm):
 
     def validate_config(self, value):
         try:
-            schema(yaml.safe_load(value.data))
+            value.data = (schema(yaml.safe_load(value.data)), value.data)
         except MultipleInvalid as e:
             raise ProjectSettingsError(e.error_message)
 
