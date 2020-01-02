@@ -55,7 +55,7 @@ class AddForm(BaseForm):
 
 class UpdateForm(BaseForm):
     status = IntegerField()
-    description = StringField()
+    config = StringField()
     editor = StringField()
 
     def validate_config(self, value):
