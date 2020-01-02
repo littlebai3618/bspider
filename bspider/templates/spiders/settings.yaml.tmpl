@@ -28,9 +28,3 @@ parser:
     - DemoPipeline:
         # 这里的配置项仅作用于DemoPipeline 其余Middleware 和 Pipeline 无法获取
         param: 'value'
-# 定时任务配置
-bcron:
-  - DemoTask:
-      crontab: '* * * * *'
-      description: ''
-
