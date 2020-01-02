@@ -127,7 +127,7 @@ class DownloaderSettings(object):
         return {
             'max_retry_times': self.__max_retry_times,
             'ignore_retry_http_code': self.__ignore_retry_http_code,
-            'middleware': list(self.middleware)
+            'middleware': {item[0]: item[1] for item in list(self.middleware)}
         }
 
 
@@ -145,7 +145,7 @@ class ParserSettings(object):
 
     def dumps(self):
         return {
-            'pipeline': list(self.pipeline)
+            'pipeline': {item[0]: item[1] for item in list(self.pipeline)}
         }
 
 
