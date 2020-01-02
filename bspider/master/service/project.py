@@ -12,7 +12,7 @@ class ProjectService(BaseService, AgentMixIn):
     def __init__(self):
         self.impl = ProjectImpl()
 
-    def add(self, editor: str, config: dict, status: int = 1):
+    def add(self, editor: str, config: dict, status: int):
         project = Project(config,
                           middleware_serializer_method=self.get_middleware_id_by_name,
                           pipeline_serializer_method=self.get_pipeline_id_by_name)

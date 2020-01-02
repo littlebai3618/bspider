@@ -43,13 +43,13 @@ schema = Schema({
 })
 
 class AddForm(BaseForm):
-    status = IntegerField()
+    status = IntegerField(default=1)
     config = StringField(validators=[ParamRequired()])
-    editor = StringField()
+    editor = StringField(validators=[ParamRequired()])
 
     def validate_config(self, value):
         try:
-            value.data = schema(yaml.safe_load(value))
+            value.data = schema(yaml.safe_load(value.data))
         except MultipleInvalid as e:
             raise ProjectSettingsError(e.error_message)
 
