@@ -127,7 +127,7 @@ class DownloaderSettings(object):
         return {
             'max_retry_times': self.__max_retry_times,
             'ignore_retry_http_code': self.__ignore_retry_http_code,
-            'middleware': {item[0]: item[1] for item in list(self.middleware)}
+            'middleware': list(self.middleware)
         }
 
 
@@ -145,7 +145,7 @@ class ParserSettings(object):
 
     def dumps(self):
         return {
-            'pipeline': {item[0]: item[1] for item in list(self.pipeline)}
+            'pipeline': list(self.pipeline)
         }
 
 
@@ -167,8 +167,8 @@ class BaseModuleSettings(object):
 
         for cls, params in self.__data[self.__cur].items():
             if self.__serializer_method:
-                return self.__serializer_method(cls), params
-            return cls, params
+                return {self.__serializer_method(cls): params}
+            return {cls: params}
             # raise ProjectSettingsError('serializer_method is None')
 
     def __eq__(self, other):
