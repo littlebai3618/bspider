@@ -14,7 +14,7 @@ class ProjectService(BaseService, AgentMixIn):
         self.impl = ProjectImpl()
 
     def add(self, editor: str, config: dict, status: int):
-        project = Project(config,
+        project = Project(yaml.safe_load(config),
                           middleware_serializer_method=self.get_middleware_id_by_name,
                           pipeline_serializer_method=self.get_pipeline_id_by_name)
         log.debug(
@@ -31,7 +31,7 @@ class ProjectService(BaseService, AgentMixIn):
                     'description': project.description,
                     'editor': editor,
                     'rate': project.rate,
-                    'config': yaml.safe_dump(config),
+                    'config': config,
                     'r_config': r_config
                 }
 
@@ -73,7 +73,7 @@ class ProjectService(BaseService, AgentMixIn):
             if not len(infos):
                 return NotFound(msg='project not exist', errno=30001)
 
-            new_project = Project(changes['config'])
+            new_project = Project(yaml.safe_load(changes['config']))
             try:
                 old_project = Project(yaml.safe_load(infos[0]['config']))
             except Exception as e:
@@ -101,8 +101,6 @@ class ProjectService(BaseService, AgentMixIn):
             if False in sign:
                 remote_param['config'] = new_project.dumps()
                 changes['r_config'] = remote_param['config']
-
-            changes['config'] = yaml.safe_dump(changes['config'])
 
         if len(remote_param):
             with self.impl.mysql_client.session() as session:
