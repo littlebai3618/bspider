@@ -78,7 +78,7 @@ class ProjectService(BaseService, AgentMixIn):
                 old_project = Project(yaml.safe_load(infos[0]['config']))
             except Exception as e:
                 log.warning(f'update error: old project yaml load failed:{e}')
-                old_project = new_project
+                return Conflict(msg=f'update error: old project yaml load failed:{e}', errno=30003)
 
             if old_project.project_name != new_project.project_name:
                 remote_param['name'] = new_project.project_name
@@ -176,9 +176,14 @@ class ProjectService(BaseService, AgentMixIn):
             errno=30003)
 
     def get_pipeline_id_by_name(self, cls_name) -> int:
-        data = self.impl.get_module_id_by_name_and_type(cls_name, 'pipeline')
+        module = 'pipeline'
+        data = self.impl.get_module_id_by_name_and_type(cls_name, module)
+        if len(data):
+            return data[0]['id']
+        module = 'extractor'
+        data = self.impl.get_module_id_by_name_and_type(cls_name, module)
         if len(data):
             return data[0]['id']
         raise Conflict(
-            msg=f'lack of necessary pipeline <{cls_name}>!',
+            msg=f'lack of necessary {module} <{cls_name}>!',
             errno=30003)
