@@ -1,3 +1,4 @@
+import yaml
 from pymysql import IntegrityError
 
 from bspider.core import Project
@@ -72,8 +73,12 @@ class ProjectService(BaseService, AgentMixIn):
             if not len(infos):
                 return NotFound(msg='project not exist', errno=30001)
 
-            old_project = Project(infos[0]['config'])
             new_project = Project(changes['config'])
+            try:
+                old_project = Project(yaml.safe_load(infos[0]['config']))
+            except Exception as e:
+                log.warning(f'update error: old project yaml load failed:{e}')
+                old_project = new_project
 
             if old_project.project_name != new_project.project_name:
                 remote_param['name'] = new_project.project_name
