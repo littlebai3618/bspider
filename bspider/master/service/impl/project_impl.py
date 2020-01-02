@@ -41,6 +41,7 @@ class ProjectImpl(BaseImpl):
     def update_project(self, unique_value, data, unique_key='id'):
         fields, values = BaseImpl.make_fv(data)
         sql = f"update {self.project_table} set {fields} where `{unique_key}` = '{unique_value}';"
+        log.info(sql, values)
         return sql, values
 
     def get_module_id_by_name_and_type(self, code_name, code_type):
