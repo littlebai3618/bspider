@@ -31,7 +31,7 @@ class ProjectService(BaseService, AgentMixIn):
                     'description': project.description,
                     'editor': editor,
                     'rate': project.rate,
-                    'config': config,
+                    'config': yaml.safe_dump(config),
                     'r_config': r_config
                 }
 
@@ -101,6 +101,8 @@ class ProjectService(BaseService, AgentMixIn):
             if False in sign:
                 remote_param['config'] = new_project.dumps()
                 changes['r_config'] = remote_param['config']
+
+            changes['config'] = yaml.safe_dump(changes['config'])
 
         if len(remote_param):
             with self.impl.mysql_client.session() as session:

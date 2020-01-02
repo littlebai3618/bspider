@@ -3,6 +3,7 @@
 """
 import asyncio
 import hashlib
+import json
 import re
 import time
 
@@ -32,9 +33,17 @@ def make_fields_values(data: dict) -> tuple:
     :param info: dict
     :return:
     """
-    fields = ','.join([' `%s`=%%s ' % (key) for key in data.keys()])
+    fields = list()
+    values = list()
+    for key, value in data.items():
+        fields.append(' `%s`=%%s ' % (key))
+        if isinstance(value, str):
+            values.append(value)
+        else:
+            values.append(json.dumps(value))
+
     values = [data[key] for key in data.keys()]
-    return fields, tuple(values)
+    return ','.join(fields), tuple(values)
 
 
 def find_class_name_by_content(content):
