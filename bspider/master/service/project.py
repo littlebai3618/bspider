@@ -108,6 +108,7 @@ class ProjectService(BaseService, AgentMixIn):
             with self.impl.mysql_client.session() as session:
                 session.update(*self.impl.update_project(project_id, changes))
                 r_config = changes.get('r_config')
+                log.debug(r_config)
                 if r_config:
                     cids = [cid for cid, _ in r_config['downloader']['middleware']]
                     cids.extend([cid for cid, _ in r_config['parser']['pipeline']])
