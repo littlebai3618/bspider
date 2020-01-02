@@ -38,8 +38,8 @@ class ProjectService(BaseService, AgentMixIn):
                 project_id = session.insert(*self.impl.add_project(data), lastrowid=True)
                 self.impl.bind_queue(project_id=project_id)
                 log.debug(f'bind new project=>{project.project_name} queue success!')
-                cids = [items.keys()[0] for items in r_config['downloader']['middleware']]
-                cids.extend([items.keys()[0] for items in r_config['parser']['pipeline']])
+                cids = [[cid for cid in items.keys()][0] for items in r_config['downloader']['middleware']]
+                cids.extend([[cid for cid in items.keys()][0] for items in r_config['parser']['pipeline']])
                 log.debug(f'code num: {cids}')
                 session.insert(*self.impl.add_project_binds(cids, project_id))
                 info = {
@@ -110,8 +110,8 @@ class ProjectService(BaseService, AgentMixIn):
                 r_config = changes.get('r_config')
                 log.debug(r_config)
                 if r_config:
-                    cids = [items.keys()[0] for items in r_config['downloader']['middleware']]
-                    cids.extend([items.keys()[0] for items in r_config['parser']['pipeline']])
+                    cids = [[cid for cid in items.keys()][0] for items in r_config['downloader']['middleware']]
+                    cids.extend([[cid for cid in items.keys()][0] for items in r_config['parser']['pipeline']])
                     log.debug(f'code num: {cids}')
                     # 20191224 bug修复，修复无法删除module引用
                     session.delete(*self.impl.delete_project_binds(project_id))
