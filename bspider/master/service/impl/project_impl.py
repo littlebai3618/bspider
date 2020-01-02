@@ -27,6 +27,7 @@ class ProjectImpl(BaseImpl):
         return self.mysql_client.select(sql), self.total_num(search, self.code_table)
 
     def add_project(self, data):
+        log.debug(data)
         fields, values = self.make_fv(data)
         sql = f"insert into {self.project_table} set {fields};"
         return sql, values
