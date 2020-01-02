@@ -14,7 +14,7 @@ class ProjectService(BaseService, AgentMixIn):
         self.impl = ProjectImpl()
 
     def add(self, editor: str, config: list, status: int):
-        project = Project(yaml.safe_load(config[0]),
+        project = Project(config[0],
                           middleware_serializer_method=self.get_middleware_id_by_name,
                           pipeline_serializer_method=self.get_pipeline_id_by_name)
         log.debug(
@@ -73,7 +73,7 @@ class ProjectService(BaseService, AgentMixIn):
             if not len(infos):
                 return NotFound(msg='project not exist', errno=30001)
 
-            new_project = Project(yaml.safe_load(changes['config'][0]))
+            new_project = Project(changes['config'][0])
             try:
                 old_project = Project(yaml.safe_load(infos[0]['config']))
             except Exception as e:
