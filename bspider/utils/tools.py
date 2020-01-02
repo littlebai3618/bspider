@@ -37,12 +37,11 @@ def make_fields_values(data: dict) -> tuple:
     values = list()
     for key, value in data.items():
         fields.append(' `%s`=%%s ' % (key))
-        if isinstance(value, str):
-            values.append(value)
-        else:
+        if isinstance(value, dict) or isinstance(value, list):
             values.append(json.dumps(value))
+        else:
+            values.append(value)
 
-    values = [data[key] for key in data.keys()]
     return ','.join(fields), tuple(values)
 
 
