@@ -1,6 +1,4 @@
-import typing
-from aiormq.types import ConfirmationFrameType, DrainResult
-from pamqp import specification as spec
+from aiormq.types import DrainResult
 
 from .pool import Pool
 

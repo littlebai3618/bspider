@@ -1,7 +1,3 @@
-# @Time    : 2019/7/11 3:58 PM
-# @Author  : 白尚林
-# @File    : log_handler
-# @Use     :
 import logging
 import os
 import sys
