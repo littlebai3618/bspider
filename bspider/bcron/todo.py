@@ -77,7 +77,7 @@ def run_spider_project(project_id, code_id, **kwargs):
 
     run_status, run_msg = run_corn_job_code(
         code_id=code_id,
-        project_id=0,
+        project_id=project_id,
         do_type='project',
         config=info['config'])
     __log.debug(info['config'])
