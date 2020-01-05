@@ -75,7 +75,11 @@ def run_spider_project(project_id, code_id, **kwargs):
         __log.warning(f'project_id:{project_id} is not run')
         # ding(f'spider project job:{project_name} is not run')
 
-    run_status, run_msg = run_corn_job_code(code_id, info['id'], info['config'])
+    run_status, run_msg = run_corn_job_code(
+        code_id=code_id,
+        project_id=0,
+        do_type='project',
+        config=info['config'])
     __log.debug(info['config'])
     if run_status:
         __log.info(run_msg)
