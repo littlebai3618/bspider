@@ -1,13 +1,10 @@
-# @Time    : 2019/6/15 5:55 PM
-# @Author  : 白尚林
-# @File    : do
-# @Use     :
 """
 这个是实际执行的方法，这个方法接收参数，通过参数决定行为
 """
 import sys
 import traceback
 
+import yaml
 
 from bspider.config import FrameSettings
 from bspider.core import Project
@@ -55,7 +52,6 @@ def do(**kwargs):
         __log.warning(f'WARNING: UNKNOW CRON JOB PARAMS: {kwargs}')
 
 
-
 def run_spider_project(project_id, code_id, **kwargs):
     """
     执行自动加载脚本的定时任务
@@ -90,9 +86,9 @@ def run_spider_project(project_id, code_id, **kwargs):
 
 def run_operation_project(code_id, **kwargs):
     run_status, run_msg = run_corn_job_code(
-        code_id,
-        0,
-        '{"downloader": {"middleware": [], "settings": {}}, "parser": {"pipeline": [], "settings": {}}}')
+        code_id=code_id,
+        project_id=0,
+        do_type='operation')
     if run_status:
         __log.info(run_msg)
     else:
@@ -100,7 +96,7 @@ def run_operation_project(code_id, **kwargs):
         ding(run_msg, 'operation task')
 
 
-def run_corn_job_code(code_id, project_id, config):
+def run_corn_job_code(code_id, project_id, do_type, config: str = None):
     CODE_STORE_TABLE = __frame_settings['CODE_STORE_TABLE']
     sql = f'select `name`, `content` from {CODE_STORE_TABLE} where `id`="{code_id}"'
     tmp = __mysql_client.select(sql)
@@ -109,23 +105,36 @@ def run_corn_job_code(code_id, project_id, config):
     content = tmp[0]['content']
     class_name = tmp[0]['name']
     mod = import_module_by_code(class_name, content)
+    instance_arg = list()
     if hasattr(mod, class_name):
-        try:
-            project = Project(config)
-            project.project_id = project_id
-        except Exception:
-            tp, msg, tb = sys.exc_info()
-            e_msg = '> '.join(traceback.format_exception(tp, msg, tb))
-            return False, f'{project_id}-{code_id}:\n > {e_msg}'
+        if do_type == 'operation':
+            instance_arg.append(LoggerPool().get_logger(
+                key=f'bcorn-{class_name}',
+                fn='bcorn',
+                module='bcorn',
+                project='operation'))
+        else:
+            try:
+                project = Project(yaml.safe_load(config))
+                project.project_id = project_id
+                instance_arg.append(project)
+                instance_arg.append(project.global_settings)
+                instance_arg.append(LoggerPool().get_logger(
+                    key=project.project_name,
+                    fn='bcorn',
+                    module='bcorn',
+                    project=project.project_name))
+            except Exception:
+                tp, msg, tb = sys.exc_info()
+                e_msg = '> '.join(traceback.format_exception(tp, msg, tb))
+                return False, f'{project_id}-{code_id}:\n > {e_msg}'
 
-        log = LoggerPool().get_logger(key=project.project_name, fn='bcorn', module='bcorn', project=project.project_name)
         try:
-            instance = getattr(mod, class_name)(project, project.global_settings, log)
-            # await instance._exec(func_name='execute_task')
-            instance.execute_task()
+            getattr(mod, class_name)(*instance_arg).execute_task()
             return True, f'{project_id}-{code_id} run succeed'
         except Exception:
             tp, msg, tb = sys.exc_info()
             e_msg = '> '.join(traceback.format_exception(tp, msg, tb))
             return False, f'{project_id}-{code_id} cron job run failed:\n > {e_msg}'
+
     return False, f'{project_id}-{code_id} don\'t have {class_name}'

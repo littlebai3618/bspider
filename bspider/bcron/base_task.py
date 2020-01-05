@@ -11,7 +11,6 @@ from bspider.core import Project
 from bspider.core.custom_module import BaseCustomModule
 from bspider.http import Request
 from bspider.utils.exceptions import MethodError
-from bspider.utils.logger import LoggerPool
 from bspider.utils.rabbitMQ import RabbitMQClient
 
 
@@ -32,9 +31,9 @@ class BaseTask(BaseCustomModule):
         data = json.dumps(request.dumps())
         self.__mq_client.send_msg(
             self.frame_settings['EXCHANGE_NAME'][0],
-            str(self.settings.project_id),
+            str(self.project.project_id),
             data,
             request.priority)
-        self.log.info(f'project:project_id->{self.settings.project_id} success send a request->{request.sign}')
-        self.log.debug(f'project:project_id->{self.settings.project_id} Request: {data}')
+        self.log.info(f'project:project_id->{self.project.project_id} success send a request->{request.sign}')
+        self.log.debug(f'project:project_id->{self.project.project_id} Request: {data}')
         return True
