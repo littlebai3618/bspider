@@ -1,7 +1,3 @@
-# @Time    : 2019/7/8 3:29 PM
-# @Author  : 白尚林
-# @File    : base_task
-# @Use     :
 """定时任务的基础类，所有定时任务类必须继承"""
 import json
 import logging
