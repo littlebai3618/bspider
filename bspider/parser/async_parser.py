@@ -24,20 +24,22 @@ class AsyncParser(object):
             key=f'project_parser->{self.project_id}', fn=log_fn, module='parser', project=self.project_name)
 
         self.pipes = []
-        for cls, params in project.parser_settings.pipeline:
-            cls_name, code = cls
-            mod = import_module_by_code(cls_name, code)
-            if mod:
-                if hasattr(mod, cls_name):
-                    try:
-                        self.pipes.append(getattr(mod, cls_name)(project, {**project.global_settings, **params}, self.log))
-                        self.log.info(f'success load: <{self.project_name}:{cls_name}>!')
-                    except Exception as e:
-                        raise ParserError(
-                            '%s pipeline init failed: %s like: %s' % (self.project_name, cls_name, e))
-            else:
-                msg = f'{self.project_name} pipeline init failed: {cls_name}'
-                raise ParserError(msg)
+        for pipeline in project.parser_settings.pipeline:
+            for cls, params in pipeline.items():
+                cls_name, code = cls
+                mod = import_module_by_code(cls_name, code)
+                if mod:
+                    if hasattr(mod, cls_name):
+                        try:
+                            self.pipes.append(
+                                getattr(mod, cls_name)(project, {**project.global_settings, **params}, self.log))
+                            self.log.info(f'success load: <{self.project_name}:{cls_name}>!')
+                        except Exception as e:
+                            raise ParserError(
+                                '%s pipeline init failed: %s like: %s' % (self.project_name, cls_name, e))
+                else:
+                    msg = f'{self.project_name} pipeline init failed: {cls_name}'
+                    raise ParserError(msg)
 
     async def parse(self, response: Response) -> list:
         """

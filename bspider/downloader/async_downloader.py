@@ -31,26 +31,28 @@ class AsyncDownloader(object):
         # 加载重试次数
         self.retry_times = project.downloader_settings.max_retry_times
         self.log.debug(f'{self.project_name} init retry time from settings: {self.retry_times}')
+
+        project.downloader_settings.ignore_retry_http_code.append(599)
+        self.ignore_retry_http_code = project.downloader_settings.ignore_retry_http_code
+        self.log.debug(
+            f'{self.project_name} init accept response code from settings: {self.ignore_retry_http_code}')
+
         self.mws = []
-        for cls, params in project.downloader_settings.middleware:
-            cls_name, code = cls
-            mod = import_module_by_code(cls_name, code)
-            if mod and hasattr(mod, cls_name):
-                try:
-                    self.mws.append(getattr(mod, cls_name)(project, {**project.global_settings, **params}, self.log))
-                    self.log.info(f'success load: <{self.project_name}:{cls_name}>!')
-                except Exception as e:
-                    raise DownloaderError('<%s:%s> middleware init failed: %s' % (self.project_name, cls_name, e))
+        for middleware in project.downloader_settings.middleware:
+            for cls, params in middleware.items():
+                cls_name, code = cls
+                mod = import_module_by_code(cls_name, code)
+                if mod and hasattr(mod, cls_name):
+                    try:
+                        self.mws.append(
+                            getattr(mod, cls_name)(project, {**project.global_settings, **params}, self.log))
+                        self.log.info(f'success load: <{self.project_name}:{cls_name}>!')
+                    except Exception as e:
+                        raise DownloaderError('<%s:%s> middleware init failed: %s' % (self.project_name, cls_name, e))
 
-            else:
-                msg = f'<{self.project_name}:{cls_name}> middleware init failed: middleware is invalid!'
-                raise DownloaderError(msg)
-
-            project.downloader_settings.ignore_retry_http_code.append(599)
-            self.ignore_retry_http_code = project.downloader_settings.ignore_retry_http_code
-            self.log.debug(
-                f'{self.project_name} init accept response code from settings: {self.ignore_retry_http_code}')
-
+                else:
+                    msg = f'<{self.project_name}:{cls_name}> middleware init failed: middleware is invalid!'
+                    raise DownloaderError(msg)
 
     async def download(self, request: Request) -> (Response, bool, str):
         """
@@ -88,7 +90,8 @@ class AsyncDownloader(object):
                 e_msg = ''.join(traceback.format_exception(tp, msg, tb))
                 e.with_traceback(tb)
                 self.log.exception(e_msg)
-                self.log.info(f'Retry download: url->{request.url} status->{response.status} retry_time:{retry_index + 1}')
+                self.log.info(
+                    f'Retry download: url->{request.url} status->{response.status} retry_time:{retry_index + 1}')
                 # 执行下载异常中间件
                 for mw in self.mws:
                     self.log.debug(f'{mw.__class__.__name__} executing process_response')
