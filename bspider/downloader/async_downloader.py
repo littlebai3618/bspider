@@ -88,7 +88,7 @@ class AsyncDownloader(object):
                 e_msg = ''.join(traceback.format_exception(tp, msg, tb))
                 e.with_traceback(tb)
                 self.log.exception(e_msg)
-                self.log.info(f'Retry download: url->{request.url} status->{response.status} retry_time:{retry_index}')
+                self.log.info(f'Retry download: url->{request.url} status->{response.status} retry_time:{retry_index + 1}')
                 # 执行下载异常中间件
                 for mw in self.mws:
                     self.log.debug(f'{mw.__class__.__name__} executing process_response')
@@ -104,7 +104,7 @@ class AsyncDownloader(object):
 
             if response.status == 200 or response.status in self.ignore_retry_http_code:
                 return response, True, None
-            self.log.info(f'Retry download: url->{request.url} status->{response.status} time:{retry_index}')
+            self.log.info(f'Retry download: url->{request.url} status->{response.status} time:{retry_index + 1}')
         self.log.info(f'{response.sign}')
         return response, False, e_msg
 
