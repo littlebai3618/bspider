@@ -143,6 +143,7 @@ class AsyncDownloader(object):
         :return:
         """
         # sc 在每次请求都要关闭，所以使用上下文管理器进行管理
+        self.log.info(f'request proxy: {req.proxy}')
         temp_timeout = aiohttp.ClientTimeout(total=req.timeout)
         async with aiohttp.ClientSession() as session:
             async with session.request(
