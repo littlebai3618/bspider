@@ -32,8 +32,7 @@ class AsyncDownloader(object):
         self.retry_times = project.downloader_settings.max_retry_times
         self.log.debug(f'{self.project_name} init retry time from settings: {self.retry_times}')
 
-        project.downloader_settings.ignore_retry_http_code.append(599)
-        self.ignore_retry_http_code = project.downloader_settings.ignore_retry_http_code
+        self.ignore_retry_http_code = set(project.downloader_settings.ignore_retry_http_code)
         self.log.debug(
             f'{self.project_name} init accept response code from settings: {self.ignore_retry_http_code}')
 
@@ -107,8 +106,10 @@ class AsyncDownloader(object):
 
             if response.status == 200 or response.status in self.ignore_retry_http_code:
                 return response, True, None
+            if response.status == 599:
+                return response, False, e_msg
             self.log.info(f'Retry download: url->{request.url} status->{response.status} time:{retry_index + 1}')
-        self.log.info(f'{response.sign}')
+        self.log.debug(f'{response.sign}')
         return response, False, e_msg
 
     async def __assemble_response(self, response: ClientResponse, request: Request) -> Response:
