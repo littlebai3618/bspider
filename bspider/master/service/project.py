@@ -3,6 +3,7 @@ from pymysql import IntegrityError
 
 from bspider.core import Project
 from bspider.master import log
+from bspider.master.controller.validators.project_form import schema
 from bspider.master.service.impl.project_impl import ProjectImpl
 from bspider.core.api import BaseService, Conflict, NotFound, PostSuccess, DeleteSuccess, GetSuccess, \
     PatchSuccess, ParameterException, AgentMixIn
@@ -77,7 +78,7 @@ class ProjectService(BaseService, AgentMixIn):
                                   middleware_serializer_method=self.get_middleware_id_by_name,
                                   pipeline_serializer_method=self.get_pipeline_id_by_name)
             try:
-                old_project = Project(yaml.safe_load(infos[0]['config']))
+                old_project = Project(schema(yaml.safe_load(infos[0]['config'])))
             except Exception as e:
                 log.warning(f'update error: old project yaml load failed:{e}')
                 return Conflict(msg=f'update error: old project yaml load failed:{e}', errno=30003)
