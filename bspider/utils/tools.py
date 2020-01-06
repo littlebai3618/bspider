@@ -7,6 +7,8 @@ import json
 import re
 import time
 
+from bspider.utils.exceptions import ModuleError
+
 
 def make_sign(url, salt=''):
     return '{}-{}'.format(hashlib.md5(f'{url}{salt}'.encode('utf-8')).hexdigest(), time.time())
@@ -50,4 +52,4 @@ def find_class_name_by_content(content):
     if reg:
         tmp = reg.groupdict()
         return True, tmp['class_name'], tmp['sub_class_name']
-    return False, None, None
+    raise ModuleError('content can\'t find class_name and sub_class_name -> \n%s' % (content[0: 100] + ' ...'))

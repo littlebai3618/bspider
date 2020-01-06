@@ -93,7 +93,7 @@ class BaseMonitor(object):
 
     def code_id_to_content(self, code_id):
         content = self.__cache.get_code(code_id)[0]['content']
-        _, cls_name, _ = find_class_name_by_content(content)
+        cls_name, _ = find_class_name_by_content(content)
         return cls_name, content
 
     def get_work_obj(self, project: Project, sign: Sign):

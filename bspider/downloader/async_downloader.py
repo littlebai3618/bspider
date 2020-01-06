@@ -7,7 +7,6 @@ import sys
 import traceback
 
 import aiohttp
-
 from aiohttp import ClientResponse
 
 from bspider.core import Project
@@ -125,26 +124,8 @@ class AsyncDownloader(object):
         )
 
     async def __do(self, req: Request) -> Response:
-        """
-        执行下载操作
-        url': '', # 请求的url 必须
-        method': '', # 请求的方法 GET, POST, PUT ,PATCH, OPTIONS, HEAD, DELETE
-        request_body': {}, # POST 请求的消息体 字典结构
-        cookies': {}, # 请求时携带的cookie 字典结构
-        meta': {}, # 请求时携带的上下文信息，通常与本次请求无关
-        proxy': str
-        allow_redirect': bool, # 下载是否需要重定向
-        timeout: int /s
-        task_info': {
-            name': '', # 任务信息
-            task_sign': '', # 一个任务中一个链接中每一次请求的唯一标识
-        }
-        :param param: dict 下载参数
-        :return:
-        """
-        # sc 在每次请求都要关闭，所以使用上下文管理器进行管理
-        self.log.info(f'request proxy: {req.proxy}')
-        temp_timeout = aiohttp.ClientTimeout(total=req.timeout)
+        # ClientSession 在每次请求都要关闭，所以使用上下文管理器进行管理
+        temp_timeout = aiohttp.ClientTimeout(connect=req.timeout)
         async with aiohttp.ClientSession() as session:
             async with session.request(
                     method=req.method,

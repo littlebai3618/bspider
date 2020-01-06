@@ -1,9 +1,8 @@
 from pymysql import IntegrityError
 
-from bspider.core.api import BaseService, Conflict, NotFound, PostSuccess, PatchSuccess, PartialSuccess, DeleteSuccess, \
+from bspider.core.api import BaseService, Conflict, NotFound, PostSuccess, PatchSuccess, DeleteSuccess, \
     GetSuccess, ParameterException
 from bspider.core.api import AgentMixIn
-from bspider.utils.validate import valid_code
 from bspider.master.server import log
 from bspider.master.service.impl.code_impl import CodeImpl
 
@@ -13,10 +12,8 @@ class CodeService(BaseService, AgentMixIn):
     def __init__(self):
         self.impl = CodeImpl()
 
-    def add(self, name, description, code_type, content, editor):
-        sign, msg = valid_code(name, code_type, content)
-        if not sign:
-            return Conflict(msg=msg, errno=40005)
+    def add(self, content, editor):
+        name, code_type, description, content = content
         try:
             with self.impl.mysql_client.session() as session:
                 data = {
@@ -30,7 +27,7 @@ class CodeService(BaseService, AgentMixIn):
 
                 sign, result = self.op_add_code(self.impl.get_nodes(), {'code_id': code_id, 'content': content})
                 if not sign:
-                    log.warning(f'not all node add cide:{name} =>{msg}')
+                    log.warning(f'not all node add cide:{name} =>{result}')
                     raise Conflict(msg=f'not all node add code:{name}', data=result, errno=40006)
             log.info(f'add code success:{name}-{editor}')
             return PostSuccess(msg='add code success', data={'code_id': code_id})
@@ -38,28 +35,35 @@ class CodeService(BaseService, AgentMixIn):
             log.error(f'add code failed:{name}-{editor} code is already exist')
             return Conflict(msg='code is already exist', errno=40002)
 
-    def update(self, code_id, changes):
+    def update(self, code_id, content, editor):
         infos = self.impl.get_code(code_id)
         if not len(infos):
             return NotFound(msg='code is not exist', errno=40001)
-
         info = infos[0]
+        update_info = dict()
 
         with self.impl.mysql_client.session() as session:
-            if 'content' in changes:
-                sign, msg = valid_code(
-                    name=changes.get('name', info['name']),
-                    code_type=changes.get('type', info['type']),
-                    content=changes['content']
-                )
-                if not sign:
-                    raise Conflict(msg=msg, errno=40005)
-                sign, result = self.op_update_code(self.impl.get_nodes(), code_id, {'content': changes['content']})
+            name, code_type, description, content = content
+            if name != info['name']:
+                update_info['name'] = name
+
+            if editor != info['editor']:
+                update_info['editor'] = editor
+
+            if code_type != info['type']:
+                update_info['type'] = code_type
+
+            if description != info['description']:
+                update_info['description'] = description
+
+            if content != info['content']:
+                sign, result = self.op_update_code(self.impl.get_nodes(), code_id, {'content': content})
                 if not sign:
                     log.warning(f'code:code_id->:{code_id} update exec')
                     raise Conflict(msg=f'not all code:code_id->:{code_id} was update', data=result, errno=40006)
-            session.update(*self.impl.update_code(code_id, changes))
-        log.info(f'update code success: {changes}')
+
+            session.update(*self.impl.update_code(code_id, update_info))
+        log.info(f'update code success: {update_info}')
         return PatchSuccess(msg='update code success')
 
     def delete(self, code_id):

@@ -5,8 +5,10 @@ class MethodError(Exception):
 class ProjectSettingsError(Exception):
     pass
 
+class ModuleError(Exception):
+    pass
 
-class ModuleExistError(Exception):
+class ModuleExistError(ModuleError):
     pass
 
 
@@ -30,17 +32,17 @@ class UsageError(Exception):
     pass
 
 
-class MiddleWareParamError(Exception):
+class MiddleWareParamError(ModuleError):
     pass
 
 
-class PipelineParamError(Exception):
+class PipelineParamError(ModuleError):
     pass
 
 
-class OperationParamError(Exception):
+class OperationParamError(ModuleError):
     pass
 
 
-class TaskParamError(Exception):
+class TaskParamError(ModuleError):
     pass

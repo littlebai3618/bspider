@@ -117,14 +117,11 @@ class Debuger(object):
             file_path = os.path.join(project_path, file)
             with open(file_path) as f:
                 content = f.read().strip()
-                sign, class_name, sub_class = find_class_name_by_content(content)
+                class_name, sub_class = find_class_name_by_content(content)
 
             if sub_class in ('BaseMiddleware', 'BaseExtractor', 'BasePipeline'):
-                if sign:
-                    self.log.debug(f'success find module:{class_name} from local')
-                    local_project_class[class_name] = content
-                else:
-                    raise ModuleExistError('load module from file %s failed, unrecognized class name' % (file))
+                self.log.debug(f'success find module:{class_name} from local')
+                local_project_class[class_name] = content
         return local_project_class
 
     def load_remote_module(self, class_name):
