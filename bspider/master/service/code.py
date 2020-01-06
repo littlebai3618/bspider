@@ -13,6 +13,7 @@ class CodeService(BaseService, AgentMixIn):
         self.impl = CodeImpl()
 
     def add(self, content, editor):
+        log.info(content)
         name, code_type, description, content = content
         try:
             with self.impl.mysql_client.session() as session:
@@ -36,6 +37,7 @@ class CodeService(BaseService, AgentMixIn):
             return Conflict(msg='code is already exist', errno=40002)
 
     def update(self, code_id, content, editor):
+        log.info(content)
         infos = self.impl.get_code(code_id)
         if not len(infos):
             return NotFound(msg='code is not exist', errno=40001)
