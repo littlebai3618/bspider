@@ -61,7 +61,7 @@ def run_spider_project(project_id, code_id, **kwargs):
     """
     __log.info(f'corn job: {project_id, code_id} run as crawl pattern')
     PROJECT_TABLE = __frame_settings['PROJECT_TABLE']
-    sql = f'select `id`, `name`, `config`, `status` from {PROJECT_TABLE} where `id`="{project_id}"'
+    sql = f'select `id`, `name`, `r_config` as `config`, `status` from {PROJECT_TABLE} where `id`="{project_id}"'
 
     infos = __mysql_client.select(sql)
     __log.debug(f'run spider_project cron_job select sql:{sql}')
