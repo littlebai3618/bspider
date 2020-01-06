@@ -1,8 +1,9 @@
 import re
 
+from flask import g
 from wtforms import StringField
 
-from bspider.core.api import BaseForm, ParamRequired
+from bspider.core.api import BaseForm, ParamRequired, Forbidden
 from bspider.utils.exceptions import ModuleError
 from bspider.utils.tools import find_class_name_by_content
 
@@ -14,6 +15,11 @@ def valid_code(content):
         description = pre_description[0]
 
     class_name, sub_class_name = find_class_name_by_content(content)
+
+    # 非admin角色不能新增operation 类
+    if class_name.lower().rfind('operation') != -1 and g.user.role != 'admin':
+        raise Forbidden(msg='role has no permission!', errno=10004)
+
     code_type_map = {
         'BaseTask': 'task',
         'BaseOperation': 'operation',
