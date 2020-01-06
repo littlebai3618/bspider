@@ -30,7 +30,7 @@ setup(
     ],
     python_requires='>=3.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*',
     install_requires=[
-        'aiohttp==3.5.4',
+        'aiohttp==3.6.2',
         'aiomysql==0.0.20',
         'aiormq==2.7.2',
         'APScheduler==3.6.1',
