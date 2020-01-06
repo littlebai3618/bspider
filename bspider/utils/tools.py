@@ -51,5 +51,5 @@ def find_class_name_by_content(content):
     reg = re.compile('class (?P<class_name>.*?)\((?P<sub_class_name>.*?)\):').search(content)
     if reg:
         tmp = reg.groupdict()
-        return True, tmp['class_name'], tmp['sub_class_name']
+        return tmp['class_name'], tmp['sub_class_name']
     raise ModuleError('content can\'t find class_name and sub_class_name -> \n%s' % (content[0: 100] + ' ...'))
