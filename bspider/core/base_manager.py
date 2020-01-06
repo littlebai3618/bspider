@@ -122,7 +122,6 @@ class BaseManager(object):
             'method': request.method,
             'url': request.url,
             'status': response.status,
-            'url_sign': request.url,
             'exception': exception,
             'response': base64.b64encode(zlib.compress(json.dumps(response.dumps()).encode()))
         }
