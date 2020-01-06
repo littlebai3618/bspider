@@ -122,6 +122,7 @@ class BaseManager(object):
             'method': request.method,
             'url': request.url,
             'status': response.status,
+            'url_sign': request.url,
             'exception': exception,
             'response': base64.b64encode(zlib.compress(json.dumps(response.dumps()).encode()))
         }
@@ -130,6 +131,6 @@ class BaseManager(object):
         else:
             data['data'] = None
         fields, values = BaseImpl.make_fv(data)
-        sql = f'insert into {self.status_table} set {fields};'.replace('`url_sign`=%s', '`url_sign`=md5(%s)')
-        await self.mysql_client.insert(sql, values)
+        sql = f'insert into {self.status_table} set {fields};'
+        await self.mysql_client.insert(sql.replace('`url_sign`=%s', '`url_sign`=md5(%s)'), values)
         self.log.info('send error info [{}]'.format(fields % values))
