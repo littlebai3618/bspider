@@ -91,9 +91,9 @@ cd ${platform_name}/projects/${spider_name}
 ```
 各文件说明
 > 1. *_pipeline.py 类似于Scrapy 的pipeline `一个py文件只能包含一个pipeline class 且类名必须为 *Pipeline`
-> 2. *_extractor.py 抽取逻辑。目前`只支持xpath`
+> 2. *_extractor.py 抽取逻辑。目前`只支持xpath 通常一个抓取任务只需编写此组件`
 > 3. *_middleware.py 下载器中间件。`一个py文件只能包含一个middleware class 且类名必须为 *Middleware`
-> 4. settings.json 当前下载任务的配置
+> 4. settings.yml 当前下载任务的配置
 > 5. *_task.py 定时任务，用于向队列中推送初始url, 相当于scrapy的start_url `一个py文件只能包含一个task class 且类名必须为 *Task`
 > 6. debug.py 开发时的调试入口 `python debug.py` 开始调试
 
@@ -104,4 +104,9 @@ cd ${platform_name}/projects/${spider_name}
 
 *** 发布前先确认有 一个或以上的 parser、downloader进程运行
 > 1. ${}/#/code/create
+
+TODO
+
+1. UI: 在*editor组件中无法修改内容，不确定是前端还是后端的bug
+2. 修改模块时不能正确提示当前模块的使用状况的bug
 
