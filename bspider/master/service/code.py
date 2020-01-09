@@ -77,7 +77,7 @@ class CodeService(BaseService, AgentMixIn):
                 sign, result = self.op_delete_code(self.impl.get_nodes(), code_id)
                 if not sign:
                     log.warning(f'code:code_id->:{code_id} delete exec')
-                    raise Conflict(msg=f'not all code:code_id->:{code_id} was delete', data=msg, errno=40006)
+                    raise Conflict(msg=f'not all code:code_id->:{code_id} was delete', data=result, errno=40006)
                 session.delete(*self.impl.delete_code(code_id))
             log.info(f'success delete code:{code_id}')
             return DeleteSuccess()
