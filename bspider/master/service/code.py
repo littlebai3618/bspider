@@ -37,12 +37,10 @@ class CodeService(BaseService, AgentMixIn):
             return Conflict(msg='code is already exist', errno=40002)
 
     def update(self, code_id, content, editor):
-        log.debug(content)
         infos = self.impl.get_code(code_id)
         if not len(infos):
             return NotFound(msg='code is not exist', errno=40001)
         info = infos[0]
-        log.debug(info)
         update_info = dict()
 
         with self.impl.mysql_client.session() as session:
@@ -64,6 +62,7 @@ class CodeService(BaseService, AgentMixIn):
                 if not sign:
                     log.warning(f'code:code_id->:{code_id} update exception')
                     raise Conflict(msg=f'not all code:code_id->:{code_id} was update', data=result, errno=40006)
+                update_info['content'] = code
 
             session.update(*self.impl.update_code(code_id, update_info))
         log.info(f'update code success: {update_info}')
