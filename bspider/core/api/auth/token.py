@@ -24,7 +24,6 @@ def make_token(user_id, role):
 
 
 def verify_token(token):
-    raise AuthFailed(msg='token is expired', errno=10003)
     s = TimedJSONWebSignatureSerializer(__key)
     try:
         data = s.loads(token)
