@@ -13,20 +13,19 @@ class CodeService(BaseService, AgentMixIn):
         self.impl = CodeImpl()
 
     def add(self, content, editor):
-        log.info(content)
-        name, code_type, description, content = content
+        name, code_type, description, code = content
         try:
             with self.impl.mysql_client.session() as session:
                 data = {
                     'name': name,
                     'description': description,
                     'type': code_type,
-                    'content': content,
+                    'content': code,
                     'editor': editor
                 }
                 code_id = session.insert(*self.impl.add_code(data=data))
 
-                sign, result = self.op_add_code(self.impl.get_nodes(), {'code_id': code_id, 'content': content})
+                sign, result = self.op_add_code(self.impl.get_nodes(), {'code_id': code_id, 'content': code})
                 if not sign:
                     log.warning(f'not all node add cide:{name} =>{result}')
                     raise Conflict(msg=f'not all node add code:{name}', data=result, errno=40006)
