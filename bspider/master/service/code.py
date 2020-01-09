@@ -42,6 +42,7 @@ class CodeService(BaseService, AgentMixIn):
         if not len(infos):
             return NotFound(msg='code is not exist', errno=40001)
         info = infos[0]
+        log.debug(info)
         update_info = dict()
 
         with self.impl.mysql_client.session() as session:
