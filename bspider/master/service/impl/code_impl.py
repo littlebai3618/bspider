@@ -22,6 +22,7 @@ class CodeImpl(BaseImpl):
     def update_code(self, code_id, data):
         fields, values = self.make_fv(data)
         sql = f"update {self.code_table} set {fields} where `id` = {code_id};"
+        log.debug(f'SQL:{sql}, {values}')
         return sql, values
 
     def delete_code(self, code_id):
