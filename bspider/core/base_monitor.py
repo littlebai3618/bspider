@@ -69,7 +69,8 @@ class BaseMonitor(object):
                 sign = Sign(project_timestamp=info['timestamp'], module=str(project.downloader_settings.middleware))
 
             if worker_obj is None or worker_obj.sign != sign:
-                tmp_projects[info['id']] = self.get_work_obj(project, sign=sign)
+                tmp_projects[project.project_id] = self.get_work_obj(project, sign=sign)
+                self.log.debug(f'success init project->project_id:{project.project_id}')
             else:
                 tmp_projects[info['id']] = worker_obj
 
