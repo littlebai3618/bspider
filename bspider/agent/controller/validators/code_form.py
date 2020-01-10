@@ -10,3 +10,7 @@ class AddForm(BaseForm):
 
 class UpdateForm(BaseForm):
     content = StringField()
+    project = StringField(default='')
+
+    def validate_project(self, value):
+        value.data = value.data.split(',')

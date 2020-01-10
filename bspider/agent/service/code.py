@@ -20,7 +20,8 @@ class CodeService(BaseService):
         return GetSuccess(data=self.cache.get_code(code_id))
 
     def update_code(self, code_id, changes):
-        self.cache.update_code(code_id, changes)
+        project = changes.pop('project')
+        self.cache.update_code(code_id, changes, project)
         log.info(f'update code:code_id->{code_id} success')
         return PatchSuccess()
 

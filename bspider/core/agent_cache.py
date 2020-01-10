@@ -75,7 +75,7 @@ class AgentCache(object):
 
     def update_project(self, project_id, data):
         fields, values = BaseImpl.make_fv(data)
-        sql = f"update project_cache set {fields} where `id` = {project_id};".replace('%s', '?')
+        sql = f"update {self.project_table} set {fields} where `id` = {project_id};".replace('%s', '?')
         return self.sqlite3_client.update(sql, values)
 
     def get_codes(self):
@@ -90,11 +90,16 @@ class AgentCache(object):
         sql = f"insert or replace into {self.code_table} values(?, ?, datetime('now'))"
         return self.sqlite3_client.insert(sql, (code_id, content))
 
+
     def delete_code(self, code_id: str):
         sql = f'delete from {self.code_table} where `id`={code_id}'
         return self.sqlite3_client.delete(sql)
 
-    def update_code(self, code_id, data):
+    def update_code(self, code_id: int, data: dict , project: list):
         fields, values = BaseImpl.make_fv(data)
         sql = f"update {self.code_table} set {fields} where `id` = {code_id};".replace('%s', '?')
-        return self.sqlite3_client.update(sql, values)
+        self.sqlite3_client.update(sql, values)
+        # 在更新代码的时候 更新project 的时间
+        for project_id in project:
+            sql = f"update {self.project_table} set `timestamp`= CURRENT_TIMESTAMP where `id` = {project_id}"
+            self.sqlite3_client.update(sql)

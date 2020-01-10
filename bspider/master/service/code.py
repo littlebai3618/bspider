@@ -39,6 +39,13 @@ class CodeService(BaseService, AgentMixIn):
         infos = self.impl.get_code(code_id)
         if not len(infos):
             return NotFound(msg='code is not exist', errno=40001)
+
+        project = list()
+        for info in infos:
+            project.append(str(info['project_id']))
+        infos[0].pop('project_id')
+        infos[0].pop('project_name')
+        infos[0]['project'] = project
         info = infos[0]
         update_info = dict()
 
@@ -57,7 +64,8 @@ class CodeService(BaseService, AgentMixIn):
                 update_info['description'] = description
 
             if code != info['content']:
-                sign, result = self.op_update_code(self.impl.get_nodes(), code_id, {'content': code})
+                sign, result = self.op_update_code(self.impl.get_nodes(), code_id,
+                                                   {'content': code, 'project': ','.join(project)})
                 if not sign:
                     log.warning(f'code:code_id->:{code_id} update exception')
                     raise Conflict(msg=f'not all code:code_id->:{code_id} was update', data=result, errno=40006)
