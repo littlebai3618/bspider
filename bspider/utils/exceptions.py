@@ -1,12 +1,10 @@
-class MethodError(Exception):
-    pass
-
-
 class ProjectSettingsError(Exception):
     pass
 
+
 class ModuleError(Exception):
     pass
+
 
 class ModuleExistError(ModuleError):
     pass

@@ -1,7 +1,6 @@
 import logging
 
 from bspider.config import FrameSettings
-from bspider.utils.exceptions import MethodError
 
 
 class BaseOperation(object):
@@ -12,4 +11,4 @@ class BaseOperation(object):
 
 
     def execute_task(self):
-        raise MethodError('you must rebuild execute_task()')
+        raise NotImplementedError

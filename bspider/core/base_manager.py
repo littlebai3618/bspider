@@ -11,7 +11,6 @@ import zlib
 
 from bspider.http import Response
 from bspider.utils.database import AioMysqlClient
-from bspider.utils.exceptions import MethodError
 from bspider.utils.logger import LoggerPool
 
 from .broker import RabbitMQBroker
@@ -85,7 +84,7 @@ class BaseManager(object):
         self.is_close = True
 
     async def do_work(self):
-        raise MethodError('you must rebuild self.do_work()')
+        raise NotImplementedError
 
     async def _save_success_result(self,
                                    response: Response,

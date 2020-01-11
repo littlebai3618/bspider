@@ -8,6 +8,7 @@ import bspider
 
 IGNORE = ignore_patterns('*.pyc', '.svn', '__pycache__')
 
+
 class BSpiderCommand(object):
     # default settings to be used for this command instead of global defaults
     frame_settings = {}
@@ -50,7 +51,6 @@ class BSpiderCommand(object):
             else:
                 copy2(srcname, dstname)
         copystat(src, dst)
-
 
     def __init__(self):
         self.settings = {}  # set in scrapy.cmdline

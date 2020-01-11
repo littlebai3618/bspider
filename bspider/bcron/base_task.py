@@ -6,7 +6,6 @@ from bspider.config import FrameSettings
 from bspider.core import Project
 from bspider.core.custom_module import BaseCustomModule
 from bspider.http import Request
-from bspider.utils.exceptions import MethodError
 from bspider.utils.rabbitMQ import RabbitMQClient
 
 
@@ -18,7 +17,7 @@ class BaseTask(BaseCustomModule):
         self.__mq_client = RabbitMQClient(self.frame_settings['RABBITMQ_CONFIG'])
 
     def execute_task(self):
-        raise MethodError('you must rebuild execute_task()')
+        raise NotImplementedError
 
     # Public API
     def send_request(self, request: Request):
