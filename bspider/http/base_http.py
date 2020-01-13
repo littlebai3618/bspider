@@ -4,13 +4,13 @@ class BaseHttp(object):
         if isinstance(url, str):
             return url
         else:
-            raise TypeError('{} url must be str, got: {}'.format(type(self).__name__, type(url).__name__))
+            raise TypeError('%s url must be str, got: %s' % (type(self).__name__, type(url).__name__))
 
     def _set_headers(self, headers):
         if headers is None:
-            return {}
+            return dict()
         elif not isinstance(headers, dict):
-            raise TypeError("{} headers must be dict. ".format(type(self).__name__))
+            raise TypeError("%s headers must be dict. " % (type(self).__name__))
         else:
             return headers
 
@@ -18,7 +18,7 @@ class BaseHttp(object):
         if cookies is None:
             return
         elif not isinstance(cookies, dict):
-            raise TypeError("{} cookies must be dict or None. ".format(type(self).__name__))
+            raise TypeError("%s cookies must be dict or None. " % (type(self).__name__))
         else:
             return cookies
 
@@ -30,15 +30,15 @@ class BaseHttp(object):
             if method in 'GET, POST, PUT ,PATCH, OPTIONS, HEAD, DELETE':
                 return method
             else:
-                raise TypeError("{} method: {} is not support. ".format(type(self).__name__, method))
+                raise TypeError("%s method: %s is not support. " % (type(self).__name__, method))
 
-        raise TypeError("{} method must be str. ".format(type(self).__name__))
+        raise TypeError("%s method must be str. " % (type(self).__name__))
 
     def _set_meta(self, meta):
         if meta is None:
-            return {}
+            return dict()
         elif not isinstance(meta, dict):
-            raise TypeError("{} meta must be dict or None. ".format(type(self).__name__))
+            raise TypeError("%s meta must be dict or None. " % (type(self).__name__))
         else:
             return meta
 
@@ -46,7 +46,7 @@ class BaseHttp(object):
         if data is None:
             return
         elif not isinstance(data, dict):
-            raise TypeError("{} data must be dict or None. ".format(type(self).__name__))
+            raise TypeError("%s data must be dict or None. " % (type(self).__name__))
         else:
             return data
 
@@ -55,7 +55,7 @@ class BaseHttp(object):
         if text is None:
             return ''
         elif not isinstance(text, str):
-            raise TypeError("{} text must be str. ".format(type(self).__name__))
+            raise TypeError("%s text must be str. " % (type(self).__name__))
         else:
             return text
 
