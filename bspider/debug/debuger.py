@@ -46,7 +46,7 @@ class Debuger(object):
 
         self.put(self.start_request)
 
-        with open(abspath('settings.yaml')) as f:
+        with open(abspath('settings.yaml'), encoding='utf8') as f:
             self.project = Project(schema(yaml.safe_load(f)),
                                    middleware_serializer_method=self.check_module,
                                    pipeline_serializer_method=self.check_module)
@@ -112,10 +112,10 @@ class Debuger(object):
 
         project_path = os.path.join(os.environ[PLATFORM_PATH_ENV], 'projects', self.project_name)
         for file in os.listdir(project_path):
-            if not file.endswith('.py'):
+            if not file.endswith('.py') or file.startswith('__init__'):
                 continue
             file_path = os.path.join(project_path, file)
-            with open(file_path) as f:
+            with open(file_path, encoding='utf8') as f:
                 content = f.read().strip()
                 class_name, sub_class = find_class_name_by_content(content)
 

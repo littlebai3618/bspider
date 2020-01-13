@@ -20,7 +20,7 @@ def init_platform_env(func):
             os.environ[BSPIDER_VERSION_ENV] = bspider.__version__
             if os.path.exists(bspider_config_path):
                 cfg = ConfigParser()
-                cfg.read([os.environ[BSPIDER_CONFIG_PATH_ENV]])
+                cfg.read([os.environ[BSPIDER_CONFIG_PATH_ENV]], encoding='utf8')
                 if cfg.has_option('settings', 'default'):
                     os.environ[BSPIDER_FRAME_SETTINGS_MODULE_ENV] = cfg.get('settings', 'default')
                 if cfg.has_option('deploy', 'platform'):
