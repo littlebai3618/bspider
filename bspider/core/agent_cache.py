@@ -1,7 +1,3 @@
-# @Time    : 2019-07-29 15:11
-# @Author  : 白尚林
-# @File    : project_cache
-# @Use     :
 import os
 
 from bspider.core.api import BaseImpl, json
