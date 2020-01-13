@@ -65,11 +65,8 @@ def _print_unknow_platform():
 def run_cmd(cmd, parser, args, opts):
     try:
         cmd.run(args, opts)
-    except UsageError as e:
-        if str(e):
-            parser.error(str(e))
-        if e.print_help:
-            parser.print_help()
+    except UsageError:
+        parser.print_help()
         sys.exit(2)
 
 

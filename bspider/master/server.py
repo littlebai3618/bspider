@@ -62,4 +62,6 @@ def create_app():
     def get_fav():
         return current_app.send_static_file('favicon.ico')
 
+    app.logger.addHandler(log)
+
     return app

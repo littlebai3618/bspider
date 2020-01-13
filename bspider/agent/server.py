@@ -46,6 +46,7 @@ class CreateApp(MasterMixIn):
 
         if self.__init_agent(**self.frame_settings['AGENT']):
             log.info('Agent:{name}->{ip}:{port} run success!'.format(**self.frame_settings['AGENT']))
+            app.logger.addHandler(log)
             return app
         else:
             exit()
