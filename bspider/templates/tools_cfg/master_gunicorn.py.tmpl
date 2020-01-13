@@ -7,7 +7,6 @@ workers = 1
 worker_connections = 2000
 worker_class = 'gevent'
 x_forwarded_for_header = 'X-Forwarded-For'
-# access_log_format = '[%(D)s gunicorn %(p)d gunicorn.py:1] ${log_level}: %({X-Forwarded-For}i)s %(b) %(r)s %(b)s'
 
-accesslog = "${platform_path}/log/master_gunicorn_access.log"      #访问日志文件
-errorlog = "${platform_path}/log/master_gunicorn_error.log"        #错误日志文件
+accesslog = "${platform_path}/log/master.log"      #访问日志文件
+errorlog = "${platform_path}/log/master.log"        #错误日志文件
