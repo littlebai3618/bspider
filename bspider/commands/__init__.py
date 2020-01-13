@@ -1,3 +1,7 @@
+"""
+整个 command 模块都参考了scrapy 的 commands模块
+这里引用了scrapy 中的代码：https://github.com/scrapy/scrapy/blob/master/scrapy/commands/__init__.py
+"""
 import os
 import re
 from optparse import OptionGroup

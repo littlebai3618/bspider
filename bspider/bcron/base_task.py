@@ -1,10 +1,8 @@
-"""定时任务的基础类，所有定时任务类必须继承"""
 import json
 import logging
 
 from bspider.config import FrameSettings
-from bspider.core import Project
-from bspider.core.custom_module import BaseCustomModule
+from bspider.core import Project, BaseCustomModule
 from bspider.http import Request
 from bspider.utils.rabbitMQ import RabbitMQClient
 

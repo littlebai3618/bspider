@@ -53,13 +53,6 @@ class AsyncDownloader(object):
                     raise DownloaderError(msg)
 
     async def download(self, request: Request) -> (Response, bool, str):
-        """
-        donwloader入口, 执行整个下载过程
-        执行中间件，执行下载时，异步
-        :param para: 队列传来的参数，格式为dict
-        :param config: 下载器配置项
-        :return:
-        """
         response = Response(url=request.url, status=599, request=request)
         # 异常占位符
         e_msg = None

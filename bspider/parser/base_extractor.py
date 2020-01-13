@@ -1,6 +1,7 @@
 """
-extractor 方法 如果传入Response 匹配到callback 那么执行self.callback 否则 抛出异常
-extractor 也是Pipeline中的一种，通过执行Response 中的callback方法返回item
+extractor 也是Pipeline中的一种
+          执行Response.callback
+    如果传入Response 匹配到callback 那么执行self.callback 否则 抛出异常
 """
 from bspider.http import Response
 from bspider.parser import BasePipeline

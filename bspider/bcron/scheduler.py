@@ -1,6 +1,3 @@
-"""
-重写内置的调度器，增加信息回调方便封装api
-"""
 import six
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.schedulers.base import STATE_STOPPED

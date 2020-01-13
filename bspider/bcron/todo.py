@@ -18,30 +18,6 @@ __mysql_client = MysqlClient.from_settings(__frame_settings['WEB_STUDIO_DB'])
 __log = LoggerPool().get_logger(key='bcorn-todo', fn='bcorn', module='bcorn')
 
 
-# def do(**kwargs):
-#     # 这里使用主线程的时间循环，因为异步MYSQL使用默认时间循环
-#     func = None
-#     if kwargs.get('type') == 'operation':
-#         func = run_operation_project
-#     elif kwargs.get('type') == 'crawl':
-#         func = run_spider_project
-#     else:
-#         __log.warning(f'WARNING: UNKNOW CRON JOB PARAMS: {kwargs}')
-#
-#     if func:
-#         loop = asyncio.get_event_loop()
-#         try:
-#             future = asyncio.run_coroutine_threadsafe(func(**kwargs), loop)
-#             loop.run_until_complete(future)
-#             __log.debug('future run success!')
-#         except Exception as e:
-#             tp, msg, tb = sys.exc_info()
-#             e_msg = '> '.join(traceback.format_exception(tp, msg, tb))
-#             e.with_traceback(tb)
-#             __log.error(f'thread event loop error:\n{e_msg}')
-#             ding(f'> {e_msg} \n', 'bcron thread event loop')
-
-
 def do(**kwargs):
     # 模式判断
     if kwargs.get('type') == 'operation':

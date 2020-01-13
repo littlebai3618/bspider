@@ -22,7 +22,7 @@ class RemoteOPError(Exception):
     pass
 
 
-class ExtractorCallbackError(Exception):
+class ExtractorCallbackError(AttributeError):
     pass
 
 

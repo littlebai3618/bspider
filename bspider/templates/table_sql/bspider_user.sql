@@ -15,3 +15,4 @@ CREATE TABLE `bspider_user` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 INSERT INTO `bspider_user`(`identity`, `username`, `password`, `role`, `status`) VALUES ('admin', 'admin', '${password}', 'admin', 1);
+INSERT INTO `bspider_user`(`identity`, `username`, `password`, `role`, `status`) VALUES ('operation', 'operation', '${password}', 'operation', 1);
