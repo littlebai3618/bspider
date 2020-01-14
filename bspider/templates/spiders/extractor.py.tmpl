@@ -1,7 +1,7 @@
 """
 @description=default
 """
-from bspider.parser import BaseExtractor
+from bspider.parser import BaseExtractor, MySQLSaverItem
 from bspider.http import Request
 
 
@@ -18,19 +18,29 @@ class DemoExtractor(BaseExtractor):
         :param response: bspider response instance
         :return:
         """
-        # html = response.text
-        # json_obj = response.json()
-        # xpath_selector_obj = response.xpath()
-        # item = xpath_selector_obj.xpath('//div[@class="demo"]/text()')
-        # self.log.info('i am a log')
-        # self.settings # this spider's pipeline settings
-        yield Request('http://xxxxx', callback=self.callback_demo)
-        # yield generate item
+        text = response.text
+        json_obj = response.json
+        xpath_selector = response.xpath_selector
+        info = xpath_selector.xpath('//div[@class="demo"]/text()')
+        item = MySQLSaverItem(table='pp', database='aa', info=info)
+        self.log.info(f'Project name: {self.project.project_name}, {self.project.rate}')
+        # 递归新链接
+        yield Request('http://xxxxx', callback=self.parser)
+        # 存入 MySQL
+        yield item
 
-    def callback_demo(self, response):
-        """
-        解析逻辑
-        :param response: bspider response instance
-        :return:
-        """
-        pass
+    # def callback(self, response):
+    #    """
+    #    解析逻辑
+    #    :param response: bspider response instance
+    #    :return:
+    #    """
+    #    pass
+
+    # def errback(self, response: Response, e: Exception):
+    #    """
+    #    此方法不一定需要重构
+    #    只是提供一个demo
+    #    ***一个extractor 可以有多个errback方法和 callback方法
+    #    """
+    #    raise e

@@ -1,5 +1,3 @@
-import logging
-
 from bspider.core.custom_module import BaseCustomModule
 
 

@@ -57,6 +57,7 @@ class Response(BaseHttp):
 
         return cls(**param)
 
+    @property
     def json(self):
         return json.loads(self.text)
 
