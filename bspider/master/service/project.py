@@ -65,6 +65,7 @@ class ProjectService(BaseService, AgentMixIn):
 
     def update(self, project_id, changes):
         remote_param = dict()
+        log.debug(f'change:{changes}')
         if 'status' in changes:
             remote_param['status'] = changes['status']
 
