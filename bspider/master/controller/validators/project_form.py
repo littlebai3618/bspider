@@ -59,10 +59,11 @@ class UpdateForm(BaseForm):
     editor = StringField()
 
     def validate_config(self, value):
-        try:
-            value.data = (schema(yaml.safe_load(value.data)), value.data)
-        except MultipleInvalid as e:
-            raise ProjectSettingsError(e.error_message)
+        if value.data:
+            try:
+                value.data = (schema(yaml.safe_load(value.data)), value.data)
+            except MultipleInvalid as e:
+                raise ProjectSettingsError(e.error_message)
 
 
 

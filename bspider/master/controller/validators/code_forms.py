@@ -54,4 +54,5 @@ class UpdateForm(BaseForm):
     editor = StringField()
 
     def validate_content(self, value):
-        value.data = valid_code(value.data)
+        if value.data:
+            value.data = valid_code(value.data)
