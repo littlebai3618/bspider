@@ -106,7 +106,7 @@ class ProjectService(BaseService, AgentMixIn):
                 remote_param['config'] = new_project.dumps()
                 changes['r_config'] = remote_param['config']
 
-        changes['config'] = changes['config'][1]
+            changes['config'] = changes['config'][1]
 
         if len(remote_param):
             with self.impl.mysql_client.session() as session:
