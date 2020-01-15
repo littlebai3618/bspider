@@ -39,7 +39,10 @@ class AsyncDownloader(object):
         for middleware in project.downloader_settings.middleware:
             for cls, params in middleware.items():
                 cls_name, code = cls
-                mod = import_module_by_code(cls_name, code)
+                if isinstance(code, str):
+                    mod = import_module_by_code(cls_name, code)
+                else:
+                    mod = code
                 if mod and hasattr(mod, cls_name):
                     try:
                         self.mws.append(

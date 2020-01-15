@@ -1,4 +1,5 @@
 import asyncio
+import inspect
 import os
 from os.path import abspath
 from queue import Queue
@@ -7,13 +8,16 @@ import yaml
 
 from bspider.config import FrameSettings
 from bspider.core import Project
+from bspider.downloader import BaseMiddleware
 from bspider.master.controller.validators.project_form import schema
 from bspider.downloader.async_downloader import AsyncDownloader
+from bspider.parser import BasePipeline, BaseExtractor
 from bspider.parser.async_parser import AsyncParser
 from bspider.http import Request
-from bspider.utils.conf import PLATFORM_PATH_ENV
+from bspider.utils.conf import PLATFORM_PATH_ENV, PLATFORM_NAME_ENV
 from bspider.utils.exceptions import ModuleExistError
 from bspider.utils.database import MysqlClient
+from bspider.utils.importer import walk_modules
 from bspider.utils.logger import LoggerPool
 from bspider.utils.sign import Sign
 from bspider.utils.tools import find_class_name_by_content
@@ -48,8 +52,8 @@ class Debuger(object):
 
         with open(abspath('settings.yaml'), encoding='utf8') as f:
             self.project = Project(schema(yaml.safe_load(f)),
-                                   middleware_serializer_method=self.check_module,
-                                   pipeline_serializer_method=self.check_module)
+                                   middleware_serializer_method=self.load_module,
+                                   pipeline_serializer_method=self.load_module)
             self.project.project_id = 0
 
         self.parser = AsyncParser(self.project, Sign(), self.debug_log_fn)
@@ -65,7 +69,8 @@ class Debuger(object):
     def put(self, request: Request):
         """向优先队列中存入req"""
         try:
-            self.priority_queue[self.max_priority - request.priority].put(request)
+            self.priority_queue[request.priority].put(request)
+            self.log.debug(f'success send request {request}')
         except KeyError as e:
             self.log.error(
                 f'At req:{request.url}, requests.priority={request.priority} must between 1~{self.max_priority}')
@@ -109,35 +114,25 @@ class Debuger(object):
     def __find_local_class(self):
         # 将模块名称转换为模块代码
         local_project_class = dict()
-
-        project_path = os.path.join(os.environ[PLATFORM_PATH_ENV], 'projects', self.project_name)
-        for file in os.listdir(project_path):
-            if not file.endswith('.py') or file.startswith('__init__'):
-                continue
-            file_path = os.path.join(project_path, file)
-            with open(file_path, encoding='utf8') as f:
-                content = f.read().strip()
-                class_name, sub_class = find_class_name_by_content(content)
-
-            if sub_class in ('BaseMiddleware', 'BaseExtractor', 'BasePipeline'):
-                self.log.debug(f'success find module:{class_name} from local')
-                local_project_class[class_name] = content
+        for mod in walk_modules(f'{os.environ[PLATFORM_NAME_ENV]}.projects.{self.project_name}'):
+            for obj in vars(mod).values():
+                if inspect.isclass(obj):
+                    if issubclass(obj, BasePipeline) or issubclass(obj, BaseMiddleware):
+                        self.log.debug(f'success find module:{obj.__name__} from local')
+                        local_project_class[obj.__name__] = mod
         return local_project_class
 
-    def load_remote_module(self, class_name):
-        """加载远程代码"""
-        sql = "select `content` from `{}` where `name`=%s;".format(self.frame_settings['CODE_STORE_TABLE'])
-        info = self.mysql_client.select(sql, (class_name))
-        if len(info):
-            self.log.debug(f'success find module:{class_name} from remote')
-            return class_name, info[0]['content']
-        else:
-            raise ModuleExistError('load module from remote failed %s is not exists' % (class_name))
-
-    def check_module(self, cls_name):
+    def load_module(self, cls_name):
         if cls_name in self.local_project_class:
             return cls_name, self.local_project_class[cls_name]
-        return self.load_remote_module(cls_name)
+
+        sql = "select `content` from `{}` where `name`=%s;".format(self.frame_settings['CODE_STORE_TABLE'])
+        info = self.mysql_client.select(sql, (cls_name))
+        if len(info):
+            self.log.debug(f'success find module:{cls_name} from remote')
+            return cls_name, info[0]['content']
+        else:
+            raise ModuleExistError('load module from remote failed %s is not exists' % (cls_name))
 
 
 if __name__ == '__main__':
