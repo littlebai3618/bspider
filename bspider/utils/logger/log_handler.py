@@ -9,7 +9,7 @@ from bspider.config import FrameSettings
 from bspider.utils.conf import PLATFORM_PATH_ENV
 from bspider.utils.sign import Sign
 
-from .formatter import get_stream_formatter
+from .formatter import get_stream_formatter, get_file_formatter
 
 
 @singleton
@@ -45,7 +45,7 @@ class LoggerPool(object):
         log_path = os.path.join(os.environ[PLATFORM_PATH_ENV], 'log', f'{fn}.log')
         log_handler = TimedRotatingFileHandler(log_path, when="midnight", backupCount=10)
         log_handler.suffix = "%Y%m%d"
-        log_formatter = get_stream_formatter(**kwargs)
+        log_formatter = get_file_formatter(**kwargs)
         log_handler.setFormatter(log_formatter)
         log.addHandler(log_handler)
         if level == 'INFO':

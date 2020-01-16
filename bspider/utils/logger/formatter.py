@@ -25,3 +25,8 @@ def get_stream_formatter(**kwargs):
     arg = ' '.join([f'{value}' for key, value in kwargs.items() if key == 'module'])
     log_from_work = f'[%(asctime)s {arg} %(process)d %(filename)s:%(lineno)s] %(levelname)s: %(message)s'
     return logging.Formatter(log_from_work)
+
+def get_file_formatter(**kwargs):
+    arg = ' '.join([f'{key}={value}' for key, value in kwargs.items()])
+    log_from_work = f'[%(asctime)s %(process)d %(filename)s:%(lineno)s] %(levelname)s: {arg} %(message)s'
+    return logging.Formatter(log_from_work)
