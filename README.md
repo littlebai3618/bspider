@@ -107,6 +107,4 @@ cd ${platform_name}/projects/${spider_name}
 
 TODO
 
-1. UI: 在*editor组件中无法修改内容，不确定是前端还是后端的bug
-2. 修改模块时不能正确提示当前模块的使用状况的bug
-
+1. 优化crontab 增加、修改流程流程，在yml配置文件中增加bcron 配置, 使用同一配置文件进行配置
