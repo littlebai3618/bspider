@@ -43,7 +43,6 @@ class BaseMonitor(object):
         获取当前时间戳 -10s
         :return:
         """
-        tmp_projects = dict()
         tmp_weight = dict()
         projects = self.__cache.get_projects()
         total_sum = 0
@@ -69,11 +68,10 @@ class BaseMonitor(object):
                 sign = Sign(project_timestamp=info['timestamp'], module=str(project.downloader_settings.middleware))
 
             if worker_obj is None or worker_obj.sign != sign:
-                tmp_projects[project.project_id] = self.get_work_obj(project, sign=sign)
+                self.projects[project.project_id] = self.get_work_obj(project, sign=sign)
             else:
-                tmp_projects[info['id']] = worker_obj
+                self.projects[info['id']] = worker_obj
 
-        self.projects = tmp_projects
         self.log.debug('sync projects success {}'.format(len(self.projects)))
         self.__weight = sorted(tmp_weight.items(), key=lambda d: d[1], reverse=False)
         self.__total_sum = total_sum
