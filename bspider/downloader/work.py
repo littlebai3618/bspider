@@ -25,7 +25,7 @@ class DownloaderManager(BaseManager):
     async def do_work(self):
         try:
             while True:
-                downloader = self.monitor.projects.get(await self.monitor.choice_project())
+                downloader = self.monitor.projects.get(self.monitor.choice_project())
                 if downloader is None:
                     # 防止协程抢占无法轮换
                     await asyncio.sleep(1)
