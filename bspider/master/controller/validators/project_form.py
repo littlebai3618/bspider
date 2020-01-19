@@ -32,12 +32,12 @@ schema = Schema({
     Required('group', default='default'): All(str, Length(min=1, max=99)),
     Required('description', default='default'): All(str),
     Required('global_settings', default=dict()): All(dict),
-    Required('downloader'): {
+    Required('downloader', default=dict()): {
         Required('max_retry_times', default=3): All(int, Range(min=1, max=10)),
         Required('ignore_retry_http_code', default=list()): All(list),
         Required('middleware', default=list()): valid_middleware
     },
-    Required('parser'): {
+    Required('parser', default=dict()): {
         Required('pipeline', default=list()): valid_pipeline
     }
 })
