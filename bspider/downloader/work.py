@@ -48,7 +48,6 @@ class DownloaderManager(BaseManager):
                         session.ack(msg_id)
 
                 # 分开写是因为要提前释放channel,防止channel 被用光影响性能
-
                 if msg_id:
                     if e_msg or not sign:
                         self.log.info(
