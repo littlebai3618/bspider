@@ -122,7 +122,7 @@ class Debuger(object):
         module_type = class_name2module_name(cls_name).split('_')[-1]
         if module_type == 'extractor':
             mod = import_module(
-                f'{os.environ[PLATFORM_NAME_ENV]}.projects.{self.project.project_name}.{class_name2module_name(cls_name)}')
+                f'{os.environ[PLATFORM_NAME_ENV]}.projects.{self.project.project_name}.extractor')
         else:
             mod = import_module(f'{os.environ[PLATFORM_NAME_ENV]}.{module_type}.{class_name2module_name(cls_name)}')
 
