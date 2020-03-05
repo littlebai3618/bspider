@@ -107,4 +107,6 @@ cd ${platform_name}/projects/${spider_name}
 
 TODO
 
-1. 优化crontab 增加、修改流程流程，在yml配置文件中增加bcron 配置, 使用同一配置文件进行配置
+1. 将pipeline 和 middleware 单独用作两个文件夹进行开发，prject 只保留 extractor、yml配置文件
+2. 将task 和extractor 结合
+3. 优化crontab 增加、修改流程流程，在yml配置文件中增加bcron 配置, 使用同一配置文件进行配置

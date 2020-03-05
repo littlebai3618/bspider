@@ -5,15 +5,12 @@ from bspider.commands import BSpiderCommand
 from bspider.utils.conf import PLATFORM_PATH_ENV
 from bspider.utils.exceptions import UsageError
 from bspider.utils.template import render_templatefile
+from bspider.utils.tools import module_name2class_name
 
 TEMPLATES_TO_RENDER = (
     ('__init__.py.tmpl',),
     ('extractor.py.tmpl',),
-    ('middleware.py.tmpl',),
-    ('pipeline.py.tmpl',),
-    ('settings.yaml.tmpl',),
-    ('debug.py.tmpl',),
-    ('task.py.tmpl',)
+    ('settings.yml.tmpl',),
 )
 
 
@@ -39,7 +36,7 @@ class Command(BSpiderCommand):
         self._copytree(join(self.templates_dir, 'spiders'), project_dir)
         for paths in TEMPLATES_TO_RENDER:
             tplfile = join(project_dir, *paths)
-            render_templatefile(tplfile, project_name=project_name)
+            render_templatefile(tplfile, project_name=project_name, ProjectName=module_name2class_name(project_name))
 
         print(f"New spider '{project_name}' init success")
         print(f"    template directory:\n    '{self.templates_dir}'")

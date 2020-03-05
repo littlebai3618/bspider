@@ -1,6 +1,7 @@
 """
 这个是实际执行的方法，这个方法接收参数，通过参数决定行为
 """
+import json
 import sys
 import traceback
 
@@ -8,13 +9,16 @@ import yaml
 
 from bspider.config import FrameSettings
 from bspider.core import Project
+from bspider.http import Request
 from bspider.utils.database import MysqlClient
 from bspider.utils.logger import LoggerPool
 from bspider.utils.importer import import_module_by_code
 from bspider.utils.notify import ding
+from bspider.utils.rabbitMQ import RabbitMQClient
 
 __frame_settings = FrameSettings()
 __mysql_client = MysqlClient.from_settings(__frame_settings['WEB_STUDIO_DB'])
+__mq_client = RabbitMQClient(__frame_settings['RABBITMQ_CONFIG'])
 __log = LoggerPool().get_logger(key='bcorn-todo', fn='bcorn', module='bcorn')
 
 
@@ -104,6 +108,11 @@ def run_corn_job_code(code_id, project_id, do_type, config: str = None):
                     fn='bcorn',
                     module='bcorn',
                     project=project.project_name))
+
+                requests = getattr(mod, class_name)(*instance_arg).start_url()
+                for request in requests:
+                    send_request(request, project)
+                return True, f'{project_id}-{code_id} run succeed'
             except Exception:
                 tp, msg, tb = sys.exc_info()
                 e_msg = '> '.join(traceback.format_exception(tp, msg, tb))
@@ -118,3 +127,16 @@ def run_corn_job_code(code_id, project_id, do_type, config: str = None):
             return False, f'{project_id}-{code_id} cron job run failed:\n > {e_msg}'
 
     return False, f'{project_id}-{code_id} don\'t have {class_name}'
+
+def send_request(request: Request, project: Project):
+    """发送request 到待下载队列"""
+    # 这里dump方法使用了浅拷贝，会影响一部分性能
+    data = json.dumps(request.dumps())
+    __mq_client.send_msg(
+            __frame_settings['EXCHANGE_NAME'][0],
+            str(project.project_id),
+            data,
+            request.priority)
+    __log.info(f'project:project_id->{project.project_id} success send a request->{request.sign}')
+    __log.debug(f'project:project_id->{project.project_id} Request: {data}')
+    return True

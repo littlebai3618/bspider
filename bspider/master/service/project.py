@@ -1,12 +1,15 @@
 import yaml
+from apscheduler.util import obj_to_ref
 from pymysql import IntegrityError
 
+from bspider.bcron import do
 from bspider.core import Project
 from bspider.master import log
 from bspider.master.controller.validators.project_form import schema
 from bspider.master.service.impl.project_impl import ProjectImpl
 from bspider.core.api import BaseService, Conflict, NotFound, PostSuccess, DeleteSuccess, GetSuccess, \
     PatchSuccess, ParameterException, AgentMixIn
+from bspider.utils.tools import class_name2module_name, get_crontab_next_run_time
 
 
 class ProjectService(BaseService, AgentMixIn):
@@ -16,10 +19,11 @@ class ProjectService(BaseService, AgentMixIn):
 
     def add(self, editor: str, config: list, status: int):
         project = Project(config[0],
-                          middleware_serializer_method=self.get_middleware_id_by_name,
-                          pipeline_serializer_method=self.get_pipeline_id_by_name)
+                          middleware_serializer_method=self.get_module_id_by_name,
+                          pipeline_serializer_method=self.get_module_id_by_name)
+
         log.debug(
-            f'pc_opj->pipeline:{project.parser_settings.pipeline}, middleware:{project.downloader_settings.middleware}')
+            f'pc_obj->pipeline:{project.parser_settings.pipeline}, middleware:{project.downloader_settings.middleware}')
 
         try:
             with self.impl.mysql_client.session() as session:
@@ -43,6 +47,22 @@ class ProjectService(BaseService, AgentMixIn):
                 cids.extend([[cid for cid in items.keys()][0] for items in r_config['parser']['pipeline']])
                 log.debug(f'code num: {cids}')
                 session.insert(*self.impl.add_project_binds(cids, project_id))
+
+                timestamp, next_run_time = get_crontab_next_run_time(project.scheduler_settings.trigger, self.tz)
+                value = {
+                    'project_id': project_id,
+                    'code_id': self.get_module_id_by_name(project.parser_settings.extractor),
+                    'type': 'crawl',
+                    'trigger': project.scheduler_settings.trigger,
+                    'trigger_type': project.scheduler_settings.trigger_type,
+                    'func': obj_to_ref(do),
+                    'executor': 'thread_pool',
+                    'description': project.scheduler_settings.description,
+                    'next_run_time': timestamp,
+                }
+                job_id = session.insert(*self.impl.add_cron_job(value))
+                log.info(f'add cron job:{project.project_name} success')
+
                 info = {
                     'project_id': project_id,
                     'name': project.project_name,
@@ -56,7 +76,8 @@ class ProjectService(BaseService, AgentMixIn):
                     log.error(f'not all node add project:{project.project_name} =>{result}')
                     return Conflict(msg=f'not all node add project:{project.project_name}', data=result, errno=30007)
                 log.info(f'add project:{project.project_name} success')
-                return PostSuccess(msg=f'add project:{project.project_name} success', data={'project_id': project_id})
+                return PostSuccess(msg=f'add project:{project.project_name} success',
+                                   data={'project_id': project_id, 'job_id': job_id})
         except IntegrityError as e:
             if e.args[0] == 1062:
                 log.error(f'all project add failed:{project.project_name} =>project is already exist')
@@ -65,6 +86,7 @@ class ProjectService(BaseService, AgentMixIn):
 
     def update(self, project_id, changes):
         remote_param = dict()
+        cron_param = dict()
         log.debug(f'change:{changes}')
         if 'status' in changes:
             remote_param['status'] = changes['status']
@@ -76,8 +98,8 @@ class ProjectService(BaseService, AgentMixIn):
                 return NotFound(msg='project not exist', errno=30001)
 
             new_project = Project(changes['config'][0],
-                                  middleware_serializer_method=self.get_middleware_id_by_name,
-                                  pipeline_serializer_method=self.get_pipeline_id_by_name)
+                                  middleware_serializer_method=self.get_module_id_by_name,
+                                  pipeline_serializer_method=self.get_module_id_by_name)
             try:
                 old_project = Project(schema(yaml.safe_load(infos[0]['config'])))
             except Exception as e:
@@ -97,6 +119,10 @@ class ProjectService(BaseService, AgentMixIn):
 
             if old_project.description != new_project.description:
                 changes['description'] = new_project.description
+
+            if old_project.scheduler_settings != new_project.scheduler_settings:
+                cron_param = new_project.scheduler_settings.dumps()
+                cron_param.pop('rate')
 
             sign = [
                 old_project.downloader_settings == new_project.downloader_settings,
@@ -120,6 +146,8 @@ class ProjectService(BaseService, AgentMixIn):
                     # 20191224 bug修复，修复无法删除module引用
                     session.delete(*self.impl.delete_project_binds(project_id))
                     session.insert(*self.impl.add_project_binds(cids, project_id))
+                    if len(cron_param):
+                        session.insert(*self.impl.update_cron_job_by_project_id(project_id, cron_param))
                 sign, result = self.op_update_project(self.impl.get_nodes(), project_id, remote_param)
                 if not sign:
                     log.warning(f'not all node update project:project_id->{project_id} =>{result}')
@@ -127,6 +155,8 @@ class ProjectService(BaseService, AgentMixIn):
         else:
             with self.impl.mysql_client.session() as session:
                 session.update(*self.impl.update_project(project_id, changes))
+                if len(cron_param):
+                    session.insert(*self.impl.update_cron_job_by_project_id(project_id, cron_param))
 
         log.info(f'update project:project_id->{project_id} success')
         return PatchSuccess(msg=f'update project success')
@@ -174,23 +204,11 @@ class ProjectService(BaseService, AgentMixIn):
                 'limit': limit
             })
 
-    def get_middleware_id_by_name(self, cls_name) -> int:
-        data = self.impl.get_module_id_by_name_and_type(cls_name, 'middleware')
+    def get_module_id_by_name(self, cls_name: str) -> int:
+        module_type = class_name2module_name(cls_name).split('_')[-1]
+        data = self.impl.get_module_id_by_name_and_type(cls_name, module_type)
         if len(data):
             return data[0]['id']
         raise Conflict(
             msg=f'lack of necessary middleware <{cls_name}>!',
-            errno=30003)
-
-    def get_pipeline_id_by_name(self, cls_name) -> int:
-        module = 'pipeline'
-        data = self.impl.get_module_id_by_name_and_type(cls_name, module)
-        if len(data):
-            return data[0]['id']
-        module = 'extractor'
-        data = self.impl.get_module_id_by_name_and_type(cls_name, module)
-        if len(data):
-            return data[0]['id']
-        raise Conflict(
-            msg=f'lack of necessary {module} <{cls_name}>!',
             errno=30003)

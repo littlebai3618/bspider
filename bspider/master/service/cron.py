@@ -8,7 +8,6 @@
 """
 from datetime import datetime
 
-import pytz
 from apscheduler.triggers.cron import CronTrigger
 from apscheduler.util import datetime_to_utc_timestamp, obj_to_ref, utc_timestamp_to_datetime
 from pymysql import IntegrityError
@@ -18,23 +17,16 @@ from bspider.core.api import BaseService, Conflict, PostSuccess, PatchSuccess, D
 from bspider.bcron.todo import do
 from bspider.master import log
 from bspider.master.service.impl.cron_impl import CronImpl
+from bspider.utils.tools import get_crontab_next_run_time
 
 
 class CronService(BaseService):
 
     def __init__(self):
         self.impl = CronImpl()
-        self.tz = pytz.timezone(self.frame_settings['TIMEZONE'])
-
-    def __next_run_time(self, trigger):
-        """将crontab 表达式转换为 下次执行的UTC时间戳"""
-        crontab = CronTrigger.from_crontab(trigger)
-        now = datetime.now(self.tz)
-        next_run_time = crontab.get_next_fire_time(None, now)
-        return datetime_to_utc_timestamp(next_run_time), next_run_time
 
     def add_cron(self, project_id, code_id, cron_type, trigger, description):
-        timestamp, next_run_time = self.__next_run_time(trigger)
+        timestamp, next_run_time = get_crontab_next_run_time(trigger, self.tz)
         value = {
             'project_id': project_id,
             'code_id': code_id,

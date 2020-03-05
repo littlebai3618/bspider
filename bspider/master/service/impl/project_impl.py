@@ -58,6 +58,20 @@ class ProjectImpl(BaseImpl):
         log.debug(f'SQL:{sql}')
         return sql, (3)
 
+    def add_cron_job(self, data: dict) -> tuple:
+        data['status'] = 1
+        fields, values = self.make_fv(data)
+        sql = f"insert into {self.cron_table} set {fields}"
+        log.debug(f'SQL:{sql}')
+        return sql, values, True
+
+    def update_cron_job_by_project_id(self, project_id: int, data: dict) -> tuple:
+        data['status'] = 2
+        fields, values = self.make_fv(data)
+        sql = f"update {self.cron_table} set {fields} where `project_id` = '{project_id}';"
+        log.debug(f'SQL:{sql}')
+        return sql, values
+
     def delete_project(self, project_id):
         sql = f'delete from {self.project_table} where `id`={project_id};'
         return sql,

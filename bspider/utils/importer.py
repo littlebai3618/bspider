@@ -13,7 +13,6 @@ def import_module_by_code(module_name: str, code: str):
     :param project_name:
     :return:
     """
-
     spec = importlib.util.spec_from_loader(module_name, None)
     mod = importlib.util.module_from_spec(spec)
     # 模拟exec_module()方法

@@ -2,10 +2,14 @@
 常用工具封装
 """
 import asyncio
+import datetime
 import hashlib
 import json
 import re
 import time
+
+from apscheduler.triggers.cron import CronTrigger
+from apscheduler.util import datetime_to_utc_timestamp
 
 from bspider.utils.exceptions import ModuleError
 
@@ -53,3 +57,26 @@ def find_class_name_by_content(content):
         tmp = reg.groupdict()
         return tmp['class_name'], tmp['sub_class_name']
     raise ModuleError('content can\'t find class_name and sub_class_name -> \n%s' % (content[0: 100] + ' ...'))
+
+
+def module_name2class_name(module_name):
+    """
+    python 的模块名改为类名
+    demo_pipeline -> DemoPipeline
+    """
+    return ''.join([word.title() for word in module_name.lower().split('_')])
+
+def class_name2module_name(class_name):
+    """
+    python 的模块名改为类名
+    DemoPipeline -> demo_pipeline
+    """
+    pattern = re.compile(r'([A-Z]{1})')
+    return re.sub(pattern, r'_\1', class_name).lower().replace('_', '', 1)
+
+def get_crontab_next_run_time(crontab, tz = None):
+    crontab = CronTrigger.from_crontab(crontab)
+    now = datetime.datetime.now(tz)
+    next_run_time = crontab.get_next_fire_time(None, now)
+    return datetime_to_utc_timestamp(next_run_time), next_run_time
+

@@ -1,6 +1,7 @@
 import asyncio
 import inspect
 import os
+from importlib import import_module
 from os.path import abspath
 from queue import Queue
 
@@ -9,18 +10,18 @@ import yaml
 from bspider.config import FrameSettings
 from bspider.core import Project
 from bspider.downloader import BaseMiddleware
+from bspider.parser import BaseExtractor
 from bspider.master.controller.validators.project_form import schema
 from bspider.downloader.async_downloader import AsyncDownloader
-from bspider.parser import BasePipeline, BaseExtractor
+from bspider.parser import BasePipeline
 from bspider.parser.async_parser import AsyncParser
 from bspider.http import Request
-from bspider.utils.conf import PLATFORM_PATH_ENV, PLATFORM_NAME_ENV
+from bspider.utils.conf import PLATFORM_NAME_ENV
 from bspider.utils.exceptions import ModuleExistError
 from bspider.utils.database import MysqlClient
-from bspider.utils.importer import walk_modules
 from bspider.utils.logger import LoggerPool
 from bspider.utils.sign import Sign
-from bspider.utils.tools import find_class_name_by_content
+from bspider.utils.tools import class_name2module_name
 
 
 class Debuger(object):
@@ -29,9 +30,6 @@ class Debuger(object):
 
     # 最大下载次数 下载超过此数量个 Request 调试进程会终止
     max_follow_url_num = 10
-    # 调试的url链接
-    start_request = Request('http://127.0.0.1')
-
     # proority fix rabbitmq 数字越大优先级越高，使用Python优先队列模拟的时候需要进行优先级翻转
 
     def __init__(self):
@@ -43,14 +41,11 @@ class Debuger(object):
             fn=self.debug_log_fn
         )
         self.mysql_client = MysqlClient.from_settings(self.frame_settings.get('WEB_STUDIO_DB'))
-        self.local_project_class = self.__find_local_class()
 
         self.max_priority = self.frame_settings['QUEUE_ARG'].get('x-max-priority', 5)
         self.priority_queue = [Queue() for _ in range(self.max_priority)]
 
-        self.put(self.start_request)
-
-        with open(abspath('settings.yaml'), encoding='utf8') as f:
+        with open(abspath('settings.yml'), encoding='utf8') as f:
             self.project = Project(schema(yaml.safe_load(f)),
                                    middleware_serializer_method=self.load_module,
                                    pipeline_serializer_method=self.load_module)
@@ -60,7 +55,19 @@ class Debuger(object):
         self.log.info('init parser success')
         self.downloader = AsyncDownloader(self.project, Sign(), self.debug_log_fn)
         self.log.info('init downloader success')
-        self.__cur_download_num = 1
+        self.__cur_download_num = 0
+        self.log.info('send Request to queue')
+        for extractor in self.parser.pipes:
+            count = 0
+            for request in extractor.start_url():
+                self.put(request)
+                self.log.info(f'project:project_id->{self.project.project_id} success send a request->{request.sign}')
+                count += 1
+                if count > 100:
+                    self.log.warning(f'Debug url over 100 ... Ignore remaining URLs')
+                    break
+            break
+
 
     @property
     def project_name(self):
@@ -111,20 +118,21 @@ class Debuger(object):
                 self.log.info(f'debuger follow url {self.max_follow_url_num} second')
                 break
 
-    def __find_local_class(self):
-        # 将模块名称转换为模块代码
-        local_project_class = dict()
-        for mod in walk_modules(f'{os.environ[PLATFORM_NAME_ENV]}.projects.{self.project_name}'):
-            for obj in vars(mod).values():
-                if inspect.isclass(obj):
-                    if issubclass(obj, BasePipeline) or issubclass(obj, BaseMiddleware):
-                        self.log.debug(f'success find module:{obj.__name__} from local')
-                        local_project_class[obj.__name__] = mod
-        return local_project_class
-
     def load_module(self, cls_name):
-        if cls_name in self.local_project_class:
-            return cls_name, self.local_project_class[cls_name]
+        module_type = class_name2module_name(cls_name).split('_')[-1]
+        if module_type == 'extractor':
+            mod = import_module(
+                f'{os.environ[PLATFORM_NAME_ENV]}.projects.{self.project.project_name}.{class_name2module_name(cls_name)}')
+        else:
+            mod = import_module(f'{os.environ[PLATFORM_NAME_ENV]}.{module_type}.{class_name2module_name(cls_name)}')
+
+        for obj in vars(mod).values():
+            if inspect.isclass(obj):
+                if issubclass(obj, BasePipeline) \
+                        or issubclass(obj, BaseMiddleware)\
+                        or issubclass(obj, BaseExtractor):
+                    self.log.debug(f'success find {module_type}:{obj.__name__} from local')
+                    return mod
 
         sql = "select `content` from `{}` where `name`=%s;".format(self.frame_settings['CODE_STORE_TABLE'])
         info = self.mysql_client.select(sql, (cls_name))

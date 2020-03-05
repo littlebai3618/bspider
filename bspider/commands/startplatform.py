@@ -62,6 +62,8 @@ class Command(BSpiderCommand):
         mkdir(join(abspath(platform_name), 'log', 'supervisor'))
         mkdir(join(abspath(platform_name), 'cache'))
         mkdir(join(abspath(platform_name), 'projects'))
+        mkdir(join(abspath(platform_name), 'pipeline'))
+        mkdir(join(abspath(platform_name), 'middleware'))
 
         tplfile = join(self.templates_dir, 'tools_cfg', '.bspider.platform.cfg.tmpl')
         copy2(tplfile, os.environ[BSPIDER_CONFIG_PATH_ENV])

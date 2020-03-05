@@ -5,6 +5,10 @@ from bspider.utils.exceptions import ExtractorCallbackError
 
 class BaseExtractor(BasePipeline):
 
+    def start_url(self) -> list:
+        """生成任务起始的URL"""
+        raise NotImplementedError
+
     def process_item(self, response):
         if isinstance(response, Response):
             if hasattr(self, response.callback):

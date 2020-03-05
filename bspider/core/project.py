@@ -18,19 +18,17 @@ class Project(object):
 
     def __init__(self,
                  settings: dict,
-                 project_id_serializer_method: types.MethodType = None,
-                 middleware_serializer_method: types.MethodType = None,
-                 pipeline_serializer_method: types.MethodType = None):
+                 project_id_serializer_method = None,
+                 middleware_serializer_method= None,
+                 pipeline_serializer_method = None):
         self.__project_name = settings['project_name']
         self.__project_id = None
         self.__global_settings = settings['global_settings']
-        self.__rate = settings['rate']
         self.__group = settings['group']
         self.__description = settings['description']
         self.__downloader = settings['downloader']
         self.__parser = settings['parser']
-
-        self.__global_settings = settings['global_settings']
+        self.__scheduler = settings['scheduler']
 
         # 初始化序列化器 序列化器完成 id<->name的转化
         self.__project_id_serializer_method = project_id_serializer_method
@@ -56,7 +54,7 @@ class Project(object):
 
     @property
     def rate(self):
-        return self.__rate
+        return self.scheduler_settings.rate
 
     @property
     def group(self):
@@ -86,16 +84,20 @@ class Project(object):
             serializer_method=self.__pipeline_serializer_method
         )
 
+    @property
+    def scheduler_settings(self):
+        return SchedulerSettings(settings=self.__scheduler)
+
     def dumps(self):
         '''dumps 方法需要serializer 方法支持'''
         return {
             'project_name': self.project_name,
             'group': self.group,
             'description': self.description,
-            'rate': self.rate,
             'global_settings': self.__global_settings,
             'downloader': self.downloader_settings.dumps(),
-            'parser': self.parser_settings.dumps()
+            'parser': self.parser_settings.dumps(),
+            'scheduler': self.scheduler_settings.dumps()
         }
 
 
@@ -121,7 +123,7 @@ class DownloaderSettings(object):
 
     @property
     def middleware(self):
-        return MiddlewareSettings(self.__middleware, self.__serializer_method)
+        return MiddlewareSettings(self.__middleware, self.__serializer_method, ['middleware'])
 
     def dumps(self):
         return {
@@ -140,8 +142,15 @@ class ParserSettings(object):
         self.__serializer_method = serializer_method
 
     @property
+    def extractor(self):
+        for pipeline in self.__pipeline:
+            if pipeline.endswith('Extractor'):
+                return pipeline
+
+
+    @property
     def pipeline(self):
-        return PipelineSettings(self.__pipeline, self.__serializer_method)
+        return PipelineSettings(self.__pipeline, self.__serializer_method, ['pipeline', 'extractor'])
 
     def dumps(self):
         return {
@@ -149,13 +158,52 @@ class ParserSettings(object):
         }
 
 
+class SchedulerSettings(object):
+
+    def __init__(self, settings: dict):
+        self.__rate = settings['rate']
+        self.__trigger_type = settings['trigger_type']
+        self.__trigger = settings['trigger']
+        self.__description = settings['description']
+
+    @property
+    def rate(self):
+        return self.__rate
+
+    @property
+    def trigger(self):
+        return self.__trigger
+
+    @property
+    def trigger_type(self):
+        return self.__trigger_type
+
+    @property
+    def description(self):
+        return self.__description
+
+    def dumps(self):
+        return {
+            'rate': self.__rate,
+            'trigger': self.__trigger,
+            'description': self.__description
+        }
+
+    def __eq__(self, other):
+        return other.trigger == self.__trigger \
+               and other.trigger_type == self.__trigger_type \
+               and other.description == self.description \
+               and other.rate == self.rate
+
+
 class BaseModuleSettings(object):
 
-    def __init__(self, data: list, serializer_method: types.MethodType):
+    def __init__(self, data: list, serializer_method: types.MethodType, module_type: list):
         self.__data = data
         self.__serializer_method = serializer_method
         self.__end = len(data)
         self.__cur = -1
+        self.module_type = module_type
 
     def __iter__(self):
         return self
