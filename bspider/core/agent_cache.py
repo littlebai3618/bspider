@@ -8,7 +8,7 @@ from bspider.utils.database import SqlLite3Client
 class AgentCache(object):
 
     def __init__(self):
-        self.sqlite3_client = SqlLite3Client(os.path.join(os.environ[PLATFORM_PATH_ENV], 'cache', 'meta.db'))
+        self.sqlite3_client = SqlLite3Client(os.path.join(os.environ[PLATFORM_PATH_ENV], '.cache', 'meta.db'))
         self.project_table = 'project_cache'
         self.project_weight_table = 'project_weight_cache'
         self.code_table = 'code_table'
