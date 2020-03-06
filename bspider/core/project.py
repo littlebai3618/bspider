@@ -141,11 +141,14 @@ class ParserSettings(object):
         self.__pipeline = pipeline
         self.__serializer_method = serializer_method
 
+
+
     @property
     def extractor(self):
         for pipeline in self.__pipeline:
-            if pipeline.endswith('Extractor'):
-                return pipeline
+            for key, _ in pipeline.items():
+                if pipeline.endswith('Extractor'):
+                    return key
 
 
     @property

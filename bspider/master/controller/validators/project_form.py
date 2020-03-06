@@ -10,6 +10,7 @@ from bspider.utils.exceptions import ProjectSettingsError
 def valid_middleware(middleware: list) -> list:
     return valid_module('Middleware', middleware)
 
+
 def valid_pipeline(pipeline: list) -> list:
     data = valid_module('Pipeline', pipeline)
     pipe_count = 0
@@ -24,10 +25,11 @@ def valid_pipeline(pipeline: list) -> list:
         raise Invalid('Module Pipeline Invalid, must hive one \'Extractor\' but find %s' % (pipe_count))
     return data
 
+
 def valid_module(module_type, data):
     for index, module in enumerate(data):
         if isinstance(module, str):
-            data[index] = { module: dict() }
+            data[index] = {module: dict()}
         elif isinstance(module, dict):
             for cls, param in module.items():
                 if not isinstance(cls, str):
@@ -38,9 +40,11 @@ def valid_module(module_type, data):
             raise Invalid('Module %s Invalid, must like \'cls\' or [{cls: dict(cls_param)}]' % (module_type))
     return data
 
+
 def valid_crontab(crontab) -> str:
     CronTrigger.from_crontab(crontab)
     return crontab
+
 
 schema = Schema({
     Required('project_name'): All(str, Length(min=1, max=99)),
@@ -64,6 +68,7 @@ schema = Schema({
 
 })
 
+
 class AddForm(BaseForm):
     status = IntegerField(default=1)
     config = StringField(validators=[ParamRequired()])
@@ -74,6 +79,7 @@ class AddForm(BaseForm):
             value.data = (schema(yaml.safe_load(value.data)), value.data)
         except MultipleInvalid as e:
             raise ProjectSettingsError(e.error_message)
+
 
 class UpdateForm(BaseForm):
     status = IntegerField()
@@ -86,8 +92,3 @@ class UpdateForm(BaseForm):
                 value.data = (schema(yaml.safe_load(value.data)), value.data)
             except MultipleInvalid as e:
                 raise ProjectSettingsError(e.error_message)
-
-
-
-
-
