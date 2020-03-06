@@ -147,7 +147,7 @@ class ParserSettings(object):
     def extractor(self):
         for pipeline in self.__pipeline:
             for key, _ in pipeline.items():
-                if pipeline.endswith('Extractor'):
+                if key.endswith('Extractor'):
                     return key
 
 
