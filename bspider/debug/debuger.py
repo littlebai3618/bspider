@@ -30,6 +30,7 @@ class Debuger(object):
 
     # 最大下载次数 下载超过此数量个 Request 调试进程会终止
     max_follow_url_num = 10
+
     # proority fix rabbitmq 数字越大优先级越高，使用Python优先队列模拟的时候需要进行优先级翻转
 
     def __init__(self):
@@ -67,7 +68,6 @@ class Debuger(object):
                     self.log.warning(f'Debug url over 100 ... Ignore remaining URLs')
                     break
             break
-
 
     @property
     def project_name(self):
@@ -121,18 +121,20 @@ class Debuger(object):
     def load_module(self, cls_name):
         module_type = class_name2module_name(cls_name).split('_')[-1]
         if module_type == 'extractor':
-            mod = import_module(
-                f'{os.environ[PLATFORM_NAME_ENV]}.projects.{self.project.project_name}.extractor')
+            module_path = f'{os.environ[PLATFORM_NAME_ENV]}.projects.{self.project.project_name}.extractor'
         else:
-            mod = import_module(f'{os.environ[PLATFORM_NAME_ENV]}.{module_type}.{class_name2module_name(cls_name)}')
+            module_path = f'{os.environ[PLATFORM_NAME_ENV]}.{module_type}'
 
-        for obj in vars(mod).values():
-            if inspect.isclass(obj):
-                if issubclass(obj, BasePipeline) \
-                        or issubclass(obj, BaseMiddleware)\
-                        or issubclass(obj, BaseExtractor):
-                    self.log.debug(f'success find {module_type}:{obj.__name__} from local')
-                    return mod
+        try:
+            mod = import_module(module_path)
+
+            for obj in vars(mod).values():
+                if inspect.isclass(obj):
+                    if obj.__name__ == cls_name:
+                        self.log.debug(f'success find {module_type}:{obj.__name__} from local')
+                        return cls_name, obj
+        except ModuleNotFoundError:
+            pass
 
         sql = "select `content` from `{}` where `name`=%s;".format(self.frame_settings['CODE_STORE_TABLE'])
         info = self.mysql_client.select(sql, (cls_name))

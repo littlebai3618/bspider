@@ -1,13 +1,13 @@
 [unix_http_server]                                                                                                                                                                             
-file=${platform_path}/cache/supervisor.sock
+file=${platform_path}/.cache/supervisor.sock
 [supervisord]
 logfile=${platform_path}/log/supervisor/supervisord.log
 loglevel=info
-pidfile=${platform_path}/cache/supervisord.pid
+pidfile=${platform_path}/.cache/supervisord.pid
 [rpcinterface:supervisor]
 supervisor.rpcinterface_factory = supervisor.rpcinterface:make_main_rpcinterface
 [supervisorctl]
-serverurl=unix://${platform_path}/cache/supervisor.sock
+serverurl=unix://${platform_path}/.cache/supervisor.sock
 
 [inet_http_server]
 port=${master_ip}:${supervisor_rpc_port}
@@ -16,7 +16,7 @@ password=${supervisor_rpc_password}
 
     
 [program:agent]
-command=gunicorn -c ${platform_path}/cache/agent_gunicorn.py --chdir ${bin_path}/ agent_manager:app
+command=gunicorn -c ${platform_path}/.cache/agent_gunicorn.py --chdir ${bin_path}/ agent_manager:app
 directory=${platform_path}
 startsecs=0
 stopwaitsecs=0
@@ -25,7 +25,7 @@ autorestart=true
 stdout_logfile=${platform_path}/log/supervisor/agent.log
 stderr_logfile=${platform_path}/log/supervisor/agent.log
 [program:master]
-command=gunicorn -c ${platform_path}/cache/master_gunicorn.py --chdir ${bin_path}/ master_manager:app
+command=gunicorn -c ${platform_path}/.cache/master_gunicorn.py --chdir ${bin_path}/ master_manager:app
 directory=${platform_path}
 startsecs=0
 stopwaitsecs=0

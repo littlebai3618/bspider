@@ -22,6 +22,9 @@ TEMPLATES_TO_RENDER = (
     ('bin', 'scheduler_manager.py.tmpl'),
     ('bin', 'master_manager.py.tmpl'),
     ('bin', '__init__.py.tmpl'),
+    ('middleware', '__init__.py.tmpl'),
+    ('pipeline', '__init__.py.tmpl'),
+    ('projects', '__init__.py.tmpl'),
     ('.', '__init__.py.tmpl'),
 )
 
@@ -60,10 +63,7 @@ class Command(BSpiderCommand):
 
         mkdir(join(abspath(platform_name), 'log'))
         mkdir(join(abspath(platform_name), 'log', 'supervisor'))
-        mkdir(join(abspath(platform_name), 'cache'))
-        mkdir(join(abspath(platform_name), 'projects'))
-        mkdir(join(abspath(platform_name), 'pipeline'))
-        mkdir(join(abspath(platform_name), 'middleware'))
+        mkdir(join(abspath(platform_name), '.cache'))
 
         tplfile = join(self.templates_dir, 'tools_cfg', '.bspider.platform.cfg.tmpl')
         copy2(tplfile, os.environ[BSPIDER_CONFIG_PATH_ENV])
