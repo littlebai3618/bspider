@@ -83,18 +83,18 @@ class Command(BSpiderCommand):
         platform_name = os.environ[PLATFORM_NAME_ENV]
 
         tplfile = os.path.join(self.templates_dir, 'tools_cfg', 'master_gunicorn.py.tmpl')
-        copy2(tplfile, os.path.join(platform_path, 'cache', 'master_gunicorn.py.tmpl'))
-        render_templatefile(os.path.join(platform_path, 'cache', 'master_gunicorn.py.tmpl'),
+        copy2(tplfile, os.path.join(platform_path, '.cache', 'master_gunicorn.py.tmpl'))
+        render_templatefile(os.path.join(platform_path, '.cache', 'master_gunicorn.py.tmpl'),
                             master_port=self.frame_settings['MASTER']['port'],
                             master_ip=self.frame_settings['MASTER']['ip'],
                             log_level=self.frame_settings['LOGGER_LEVEL'].lower(),
                             platform_name=platform_name,
                             platform_path=platform_path)
 
-        if os.path.exists(os.path.join(platform_path, 'cache', 'supervisord.pid')):
+        if os.path.exists(os.path.join(platform_path, '.cache', 'supervisord.pid')):
             return True
         tplfile = os.path.join(self.templates_dir, 'tools_cfg', 'supervisor.conf.tmpl')
-        config_path = os.path.join(platform_path, 'cache', 'supervisor.conf')
+        config_path = os.path.join(platform_path, '.cache', 'supervisor.conf')
         copy2(tplfile, config_path)
         render_templatefile(config_path,
                             platform_path=platform_path,
@@ -104,7 +104,7 @@ class Command(BSpiderCommand):
                             supervisor_rpc_username=self.frame_settings['SUPERVISOR_RPC']['username'],
                             supervisor_rpc_password=self.frame_settings['SUPERVISOR_RPC']['password'])
 
-        cmd = 'supervisord -c {}'.format(os.path.join(platform_path, 'cache', 'supervisor.conf'))
+        cmd = 'supervisord -c {}'.format(os.path.join(platform_path, '.cache', 'supervisor.conf'))
         print('start supervisor')
         print(f'cmd: {cmd}')
         print(os.popen(cmd).read().strip())
@@ -160,7 +160,7 @@ class Command(BSpiderCommand):
         if op == 'start':
             self.init_database()
             self.init_supervisor()
-        rpc_socket = os.path.join(os.environ[PLATFORM_PATH_ENV], 'cache', 'supervisor.conf')
+        rpc_socket = os.path.join(os.environ[PLATFORM_PATH_ENV], '.cache', 'supervisor.conf')
 
         print('=======supervisor output ========')
         for module in ('master', 'bcorn', 'scheduler'):

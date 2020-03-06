@@ -30,7 +30,7 @@ class Command(BSpiderCommand):
 
         # 停止supervisor
         try:
-            with open(os.path.join(platform_path, 'cache', 'supervisord.pid')) as f:
+            with open(os.path.join(platform_path, '.cache', 'supervisord.pid')) as f:
                 pid = f.read().strip()
             print(os.popen(f'kill {pid}').read().strip())
             print('Stop supervisor process success')
