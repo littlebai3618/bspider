@@ -78,7 +78,7 @@ class Command(BSpiderCommand):
         print("You can development your first spider with:")
         print(f"    cd {abspath(platform_name)}/projects")
         print("then you can init you spider code by template")
-        print("     bspider startspider <spider_name>")
+        print("     bspider mkspider <spider_name>")
 
 
 if __name__ == '__main__':

@@ -32,12 +32,12 @@ class Command(BSpiderCommand):
         try:
             with open(os.path.join(platform_path, 'cache', 'supervisord.pid')) as f:
                 pid = f.read().strip()
+            print(os.popen(f'kill {pid}').read().strip())
+            print('Stop supervisor process success')
         except Exception:
-            print(f'Error: supervisor process is not running')
-            self.exitcode = 1
-            return
-        print(os.popen(f'kill {pid}').read().strip())
-        print('Stop supervisor process success')
+            print(f'warning: supervisor process is not running')
+
+
         print('Clean platform file ...')
         # 删除文件
         rmtree(os.environ[PLATFORM_PATH_ENV], ignore_errors=True)

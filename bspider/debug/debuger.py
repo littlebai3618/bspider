@@ -118,11 +118,12 @@ class Debuger(object):
                 break
 
     def load_module(self, cls_name):
-        module_type = class_name2module_name(cls_name).split('_')[-1]
+        module_name = class_name2module_name(cls_name)
+        module_type = module_name.split('_')[-1]
         if module_type == 'extractor':
             module_path = f'{os.environ[PLATFORM_NAME_ENV]}.projects.{self.project.project_name}.extractor'
         else:
-            module_path = f'{os.environ[PLATFORM_NAME_ENV]}.{module_type}'
+            module_path = f'{os.environ[PLATFORM_NAME_ENV]}.{module_type}.{module_name}'
 
         try:
             mod = import_module(module_path)
