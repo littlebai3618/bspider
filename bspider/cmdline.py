@@ -59,7 +59,7 @@ def _print_unknown_command(cmdname):
 
 def _print_unknow_platform():
     print(f"BSpider {os.environ[BSPIDER_VERSION_ENV]} - no platform")
-    print('Please use bspider startplatform <platform_name> to create a platform')
+    print('Please use bspider mkplatform <platform_name> to create a platform')
 
 
 def run_cmd(cmd, parser, args, opts):
@@ -93,7 +93,7 @@ def execute(argv=None):
         _print_unknown_command(cmdname)
         sys.exit(2)
 
-    if cmdname == 'startplatform' or cmdname == 'version':
+    if cmdname == 'mkplatform' or cmdname == 'version':
         frame_settings = dict()
     elif os.environ.get(PLATFORM_NAME_ENV):
         frame_settings = FrameSettings()
