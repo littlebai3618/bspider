@@ -9,6 +9,7 @@ class ProjectService(BaseService):
         self.cache = AgentCache()
 
     def add_project(self, project_id, name, config, rate, status):
+        log.debug(project_id, name, config, rate, status)
         self.cache.set_project(project_id, name, config, rate, status)
         log.info(f'add project:project_id->{project_id} project_name->{name} {status} success')
         return PostSuccess()

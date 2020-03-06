@@ -1,6 +1,5 @@
 import sqlite3
 
-from bspider.agent import log
 from bspider.utils import singleton
 
 
@@ -34,7 +33,7 @@ class SqlLite3Client(object):
         :param lastrowid: 是否返回自增id
         :return: 插入结果
         """
-        log.info(sql, values)
+        print(sql, values)
         return self._do_query(self._insert, sql, values=values, lastrowid=lastrowid)
 
     def update(self, sql: str, values: tuple = None) -> int:
