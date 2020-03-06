@@ -9,11 +9,8 @@ import yaml
 
 from bspider.config import FrameSettings
 from bspider.core import Project
-from bspider.downloader import BaseMiddleware
-from bspider.parser import BaseExtractor
 from bspider.master.controller.validators.project_form import schema
 from bspider.downloader.async_downloader import AsyncDownloader
-from bspider.parser import BasePipeline
 from bspider.parser.async_parser import AsyncParser
 from bspider.http import Request
 from bspider.utils.conf import PLATFORM_NAME_ENV
@@ -60,6 +57,8 @@ class Debuger(object):
         self.log.info('send Request to queue')
         for extractor in self.parser.pipes:
             count = 0
+            if not extractor.__class__.__name__.endswith('Extractor'):
+                continue
             for request in extractor.start_url():
                 self.put(request)
                 self.log.info(f'project:project_id->{self.project.project_id} success send a request->{request.sign}')
@@ -132,7 +131,7 @@ class Debuger(object):
                 if inspect.isclass(obj):
                     if obj.__name__ == cls_name:
                         self.log.debug(f'success find {module_type}:{obj.__name__} from local')
-                        return cls_name, obj
+                        return cls_name, mod
         except ModuleNotFoundError:
             pass
 
@@ -143,9 +142,3 @@ class Debuger(object):
             return cls_name, info[0]['content']
         else:
             raise ModuleExistError('load module from remote failed %s is not exists' % (cls_name))
-
-
-if __name__ == '__main__':
-    for i in range(10, 0):
-        print(i)
-        'ProjectConfigError'
