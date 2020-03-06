@@ -3,7 +3,6 @@
 """
 from flask import Blueprint
 
-from bspider.agent import log
 from bspider.core.api import auth
 from .validators.project_form import AddForm, UpdateForm
 from bspider.agent.service.project import ProjectService
@@ -16,7 +15,6 @@ project_service = ProjectService()
 @auth.login_required
 def add_project():
     form = AddForm()
-    log.info(form.to_dict())
     return project_service.add_project(**form.to_dict())
 
 @project.route('/project/<int:project_id>', methods=['PATCH'])

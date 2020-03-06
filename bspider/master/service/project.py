@@ -70,7 +70,6 @@ class ProjectService(BaseService, AgentMixIn):
                     'config': r_config,
                     'status': status
                 }
-                log.info(info)
                 node_list = self.impl.get_nodes()
                 sign, result = self.op_add_project(node_list, info)
                 if not sign:

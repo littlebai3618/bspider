@@ -56,14 +56,14 @@ class AgentCache(object):
 
     def get_project(self, project_id):
         sql = f'select `id`, `name`, `config`, `rate`, `timestamp`, `status` from project_cache where `id`={project_id};'
-        return [{'id': project_id, 'name': name, 'config': config,
+        return [{'id': project_id, 'name': name, 'config': json.loads(config),
                  'rate': rate, 'timestamp': timestamp, 'status': status} for
                 project_id, name, config, rate, timestamp, status in
                 self.sqlite3_client.select(sql)]
 
     def set_project(self, project_id: int, name: str, config: str, rate: int, status: int):
         sql = f"insert or replace into {self.project_table} values(?, ?, ?, ?, ?, datetime('now'))"
-        return self.sqlite3_client.insert(sql, (project_id, name, rate, config, status))
+        return self.sqlite3_client.insert(sql, (project_id, name, rate, json.dumps(config), status))
 
     def delete_project(self, project_id: int):
         sql = f'delete from {self.project_table} where `id`={project_id}'
