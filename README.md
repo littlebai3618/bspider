@@ -49,7 +49,7 @@ BSpider [Demo](http://bspider-demo.baishanglin.top/)
 ### 多节点部署
 启动master
 ```shell script
-bspider startplatform ${platform_name} # 初始化工作台
+bspider mkplatform ${platform_name} # 初始化工作台
 vim ${platform_name}/config/frame_settings.py # 填入配置
 bspider master start # 启动master节点第一次启动节点会初始化MySQL表
 ```
@@ -83,30 +83,28 @@ bspider agent start # 初次启动agent需要使用命令行进行启动，后�
 初始化项目
 ```shell script
 # 在要进行开发的电脑上
-bspider startplatform ${platform_name} # 初始化工作台
+bspider mkplatform ${platform_name} # 初始化工作台
 vim ${platform_name}/config/frame_settings.py # 填入配置 AGENT配置可不填，其他配置和线上配置保持一致
-bspider startspider ${spider_name} # 自动生成模板代码
+bspider mkspider ${spider_name} # 自动生成模板代码
 cd ${platform_name}/projects/${spider_name}
 # 开始开发
 ```
 各文件说明
-> 1. *_pipeline.py 类似于Scrapy 的pipeline `一个py文件只能包含一个pipeline class 且类名必须为 *Pipeline`
-> 2. *_extractor.py 抽取逻辑。目前`只支持xpath 通常一个抓取任务只需编写此组件`
-> 3. *_middleware.py 下载器中间件。`一个py文件只能包含一个middleware class 且类名必须为 *Middleware`
-> 4. settings.yml 当前下载任务的配置
-> 5. *_task.py 定时任务，用于向队列中推送初始url, 相当于scrapy的start_url `一个py文件只能包含一个task class 且类名必须为 *Task`
-> 6. debug.py 开发时的调试入口 `python debug.py` 开始调试
+> 1. pipeline.*_pipeline.py 类似于Scrapy 的pipeline `一个py文件只能包含一个pipeline class 且类名必须为 *Pipeline`
+> 2. project.${project_name}.*_extractor.py 抽取逻辑。目前`只支持xpath 通常一个抓取任务只需编写此组件`
+> 3. middleware.*_middleware.py 下载器中间件。`一个py文件只能包含一个middleware class 且类名必须为 *Middleware`
+> 4. project.${project_name}.settings.yml 当前下载任务的配置
+
+> 只需编写 extractor 和 yml 配置文件即可完成爬虫开发
 
 `notice: 每个项目只可配置一个extractor， 但可配置多个pipeline 或 middleware` 
 
 
 发布到服务
 
-*** 发布前先确认有 一个或以上的 parser、downloader进程运行
+*** 发布前先确认有 一个或以上的 parser、downloader `进程`运行
 > 1. ${}/#/code/create
 
 TODO
 
-1. 将pipeline 和 middleware 单独用作两个文件夹进行开发，prject 只保留 extractor、yml配置文件
-2. 将task 和extractor 结合
-3. 优化crontab 增加、修改流程流程，在yml配置文件中增加bcron 配置, 使用同一配置文件进行配置
+1. 校验pipeline 拟采用jsonschema实现
