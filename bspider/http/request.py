@@ -20,7 +20,8 @@ class Request(BaseHttp):
                  timeout: int = 10,
                  verify_ssl: bool = False,
                  errback: str = None,
-                 sign: str = None):
+                 sign: str = None,
+                 ignore_filter: bool = False):
         """
         :param url: 需要请求的链接
         :param method: 请求的方法
@@ -51,6 +52,7 @@ class Request(BaseHttp):
         self.callback = self._set_callback(callback)
         self.errback = self._set_errback(errback)
         self.sign = make_sign(self.url, salt='' if data is None else json.dumps(data)) if sign is None else sign
+        self.ignore_filter = ignore_filter # 过滤器识别标识
 
     @classmethod
     def loads(cls, param: dict):

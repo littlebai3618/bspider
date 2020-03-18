@@ -1,7 +1,7 @@
 """
-初始化解析器类 加上异步mysql 的处理
 2019-08-29 增加callback 参数处理 - 需要单独抽象出extractor类
 将Request 对象发送到待下载队列
+2020-03-18 增加SendRequestHelper
 """
 from types import GeneratorType
 
@@ -11,6 +11,13 @@ from bspider.utils.exceptions import ParserError
 from bspider.utils.logger import LoggerPool
 from bspider.utils.importer import import_module_by_code
 from bspider.utils.sign import Sign
+
+
+class SendRequestHelper(object):
+
+    def process_item(self, item):
+        if isinstance(item, Request):
+            yield item
 
 
 class AsyncParser(object):
@@ -44,6 +51,8 @@ class AsyncParser(object):
                 else:
                     msg = f'{self.project_name} pipeline init failed: {cls_name}'
                     raise ParserError(msg)
+        # 增加默认的 SendRequestHelper
+        self.pipes.append(SendRequestHelper())
 
     async def parse(self, response: Response) -> list:
         """
@@ -71,19 +80,21 @@ class AsyncParser(object):
         """
         self.log.debug(f'{pipeline.__class__.__name__} executing process_response')
         temp_items = await pipeline._exec('process_item', pre_item)
-        self.__exec_items(temp_items, requests, cur_item)
+        is_send_request_helper = isinstance(pipeline, SendRequestHelper)
+        self.__exec_items(temp_items, requests, cur_item, is_send_request_helper)
 
-    def __exec_items(self, items, requests: list, cur_item: list):
+    def __exec_items(self, items, requests: list, cur_item: list, is_send_request_helper: bool):
         if not isinstance(items, GeneratorType):
             if isinstance(items, Request):
-                requests.append(items)
+                if is_send_request_helper:
+                    requests.append(items)
             else:
                 cur_item.append(items)
             return
 
         while True:
             try:
-                self.__exec_items(next(items), requests, cur_item)
+                self.__exec_items(next(items), requests, cur_item, is_send_request_helper)
             except StopIteration as e:
-                self.__exec_items(e.value, requests, cur_item)
+                self.__exec_items(e.value, requests, cur_item, is_send_request_helper)
                 break
