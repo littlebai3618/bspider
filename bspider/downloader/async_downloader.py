@@ -101,8 +101,6 @@ class AsyncDownloader(object):
 
             if response.status == 200 or response.status in self.ignore_retry_http_code:
                 return response, True, None
-            if response.status == 599:
-                return response, False, e_msg
             self.log.info(f'Retry download: url->{request.url} status->{response.status} time:{retry_index + 1}')
         self.log.debug(f'{response.sign}')
         return response, False, e_msg

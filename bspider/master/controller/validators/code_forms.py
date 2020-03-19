@@ -21,7 +21,6 @@ def valid_code(content):
         raise Forbidden(msg='role has no permission!', errno=10004)
 
     code_type_map = {
-        'BaseTask': 'task',
         'BaseOperation': 'operation',
         'BasePipeline': 'pipeline',
         'BaseMiddleware': 'middleware',

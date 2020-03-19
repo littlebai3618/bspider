@@ -39,16 +39,15 @@ class Response(BaseHttp):
         else:
             raise TypeError("%s request must be dict or bspider.Request object. " % (type(self).__name__))
 
-
     def dumps(self):
         """解决序列化的嵌套问题"""
         resp = dict(
-            url = self.url,
-            status = self.status,
-            request = self.request if not isinstance(self.request, Request) else self.request.dumps(),
-            headers = self.headers,
-            cookies = self.cookies,
-            text = self.text
+            url=self.url,
+            status=self.status,
+            request=self.request if not isinstance(self.request, Request) else self.request.dumps(),
+            headers=self.headers,
+            cookies=self.cookies,
+            text=self.text
         )
         return resp
 
