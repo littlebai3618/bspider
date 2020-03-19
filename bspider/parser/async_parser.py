@@ -19,6 +19,9 @@ class SendRequestHelper(object):
         if isinstance(item, Request):
             yield item
 
+    async def _exec(self, func_name, *args):
+        return getattr(self, func_name)(*args)
+
 
 class AsyncParser(object):
 
