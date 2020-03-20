@@ -112,4 +112,4 @@ TODO
 3. master 增加报警接口 为各节点提供统一的报警处理方式
 4. done 去重pipeline redis 布隆过滤器
 5. code 增加 doc 使用文档
-6. spider project 增加 settings-development.yml
+6. done spider project 增加 settings-development.yml

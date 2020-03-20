@@ -14,7 +14,7 @@ from bspider.downloader.async_downloader import AsyncDownloader
 from bspider.parser.async_parser import AsyncParser
 from bspider.http import Request
 from bspider.utils.conf import PLATFORM_NAME_ENV
-from bspider.utils.exceptions import ModuleExistError
+from bspider.utils.exceptions import ModuleExistError, ParserError
 from bspider.utils.database import MysqlClient
 from bspider.utils.logger import LoggerPool
 from bspider.utils.sign import Sign
@@ -43,7 +43,7 @@ class Debuger(object):
         self.max_priority = self.frame_settings['QUEUE_ARG'].get('x-max-priority', 5)
         self.priority_queue = [Queue() for _ in range(self.max_priority)]
 
-        with open(abspath('settings.yml'), encoding='utf8') as f:
+        with open(abspath('settings-development.yml'), encoding='utf8') as f:
             self.project = Project(schema(yaml.safe_load(f)),
                                    middleware_serializer_method=self.load_module,
                                    pipeline_serializer_method=self.load_module)
@@ -77,10 +77,9 @@ class Debuger(object):
         try:
             self.priority_queue[request.priority].put(request)
             self.log.debug(f'success send request {request}')
-        except KeyError as e:
-            self.log.error(
-                f'At req:{request.url}, requests.priority={request.priority} must between 1~{self.max_priority}')
-            raise e
+        except IndexError:
+            ParserError(
+                f'At req:%s, requests.priority=%s must between 1~%s' % (request.url, request.priority, self.max_priority))
 
     def get(self):
         """从优先队列中取出req，若空则返回None"""

@@ -14,7 +14,7 @@ class Request(BaseHttp):
                  data=None,
                  cookies=None,
                  meta=None,
-                 priority: int = 3,
+                 priority: int = 0,
                  proxy=None,
                  allow_redirect: bool = False,
                  timeout: int = 10,

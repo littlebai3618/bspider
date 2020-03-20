@@ -10,7 +10,8 @@ from bspider.utils.tools import module_name2class_name
 TEMPLATES_TO_RENDER = (
     ('__init__.py.tmpl',),
     ('extractor.py.tmpl',),
-    ('settings.yml.tmpl',),
+    ('settings-development.yml.tmpl',),
+    ('settings-production.yml.tmpl',),
 )
 
 
