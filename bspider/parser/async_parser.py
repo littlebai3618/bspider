@@ -91,8 +91,7 @@ class AsyncParser(object):
             if isinstance(items, Request):
                 if is_send_request_helper:
                     requests.append(items)
-            else:
-                cur_item.append(items)
+            cur_item.append(items)
             return
 
         while True:
