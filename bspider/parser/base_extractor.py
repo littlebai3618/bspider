@@ -1,4 +1,5 @@
 import sys
+from types import GeneratorType
 
 from bspider.http import Response
 from bspider.parser import BasePipeline
@@ -15,11 +16,16 @@ class BaseExtractor(BasePipeline):
         if isinstance(response, Response):
             if response.callback:
                 try:
-                    yield getattr(self, response.callback)(response)
+                    items = getattr(self, response.callback)(response)
+                    if not isinstance(items, GeneratorType):
+                        return items
+
+                    for item in items:
+                        yield item
                 except Exception as e:
                     tp, msg, tb = sys.exc_info()
                     e.with_traceback(tb)
-                    yield getattr(self, response.errback)(response, e)
+                    yield getattr(self, response.errback)(response, e, msg)
             else:
                 raise ExtractorCallbackError('Cannot find callback %s in extractor %s' %
                                              (self.__class__.__name__, response.callback))
@@ -32,5 +38,5 @@ class BaseExtractor(BasePipeline):
         """
         pass
 
-    def errback(self, response: Response, e: Exception):
+    def errback(self, response: Response, e: Exception, traceback: str):
         raise e
