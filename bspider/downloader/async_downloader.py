@@ -139,7 +139,7 @@ class AsyncDownloader(object):
                     timeout=temp_timeout,
                     proxy=None if not isinstance(req.proxy, dict) else req.proxy.get('proxy'),
                     # ssl验证
-                    verify_ssl=req.verify_ssl,
+                    ssl=req.verify_ssl,
             ) as resp:
                 # 挂起等待下载结果
                 self.log.debug(f'aiohttp finish {temp_timeout.total}')
