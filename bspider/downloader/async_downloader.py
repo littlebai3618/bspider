@@ -58,7 +58,7 @@ class AsyncDownloader(object):
                     raise DownloaderError(msg)
 
     async def download(self, request: Request) -> (Response, bool, str):
-        self.log.info(f'start download sign:{request.sign} {request}')
+        self.log.info(f'===>> start download sign:{request.sign} {request}')
         response = Response(url=request.url, status=599, request=request)
         # 异常占位符
         e_msg = None
@@ -92,6 +92,7 @@ class AsyncDownloader(object):
                     self.log.debug(f'{mw.__class__.__name__} executing process_response')
                     result = await mw._exec('process_exception', request, e, response)
                     if result is None:
+                        self.log.info(f'===>> complete download sign:{request.sign} {request}')
                         return response, False, e_msg
 
             for mw in self.mws:
@@ -101,10 +102,11 @@ class AsyncDownloader(object):
                     break
 
             if response.status in self.ignore_retry_http_code:
-                self.log.info(f'response.status == {response.status}: url->{request.url} ignore retry')
+                self.log.debug(f'response.status == {response.status}: url->{request.url} ignore retry')
+                self.log.info(f'===>> complete download sign:{request.sign} {request}')
                 return response, True, None
             self.log.info(f'Retry download: url->{request.url} status->{response.status} time:{retry_index + 1}')
-        self.log.debug(f'{response.sign}')
+        self.log.info(f'===>> complete download sign:{request.sign} {request}')
         return response, False, e_msg
 
     async def __assemble_response(self, response: ClientResponse, request: Request) -> Response:
