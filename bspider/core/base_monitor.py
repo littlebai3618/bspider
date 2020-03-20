@@ -56,8 +56,9 @@ class BaseMonitor(object):
                 total_sum += info['rate']
 
             worker_obj = self.projects.get(info['id'])
+            self.log.info(info['config'])
             project = Project(
-                info['config'],
+                settings=info['config'],
                 pipeline_serializer_method=self.code_id_to_content,
                 middleware_serializer_method=self.code_id_to_content
             )
