@@ -57,7 +57,7 @@ class BaseMonitor(object):
 
             worker_obj = self.projects.get(info['id'])
             project = Project(
-                json.loads(info['config']),
+                info['config'],
                 pipeline_serializer_method=self.code_id_to_content,
                 middleware_serializer_method=self.code_id_to_content
             )
