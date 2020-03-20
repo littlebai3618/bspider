@@ -1,5 +1,4 @@
 import sys
-import traceback
 
 from bspider.http import Response
 from bspider.parser import BasePipeline
@@ -14,7 +13,7 @@ class BaseExtractor(BasePipeline):
 
     def process_item(self, response):
         if isinstance(response, Response):
-            if hasattr(self, response.callback):
+            if response.callback:
                 try:
                     yield getattr(self, response.callback)(response)
                 except Exception as e:

@@ -58,6 +58,7 @@ class AsyncDownloader(object):
                     raise DownloaderError(msg)
 
     async def download(self, request: Request) -> (Response, bool, str):
+        self.log.info(f'start download sign:{request.sign} {request}')
         response = Response(url=request.url, status=599, request=request)
         # 异常占位符
         e_msg = None
