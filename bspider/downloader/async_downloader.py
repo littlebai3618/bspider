@@ -123,12 +123,14 @@ class AsyncDownloader(object):
 
     async def __do(self, req: Request) -> Response:
         # ClientSession 在每次请求都要关闭，所以使用上下文管理器进行管理
-        temp_timeout = aiohttp.ClientTimeout(connect=req.timeout)
+        temp_timeout = aiohttp.ClientTimeout(total=req.timeout)
+        self.log.debug(f'set time out {temp_timeout.total}')
         async with aiohttp.ClientSession() as session:
             async with session.request(
                     method=req.method,
                     url=req.url,
                     headers=req.headers,
+                    params=req.params,
                     # post 参数，get时为 None
                     data=req.data,
                     cookies=req.cookies,
@@ -137,9 +139,10 @@ class AsyncDownloader(object):
                     timeout=temp_timeout,
                     proxy=None if not isinstance(req.proxy, dict) else req.proxy.get('proxy'),
                     # ssl验证
-                    ssl=req.verify_ssl,
+                    verify_ssl=req.verify_ssl,
             ) as resp:
                 # 挂起等待下载结果
+                self.log.debug(f'aiohttp finish {temp_timeout.total}')
                 return await self.__assemble_response(resp, req)
 
 

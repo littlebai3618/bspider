@@ -50,6 +50,14 @@ class BaseHttp(object):
         else:
             return data
 
+    def _set_params(self, params):
+        if params is None:
+            return
+        elif not isinstance(params, dict):
+            raise TypeError("%s params must be dict or None. " % (type(self).__name__))
+        else:
+            return params
+
     # Response API
     def _set_text(self, text):
         if text is None:

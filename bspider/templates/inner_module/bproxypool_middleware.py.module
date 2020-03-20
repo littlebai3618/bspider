@@ -18,15 +18,14 @@ class BProxyPoolMiddleware(BaseMiddleware):
 
     def __init__(self, project, settings, log):
         super().__init__(project, settings, log)
-        bproxypool_url = self.settings.get('PROXY_POOL_API')
+        bproxypool_url = self.settings.get('api')
         if bproxypool_url is None:
-            raise MiddleWareParamError('\'PROXY_POOL_API\' is Required like http://127.0.0.1:80/proxy/')
-        self.timeout = self.settings.get('PROXY_POOL_TIMEOUT', 3)
-        self.retry_time = self.settings.get('PROXY_POOL_RETRY_TIME', 3)
-        virtual_pool = self.settings.get('VIRTUAL_PROXY_POOL')
-        self.cool_down_time = self.settings.get('PROXY_COOL_DOWN_TIME')
-        ignore = self.settings.get('PROXY_COOL_DOWN_CODE', list())
-        ignore.append(599)
+            raise MiddleWareParamError('\'api\' is Required like http://127.0.0.1:80/proxy/')
+        self.timeout = self.settings.get('timeout', 3)
+        self.retry_time = self.settings.get('retry_time', 3)
+        virtual_pool = self.settings.get('virtual_proxy_pool')
+        self.cool_down_time = self.settings.get('proxy_cool_down_time')
+        ignore = self.settings.get('ignore_cool_down_http_code', list())
         self.ignore = set(ignore)
         if virtual_pool:
             self.proxy_url = f'{bproxypool_url}{virtual_pool}'
@@ -60,16 +59,18 @@ class BProxyPoolMiddleware(BaseMiddleware):
         raise DownloaderError('Proxy get failed, please check proxy service!')
 
     async def process_exception(self, request, e, response):
-        if isinstance(e, aiohttp.ClientProxyConnectionError):
+        if issubclass(e.__class__, aiohttp.ClientError) or isinstance(e, TimeoutError):
             await self.delete_proxy(request.proxy)
             self.log.info('{proxy} {source} is invalid delete it'.format(
                 **request.proxy
             ))
+            return
         elif response.status not in self.ignore:
             await self.cool_down_proxy(request.proxy)
             self.log.info('{proxy} {source} success to cool down'.format(
                 **request.proxy
             ))
+            return
         return response
 
     async def get_proxy(self) -> dict:
@@ -90,7 +91,7 @@ class BProxyPoolMiddleware(BaseMiddleware):
                     method='DELETE',
                     url=self.proxy_url,
                     timeout=temp_timeout,
-                    data=proxy
+                    params=proxy
             ) as resp:
                 # 挂起等待下载结果
                 return resp.status == 204
@@ -105,7 +106,7 @@ class BProxyPoolMiddleware(BaseMiddleware):
                     method='PATCH',
                     url=self.proxy_url,
                     timeout=temp_timeout,
-                    data=data
+                    params=data
             ) as resp:
                 # 挂起等待下载结果
                 return resp.status == 200

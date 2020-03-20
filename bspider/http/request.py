@@ -11,6 +11,7 @@ class Request(BaseHttp):
                  method='GET',
                  callback='parser',
                  headers=None,
+                 params=None,
                  data=None,
                  cookies=None,
                  meta=None,
@@ -27,6 +28,7 @@ class Request(BaseHttp):
         :param method: 请求的方法
         :param callback: Extractor的回调方法
         :param headers: 请求头
+        :param params: get请求参数
         :param data: HTTP请求的body参数
         :param cookies: 需要携带的cookie
         :param meta: 元数据，不跟随request发送到服务端
@@ -43,6 +45,7 @@ class Request(BaseHttp):
         self.cookies = self._set_cookies(cookies)
         self.method = self._set_method(method)
         self.data = self._set_data(data)
+        self.params = self._set_params(params)
         self.meta = self._set_meta(meta)
         self.priority = priority
         self.proxy = proxy  # 下载是否需要使用代理
