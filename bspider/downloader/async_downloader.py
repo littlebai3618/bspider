@@ -32,6 +32,8 @@ class AsyncDownloader(object):
         self.log.debug(f'{self.project_name} init retry time from settings: {self.retry_times}')
 
         self.ignore_retry_http_code = set(project.downloader_settings.ignore_retry_http_code)
+        self.ignore_retry_http_code.add(599)
+        self.ignore_retry_http_code.add(200)
         self.log.debug(
             f'{self.project_name} init accept response code from settings: {self.ignore_retry_http_code}')
 
@@ -84,8 +86,6 @@ class AsyncDownloader(object):
                 e_msg = ''.join(traceback.format_exception(tp, msg, tb))
                 e.with_traceback(tb)
                 self.log.exception(e_msg)
-                self.log.info(
-                    f'Retry download: url->{request.url} status->{response.status} retry_time:{retry_index + 1}')
                 # 执行下载异常中间件
                 for mw in self.mws:
                     self.log.debug(f'{mw.__class__.__name__} executing process_response')
@@ -99,7 +99,7 @@ class AsyncDownloader(object):
                 if result is None:
                     break
 
-            if response.status == 200 or response.status in self.ignore_retry_http_code:
+            if response.status in self.ignore_retry_http_code:
                 self.log.info(f'response.status == {response.status}: url->{request.url} ignore retry')
                 return response, True, None
             self.log.info(f'Retry download: url->{request.url} status->{response.status} time:{retry_index + 1}')
