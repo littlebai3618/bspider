@@ -1,3 +1,6 @@
+import sys
+import traceback
+
 from bspider.http import Response
 from bspider.parser import BasePipeline
 from bspider.utils.exceptions import ExtractorCallbackError
@@ -15,10 +18,9 @@ class BaseExtractor(BasePipeline):
                 try:
                     yield getattr(self, response.callback)(response)
                 except Exception as e:
-                    if response.errback and hasattr(self, response.errback):
-                        yield getattr(self, response.errback)(response, e)
-                    else:
-                        raise e
+                    tp, msg, tb = sys.exc_info()
+                    e.with_traceback(tb)
+                    yield getattr(self, response.errback)(response, e)
             else:
                 raise ExtractorCallbackError('Cannot find callback %s in extractor %s' %
                                              (self.__class__.__name__, response.callback))
@@ -30,3 +32,6 @@ class BaseExtractor(BasePipeline):
         当一个 response 对象没有指定 callback 方法时此方法将被执行
         """
         pass
+
+    def errback(self, response: Response, e: Exception):
+        raise e

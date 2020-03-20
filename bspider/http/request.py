@@ -19,7 +19,7 @@ class Request(BaseHttp):
                  allow_redirect: bool = False,
                  timeout: int = 10,
                  verify_ssl: bool = False,
-                 errback: str = None,
+                 errback: str = 'errback',
                  sign: str = None,
                  ignore_filter: bool = False):
         """
