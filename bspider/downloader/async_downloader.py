@@ -93,7 +93,7 @@ class AsyncDownloader(object):
                     result = await mw._exec('process_exception', request, e, response)
                     if result is None:
                         self.log.info(f'===>> complete download sign:{request.sign} {request}')
-                        return response, False, e_msg
+                        return response, True, e_msg
                 continue
 
             for mw in self.mws:
@@ -108,7 +108,7 @@ class AsyncDownloader(object):
                 return response, True, None
             self.log.info(f'Retry download: url->{request.url} status->{response.status} time:{retry_index + 1}')
         self.log.info(f'===>> complete download sign:{request.sign} {request}')
-        return response, False, e_msg
+        return response, True, e_msg
 
     async def __assemble_response(self, response: ClientResponse, request: Request) -> Response:
         # 这里只处理 str 类型的数据
