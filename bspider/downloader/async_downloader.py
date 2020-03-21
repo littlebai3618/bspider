@@ -94,6 +94,7 @@ class AsyncDownloader(object):
                     if result is None:
                         self.log.info(f'===>> complete download sign:{request.sign} {request}')
                         return response, False, e_msg
+                continue
 
             for mw in self.mws:
                 self.log.debug(f'{mw.__class__.__name__} executing process_response')
