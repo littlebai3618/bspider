@@ -124,7 +124,7 @@ class AsyncDownloader(object):
 
     async def __do(self, req: Request) -> Response:
         # ClientSession 在每次请求都要关闭，所以使用上下文管理器进行管理
-        temp_timeout = aiohttp.ClientTimeout(connect=req.timeout)
+        temp_timeout = aiohttp.ClientTimeout(total=20, connect=req.timeout)
         self.log.debug(f'set time out {temp_timeout.connect}')
         async with aiohttp.ClientSession() as session:
             async with session.request(
