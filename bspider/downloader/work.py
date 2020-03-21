@@ -49,13 +49,13 @@ class DownloaderManager(BaseManager):
 
                 # 分开写是因为要提前释放channel,防止channel 被用光影响性能
                 if msg_id:
+                    await self.broker.set_response(response, downloader.project_id)
                     if e_msg or not sign:
                         self.log.info(
                             f'project:project_id->{downloader.project_id} project_name->{downloader.project_name} fail download: {request}')
                         await self._save_error_result(response, downloader.project_name, downloader.project_id, e_msg)
                     else:
                         # 持久化下载结果
-                        await self.broker.set_response(response, downloader.project_id)
                         await self._save_success_result(response, downloader.project_name, downloader.project_id)
                         self.log.info('project:project_id->{} project_name->{} complete download: {}'.format(
                             downloader.project_id, downloader.project_name, response.url))
