@@ -43,6 +43,8 @@ class DownloaderManager(BaseManager):
                             self.log.info(f'success get a new Request: {request}')
                             if request.life_cycle is None or request.life_cycle > 0:
                                 response, sign, e_msg = await downloader.download(request)
+                                if isinstance(request.life_cycle, int):
+                                    response.request.life_cycle -= 1
                             else:
                                 self.log.warning(f'Request life_cycle <= 0 ignore it: {request}')
                         except Exception:
