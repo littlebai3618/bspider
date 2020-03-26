@@ -41,7 +41,10 @@ class DownloaderManager(BaseManager):
                         try:
                             request = Request.loads(json.loads(data))
                             self.log.info(f'success get a new Request: {request}')
-                            response, sign, e_msg = await downloader.download(request)
+                            if request.life_cycle > 0:
+                                response, sign, e_msg = await downloader.download(request)
+                            else:
+                                self.log.warning(f'Request life_cycle <= 0 ignore it: {request}')
                         except Exception:
                             tp, msg, tb = sys.exc_info()
                             e_msg = ''.join(traceback.format_exception(tp, msg, tb))

@@ -22,7 +22,8 @@ class Request(BaseHttp):
                  verify_ssl: bool = False,
                  errback: str = 'errback',
                  sign: str = None,
-                 ignore_filter: bool = False):
+                 ignore_filter: bool = False,
+                 life_cycle: int = 3):
         """
         :param url: 需要请求的链接
         :param method: 请求的方法
@@ -39,6 +40,7 @@ class Request(BaseHttp):
         :param verify_ssl: 是否校验证书
         :param errback: 解析异常时的回调函数
         :param sign: request唯一标识，用于下载状态回溯
+        :param life_cycle: 该请求的生命周期
         """
         self.url = self._set_url(url)
         self.headers = self._set_headers(headers)
@@ -56,6 +58,7 @@ class Request(BaseHttp):
         self.errback = self._set_errback(errback)
         self.sign = make_sign(self.url, salt='' if data is None else json.dumps(data)) if sign is None else sign
         self.ignore_filter = ignore_filter # 过滤器识别标识
+        self.life_cycle = life_cycle
 
     @classmethod
     def loads(cls, param: dict):
