@@ -23,7 +23,7 @@ class Request(BaseHttp):
                  errback: str = 'errback',
                  sign: str = None,
                  ignore_filter: bool = False,
-                 life_cycle: int = 3):
+                 life_cycle: int = None):
         """
         :param url: 需要请求的链接
         :param method: 请求的方法
