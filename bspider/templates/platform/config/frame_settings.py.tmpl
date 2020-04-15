@@ -1,0 +1,86 @@
+# 运行模式，本地开发请使用development，服务部署请使用produce
+# development log 输出至终端
+# produce log 输出至文件
+# GLOBAL_PATTERN = 'development'
+# LOGGER_LEVEL = 'DEBUG' # DEBUG INFO ...
+
+#################
+# MASTER模块配置 #
+#################
+# 各节点的 AGENT 进程将会通过访问 http://ip:port 和主进程进行通信
+# ```&&集群的每个节点的MASTER 配置项 应保持 一致 &&```
+# web studio访问地址：http://ip:port
+# ****************************************************
+# web studio 默认用户: 账号admin，密码admin 请登录后尽快修改
+# ****************************************************
+MASTER = {
+    'ip': '127.0.0.1',
+    'port': 5000,
+    'name': 'default_master',
+    'description': 'default desc'
+}
+
+# MySQL 连接配置 dict
+WEB_STUDIO_DB = {
+    'host': '127.0.0.1',
+    'port': 3306,
+    'user': '',
+    'password': '',
+    'charset': 'utf8',
+    'db': '',
+}
+
+# 时区配置 str
+# TIMEZONE = 'Asia/Shanghai'
+
+# JWT Token SECRET 配置
+WEB_SECRET_KEY = ''
+
+# JWT Token 生效时间
+# WEB_TOKEN_LIVE_TIME = 3600 * 5
+
+# 定时任务进程启动多少工作线程用以执行定时任务
+# CRON_JOB_THREAD_NUM = 20
+# 多久同步一次定时任务信息，单位s, 数字越小效果越好，数字越大性能消耗越小
+# CRON_JOB_REFRESH_TIME = 3
+
+#################
+# AGENT  模块配置 #
+#################
+# master节点将通过访问 http://ip:port 和 当前节点agent进行通信
+AGENT = {
+    'ip': '127.0.0.1',
+    'port': 5001,
+    'name': 'default_agent',
+    'description': 'default desc'
+}
+
+#################
+# RABBITMQ 配置  #
+#################
+# rabbitmq 连接配置
+RABBITMQ_CONFIG = {
+    'host': '127.0.0.1',
+    'port': 5672,
+    'username': '',
+    'password': '',
+    'virtual_host': 'bspider',
+}
+# rabbitmq management 插件 配置
+RABBITMQ_MANAGEMENT_CONFIG = {
+    'address': '',
+    'username': '',
+    'password': ''
+}
+
+#################
+# supervisor配置 #
+#################
+# supervisor 服务的端口, 如默认端口被占则提供未被占用的端口
+# SUPERVISOR_RPC_PORT = 9010
+
+#################
+# 消息通知模块配置 #
+#################
+# 钉钉机器人
+DING = ''

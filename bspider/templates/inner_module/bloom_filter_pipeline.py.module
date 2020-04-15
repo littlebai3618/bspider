@@ -1,0 +1,84 @@
+"""
+@description=布隆过滤器
+"""
+from parser import ParserError
+
+from bspider.http import Request
+from bspider.parser import BasePipeline
+from bspider.utils.database import RedisClient
+
+
+class BloomFilterPipeline(BasePipeline):
+    """Pipeline支持协程、常规两种编程方式
+    ***协程虽然能提升效率但协程编程是棘手的
+    多Pipeline执行顺序：
+    Pipe1.process_item -> Pipe2.process_item ->... ->
+    下载 ->
+    Pipe1.process_item -> Pipe2.process_item
+    """
+    seeds = [5, 7, 11, 13, 31, 37, 61]
+    length_map = {
+        '16MB': 134217728,
+        '32MB': 268435456,
+        '64MB': 536870912,
+        '128MB': 1073741824,
+        '256MB': 2147483648,
+        '512MB': 4294967296,
+    }
+
+    def __init__(self, project, settings, log):
+        super().__init__(project, settings, log)
+        # 实例化MySQL操作对象
+        db_config = settings.get("redis")
+        if db_config is None:
+            raise ParserError('\'redis\' must be set in BloomFilterPipeline settings.')
+
+        for config in db_config:
+            self.redis_handler = RedisClient(config)
+
+        # 默认最大值 512M
+        if settings.get("length", '64MB') not in  self.length_map:
+            raise ParserError(f'\'bloom length\' must be \'16MB\'|\'32MB\'|\'64MB\'|\'128MB\'|\'256MB\'|\'512MB\'.')
+
+        self.bloom_filter_size = self.length_map[settings.get("length", '64MB')]
+        self.log.info(f'bloom_filter_size is {self.bloom_filter_size}')
+        self.bloom_filter_name = settings.get("filter_name", "default")
+
+    def hash(self, data: str, seed: int) -> int:
+        ret = 0
+        for char in data:
+            ret += seed * ret + ord(char)
+        return (self.bloom_filter_size - 1) & ret
+
+    def setbits(self, locals: list) -> list:
+        # 优化 一次IO解决所有问题
+        bfo = self.redis_handler.bitfield(self.bloom_filter_name)
+        for local in locals:
+            bfo.set('u1', local, 1)
+        return bfo.execute()
+
+    def contains(self, data: str) -> bool:
+        # False 已经存在  True 不存在
+        locals = [self.hash(data, seed) for seed in self.seeds]
+        old_value = self.setbits(locals)
+        return 0 in old_value
+
+    def process_item(self, item):
+        """
+        对item进行处理,各个pipeline重写
+        可以yield返回也可以return
+        返回类型为自订定义的类型，会传递给后面的pipeline，返回None将会丢弃这个item
+        :param item: previous pipeline result
+        :return: param to next pipeline
+        """
+        # 类型校验
+        if not isinstance(item, Request):
+            return item
+
+        # 判断是否忽略去重
+        if item.ignore_filter:
+            return item
+
+        # 判断是否存在
+        if self.contains(item.sign.split('-')[0]):
+            return item

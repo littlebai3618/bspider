@@ -1,0 +1,9 @@
+"""
+解决gunicorn + Flask 启动多次实例化APSchedule导致定时任务多次执行的bug
+
+这里采用单独进程处理任务调度
+"""
+from bspider.bcron import run_bcorn
+
+if __name__ == '__main__':
+    run_bcorn()

@@ -1,0 +1,112 @@
+"""
+@name=BProxyPoolMiddleware
+@description=使用 bproxypool服务 为请求头添加proxy
+@type=middleware
+@editor=bspider
+"""
+import json
+
+import aiohttp.client_exceptions
+from bspider.downloader import BaseMiddleware
+from bspider.utils.exceptions import DownloaderError, MiddleWareParamError
+
+
+class BProxyPoolMiddleware(BaseMiddleware):
+    """
+    使用 bproxypool服务 为请求头添加proxy
+    """
+
+    def __init__(self, project, settings, log):
+        super().__init__(project, settings, log)
+        bproxypool_url = self.settings.get('api')
+        if bproxypool_url is None:
+            raise MiddleWareParamError('\'api\' is Required like http://127.0.0.1:80/proxy/')
+        self.timeout = self.settings.get('timeout', 3)
+        self.retry_time = self.settings.get('retry_time', 3)
+        virtual_pool = self.settings.get('virtual_proxy_pool')
+        self.cool_down_time = self.settings.get('proxy_cool_down_time')
+        ignore = self.settings.get('ignore_cool_down_http_code', list())
+        self.ignore = set(ignore)
+        if virtual_pool:
+            self.proxy_url = f'{bproxypool_url}{virtual_pool}'
+        else:
+            self.proxy_url = bproxypool_url
+        self.log.info(f'Proxy URL\'s is {self.proxy_url}')
+
+    # by coroutine
+    # async process_request(self, request):
+    async def process_request(self, request):
+        """
+        执行下载前的操作
+        返回Response类型，作为response完成下载，跳过后面的下载阶段，直接进入下载后的中间件
+        返回空或其他返回值 继续下一个中间件
+        """
+        for index in range(self.retry_time):
+            try:
+                proxy_req = await self.get_proxy()
+                request.proxy = {
+                    'proxy': 'http://{}'.format(proxy_req['data']['proxy']),
+                    'source': proxy_req['data']['source']
+                }
+                self.log.info('success add proxy in {} {}'.format(
+                    request,
+                    request.proxy
+                ))
+                return request
+            except Exception as e:
+                self.log.warning(f'get proxy failed: {e} {request} retry:{index}')
+
+        raise DownloaderError('Proxy get failed, please check proxy service!')
+
+    async def process_exception(self, request, e, response):
+        if issubclass(e.__class__, aiohttp.ClientError) or isinstance(e, TimeoutError):
+            await self.delete_proxy(request.proxy)
+            self.log.info('{proxy} {source} is invalid delete it'.format(
+                **request.proxy
+            ))
+            return
+        elif response.status not in self.ignore:
+            await self.cool_down_proxy(request.proxy)
+            self.log.info('{proxy} {source} success to cool down'.format(
+                **request.proxy
+            ))
+            return
+        return response
+
+    async def get_proxy(self) -> dict:
+        temp_timeout = aiohttp.ClientTimeout(total=self.timeout)
+        async with aiohttp.ClientSession() as session:
+            async with session.request(
+                    method='GET',
+                    url=self.proxy_url,
+                    timeout=temp_timeout
+            ) as resp:
+                # 挂起等待下载结果
+                return json.loads(await resp.text())
+
+    async def delete_proxy(self, proxy: dict) -> bool:
+        temp_timeout = aiohttp.ClientTimeout(total=self.timeout)
+        async with aiohttp.ClientSession() as session:
+            async with session.request(
+                    method='DELETE',
+                    url=self.proxy_url,
+                    timeout=temp_timeout,
+                    params=proxy
+            ) as resp:
+                # 挂起等待下载结果
+                return resp.status == 204
+
+    async def cool_down_proxy(self, proxy: dict) -> bool:
+        temp_timeout = aiohttp.ClientTimeout(total=self.timeout)
+        data = {'proxy': proxy['proxy']}
+        if self.cool_down_time:
+            data['expire'] = self.cool_down_time
+        async with aiohttp.ClientSession() as session:
+            async with session.request(
+                    method='PATCH',
+                    url=self.proxy_url,
+                    timeout=temp_timeout,
+                    params=data
+            ) as resp:
+                # 挂起等待下载结果
+                return resp.status == 200

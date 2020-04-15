@@ -1,0 +1,34 @@
+"""
+@description=default
+"""
+from bspider.downloader import BaseMiddleware
+
+
+class ${middleware_name}(BaseMiddleware):
+    """中间件支持协程、常规两种编程方式
+    ***协程虽然能提升效率但协程编程是棘手的
+    多中间件执行顺序：
+    Mid1.process_request -> Mid2.process_request ->... ->
+    下载 ->
+    Mid1.process_response -> Mid2.process_response
+    """
+
+    # by coroutine
+    # async process_request(self, request):
+    def process_request(self, request):
+        """
+        执行下载前的操作
+        返回Response类型，作为response完成下载，跳过后面的下载阶段，直接进入下载后的中间件
+        返回空或其他返回值 继续下一个中间件
+        """
+        return None
+
+    # by coroutine
+    # async process_response(self, request):
+    def process_response(self, request, response):
+        """
+        执行下载后的操作，各个中间件进行重写
+        返回Response类型，正常，继续下一个中间件
+        返回None类型或其他返回值，丢弃，后面不再处理
+        """
+        return response
