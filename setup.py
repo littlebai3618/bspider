@@ -5,7 +5,7 @@ extras_require = {}
 setup(
     name='bspider',
     version=open('./bspider/VERSION').read().strip(),
-    description='A high-level distributed crawling framework',
+    description='A high-level distributed crawling framework Git: https://github.com/littlebai3618/bspider',
     author='baii',
     author_email='2624386844@qq.com',
     license='BSD',
