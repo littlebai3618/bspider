@@ -51,8 +51,8 @@ class CommandLine(object):
             i += 1
 
     @init_platform_env
-    def execute(self, argv=None):
-        self.args = sys.argv if argv is None else argv
+    def execute(self, argv):
+        self.args = argv
         command_name = self.command_name
         if not command_name:
             self.__print_header()
@@ -92,14 +92,14 @@ class CommandLine(object):
         sys.exit(command.exitcode)
 
 
-def execute(argv):
+def execute(argv=None):
     """
     执行终端命令
     :param cmdname:
     :param args:
     :return:
     """
-    CommandLine().execute(argv)
+    CommandLine().execute(sys.argv if argv is None else argv)
 
 
 if __name__ == '__main__':
