@@ -103,7 +103,7 @@ cd ${platform_name}/projects/${spider_name}
 发布到服务
 
 *** 发布前先确认有 一个或以上的 parser、downloader `进程`运行
-> 1. ${}/#/code/create
+> 进入ui提交任务
 
 TODO
 
@@ -112,3 +112,7 @@ TODO
 3. master 增加报警接口 为各节点提供统一的报警处理方式
 4. code 增加 doc 使用文档
 5. project页面直达 extractor编辑页面
+
+## License
+
+[MIT](https://github.com/littlebai3618/bspider/blob/master/LICENSE) license.
