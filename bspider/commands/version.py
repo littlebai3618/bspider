@@ -2,6 +2,7 @@ import os
 import sys
 
 from lxml import etree
+from aiohttp import __version__
 
 import bspider
 from bspider.commands import BSpiderCommand
@@ -32,6 +33,7 @@ class Command(BSpiderCommand):
                 ("lxml", lxml_version),
                 ("libxml2", libxml2_version),
                 ("Python", sys.version.replace("\n", "- ")),
+                ("aiohttp", __version__)
             ]
             width = max(len(n) for (n, _) in versions)
             patt = "%-{}s : %s".format(width)

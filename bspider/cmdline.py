@@ -19,7 +19,6 @@ class CommandLine(object):
 
     def __init__(self):
         self.cmds = self.__get_commands_from_module()
-        print(self.cmds)
         self.args = list()
 
     @staticmethod
@@ -85,7 +84,8 @@ class CommandLine(object):
         command.add_options(parser)
         command.frame_settings = frame_settings
         try:
-            command.run(*parser.parse_args(self.args))
+            opts, args = parser.parse_args(self.args)
+            command.run(args=args, opts=opts)
         except UsageError:
             parser.print_help()
             sys.exit(2)
