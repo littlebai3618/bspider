@@ -60,7 +60,7 @@ setup(
         'multidict==4.5.2',
         'pamqp==2.3.0',
         'pika==1.1.0',
-        'psutil==5.6.3',
+        'psutil>=5.6.6',
         'pycparser==2.19',
         'PyMySQL==0.9.2',
         'pytz==2019.2',
