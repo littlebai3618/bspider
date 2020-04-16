@@ -103,7 +103,7 @@ cd ${platform_name}/projects/${spider_name}
 发布到服务
 
 *** 发布前先确认有 一个或以上的 parser、downloader `进程`运行
-> 1. ${}/#/code/create
+> 进入ui提交任务
 
 TODO
 
