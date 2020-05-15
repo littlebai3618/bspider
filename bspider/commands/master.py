@@ -71,10 +71,10 @@ class Command(BSpiderCommand):
         return "Run/stop BSpider as a master node"
 
     def long_desc(self):
-        return """Run/stop BSpider by supervisor with three process:
-        master: a web server to manager spiders (by gunicorn and gevent).
-        bcorn: a cronjob process to manager cron task.
-        scheduler: dispatch all spider project.
+        return """Run/stop BSpider by supervisor with three process:\n
+        master: a web server to manager spiders (by gunicorn and gevent).\n
+        bcorn: a cronjob process to manager cron task.\n
+        scheduler: dispatch all spider project.\n
         ** first start master service this cmd will try to create some MySQL table"""
 
     def init_supervisor(self):

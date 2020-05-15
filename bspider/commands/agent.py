@@ -22,7 +22,7 @@ class Command(BSpiderCommand):
         return "Run BSpider as a agent node"
 
     def long_desc(self):
-        return """Run BSpider by supervisor with one process:
+        return """Run BSpider by supervisor with one process:\n
         agent: a web server to manager bspider worker node (by gunicorn and gevent).
         """
 
