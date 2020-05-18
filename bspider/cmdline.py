@@ -85,7 +85,7 @@ class CommandLine(object):
         command.frame_settings = frame_settings
         try:
             opts, args = parser.parse_args(self.args)
-            command.run(args=args, opts=opts)
+            command.run(args=args[1:], opts=opts)
         except UsageError:
             parser.print_help()
             sys.exit(2)
