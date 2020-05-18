@@ -154,6 +154,7 @@ class Command(BSpiderCommand):
         return True
 
     def run(self, args, opts):
+        print(args)
         if len(args) != 1:
             raise UsageError('args error')
         op = args[0]
