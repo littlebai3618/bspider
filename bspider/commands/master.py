@@ -78,9 +78,7 @@ class Command(BSpiderCommand):
             'scheduler: dispatch all spider project.',
             '** first start master service this cmd will try to create some MySQL table'
         ]
-        for d in desc:
-            print(d)
-        # return '\n'.join(desc)
+        return '\n'.join(desc)
 
     def init_supervisor(self):
         """查看supervisor是否已经启动"""
