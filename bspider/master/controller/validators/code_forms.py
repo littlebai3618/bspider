@@ -1,11 +1,15 @@
 import re
+import sys
+import traceback
 
 from flask import g
 from wtforms import StringField
 
 from bspider.core.api import BaseForm, ParamRequired, Forbidden
+from bspider.master import log
 from bspider.utils.exceptions import ModuleError
 from bspider.utils.tools import find_class_name_by_content
+from bspider.utils.importer import import_module_by_code
 
 
 def valid_code(content):
@@ -33,8 +37,11 @@ def valid_code(content):
 
     # pre_exec
     try:
-        exec(content)
+        import_module_by_code('ModuleTest', content)
     except Exception as e:
+        tp, msg, tb = sys.exc_info()
+        e_msg = ''.join(traceback.format_exception(tp, msg, tb))
+        log.error(e_msg)
         raise ModuleError('module code has a exception:%s' % (e))
 
     return class_name, module_type, description, content

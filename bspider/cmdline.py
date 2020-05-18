@@ -19,7 +19,6 @@ class CommandLine(object):
 
     def __init__(self):
         self.cmds = self.__get_commands_from_module()
-        print(self.cmds)
         self.args = list()
 
     @staticmethod
@@ -51,8 +50,8 @@ class CommandLine(object):
             i += 1
 
     @init_platform_env
-    def execute(self, argv=None):
-        self.args = sys.argv if argv is None else argv
+    def execute(self, argv):
+        self.args = argv
         command_name = self.command_name
         if not command_name:
             self.__print_header()
@@ -85,21 +84,22 @@ class CommandLine(object):
         command.add_options(parser)
         command.frame_settings = frame_settings
         try:
-            command.run(*parser.parse_args(self.args))
+            opts, args = parser.parse_args(self.args)
+            command.run(args=args[1:], opts=opts)
         except UsageError:
             parser.print_help()
             sys.exit(2)
         sys.exit(command.exitcode)
 
 
-def execute(argv):
+def execute(argv=None):
     """
     执行终端命令
     :param cmdname:
     :param args:
     :return:
     """
-    CommandLine().execute(argv)
+    CommandLine().execute(sys.argv if argv is None else argv)
 
 
 if __name__ == '__main__':
