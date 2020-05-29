@@ -58,7 +58,9 @@ PLAIN_TABLE = [
     ('bspider_project', dict()),
     ('bspider_project_customcode', dict()),
     ('bspider_user', dict(password=generate_password_hash('admin'))),
-    ('bspider_worker', dict())
+    ('bspider_worker', dict()),
+    ('bspider_data_source', dict()),
+    ('bspider_project_data_source', dict())
 ]
 
 

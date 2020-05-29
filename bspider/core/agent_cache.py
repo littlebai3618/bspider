@@ -11,7 +11,8 @@ class AgentCache(object):
         self.sqlite3_client = SqlLite3Client(os.path.join(os.environ[PLATFORM_PATH_ENV], '.cache', 'meta.db'))
         self.project_table = 'project_cache'
         self.project_weight_table = 'project_weight_cache'
-        self.code_table = 'code_table'
+        self.code_table = 'code_cache'
+        self.data_source_table = 'data_source_cache'
 
     def initialization(self) -> (bool, str):
         """初始化bdb"""
@@ -39,10 +40,19 @@ class AgentCache(object):
             `content` text NOT NULL,
             `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
         ); 
+        DROP table if exists {data_source_table};
+        CREATE TABLE `{data_source_table}` (
+            `id` int(11) PRIMARY KEY NOT NULL,
+            `name` varchar(50) NOT NULL,
+            `type` varchar(50) NOT NULL,
+            `param` text NOT NULL,
+            `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
+        ); 
         """.format(
             code_table=self.code_table,
             project_weight_table=self.project_weight_table,
-            project_table=self.project_table
+            project_table=self.project_table,
+            data_source_table=self.data_source_table
         )
         for sql in sqls.split(';'):
             self.sqlite3_client.query(sql)
@@ -86,7 +96,6 @@ class AgentCache(object):
         sql = f"insert or replace into {self.code_table} values(?, ?, datetime('now'))"
         return self.sqlite3_client.insert(sql, (code_id, content))
 
-
     def delete_code(self, code_id: str):
         sql = f'delete from {self.code_table} where `id`={code_id}'
         return self.sqlite3_client.delete(sql)
@@ -94,6 +103,32 @@ class AgentCache(object):
     def update_code(self, code_id: int, data: dict , project: list):
         fields, values = BaseImpl.make_fv(data)
         sql = f"update {self.code_table} set {fields} where `id` = {code_id};".replace('%s', '?')
+        self.sqlite3_client.update(sql, values)
+        # 在更新代码的时候 更新project 的时间
+        for project_id in project:
+            sql = f"update {self.project_table} set `timestamp`= CURRENT_TIMESTAMP where `id` = {project_id}"
+            self.sqlite3_client.update(sql)
+
+
+    def get_data_sources(self):
+        sql = f'select `name`, `type`, `param` from {self.data_source_table};'
+        return [{'name': name,'type': type, 'param': json.loads(param)} for name, type, param in self.sqlite3_client.select(sql)]
+
+    def get_data_source(self, name: str):
+        sql = f'select `name`, `type`, `param` from {self.data_source_table} where `name`=?;'
+        return [{'name': name,'type': type, 'param': json.loads(param)} for name, type, param in self.sqlite3_client.select(sql, (name,))]
+
+    def set_data_source(self, name: str, type: str, param: dict):
+        sql = f"insert or replace into {self.data_source_table} values(?, ?, ? datetime('now'))"
+        return self.sqlite3_client.insert(sql, (name, type, json.dumps(param)))
+
+    def delete_data_source(self, name: str):
+        sql = f'delete from {self.data_source_table} where `name`=?'
+        return self.sqlite3_client.delete(sql, (name,))
+
+    def update_data_source(self, name: str, data: dict , project: list):
+        fields, values = BaseImpl.make_fv(data)
+        sql = f"update {self.data_source_table} set {fields} where `name` = '{name}';".replace('%s', '?')
         self.sqlite3_client.update(sql, values)
         # 在更新代码的时候 更新project 的时间
         for project_id in project:

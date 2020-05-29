@@ -94,29 +94,3 @@ class ToolsService(BaseService, AgentMixIn):
         if len(infos):
             return GetSuccess(msg='get user success', data=infos[0])
         return NotFound(errno=10006, msg='invalid user')
-
-
-
-
-    def get_request_track(self, url=None, sign=None):
-        if url:
-            sign = self.impl.get_sign_by_url(url)
-
-        if sign:
-            track_info = self.impl.get_reqest_track(sign)
-            return 0, f'查询成功', track_info
-
-    def parser_error(self, error):
-        for err in error:
-            err['size'] = 'large'
-            err['timestamp'] = err['crawl_time']
-            if err['status'] == 599:
-                err['type'] = 'warning'
-            else:
-                err['type'] = 'danger'
-
-            if err['status'] == -1:
-                err['status'] = 'FAIL'
-            if err['exception']:
-                err['exception'] = err['exception'].replace('\n\n', '<br>')
-        return error

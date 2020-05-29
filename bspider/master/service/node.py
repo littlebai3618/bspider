@@ -29,7 +29,8 @@ class Node(BaseService, AgentMixIn):
             data={
                 'projects': self.impl.get_all_projects(),
                 'codes': self.impl.get_all_codes(),
-                'workers': self.impl.get_all_workers(ip)
+                'workers': self.impl.get_all_workers(ip),
+                'data_sources': self.impl.get_all_data_source()
             })
 
     def delete_node(self, node_id):

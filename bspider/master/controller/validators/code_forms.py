@@ -28,12 +28,13 @@ def valid_code(content):
         'BaseOperation': 'operation',
         'BasePipeline': 'pipeline',
         'BaseMiddleware': 'middleware',
-        'BaseExtractor': 'extractor'
+        'BaseExtractor': 'extractor',
+        # 'BaseSaver': 'saver'
     }
 
     module_type = code_type_map.get(sub_class_name)
     if module_type is None:
-        raise ModuleError('Unknown module type->%s(%s)' % (class_name, sub_class_name))
+        raise ModuleError('Invalid module type->%s(%s)' % (class_name, sub_class_name))
 
     # pre_exec
     try:

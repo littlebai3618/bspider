@@ -73,6 +73,10 @@ class MysqlClient(object):
             cursorclass=DictCursor
         )
 
+    def test_conn(self) -> bool:
+        self.query('show tables;')
+        return True
+
     @classmethod
     def from_settings(cls, settings):
         return cls(settings)

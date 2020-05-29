@@ -94,10 +94,14 @@ class BaseMonitor(object):
                 if seed < 0:
                     return project_id
 
-    def code_id_to_content(self, code_id):
+    def code_id_to_content(self, code_id, params):
         content = self.__cache.get_code(code_id)[0]['content']
         cls_name, _ = find_class_name_by_content(content)
-        return cls_name, content
+        # Monkey Patch 为了兼容数据源模块，不得已而为之
+        if params.get('data_source'):
+            for index, data_source in params.get('data_source'):
+                params['data_source'][index] = self.__cache.get_data_source(data_source)
+        return (cls_name, content), params
 
     def get_work_obj(self, project: Project, sign: Sign):
         """继承重写 -> 根据配置返回对象"""

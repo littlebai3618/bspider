@@ -8,7 +8,5 @@ __all__ = [
     'BaseExtractor',
     'run_parser',
     'Item',
-    'MySQLSaverItem',
-    'RabbitMQSaverItem',
-    'RedisSaverItem'
+    'MySQLSaverItem'
 ]

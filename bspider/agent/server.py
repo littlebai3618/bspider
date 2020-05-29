@@ -9,7 +9,7 @@ from flask import Flask
 from werkzeug.exceptions import HTTPException
 
 from bspider.agent import log
-from bspider.core.api import APIException, MasterMixIn
+from bspider.core.api import APIException, MasterMixIn, json
 from bspider.core import AgentCache
 from bspider.config import FrameSettings
 
@@ -86,6 +86,10 @@ class CreateApp(MasterMixIn):
 
             for project in data['projects']:
                 cache.set_project(**project)
+
+            for data_source in data['data_sources']:
+                data_source['param'] = json.loads(data_source['param'])
+                cache.set_data_source(**data_source)
         except Exception:
             tp, msg, tb = sys.exc_info()
             e_msg = ''.join(traceback.format_exception(tp, msg, tb))

@@ -70,7 +70,7 @@ class ProjectService(BaseService, AgentMixIn):
                     'config': r_config,
                     'status': status
                 }
-                node_list = self.impl.get_nodes()
+                node_list = self.impl.get_all_node_ip()
                 sign, result = self.op_add_project(node_list, info)
                 if not sign:
                     log.error(f'not all node add project:{project.project_name} =>{result}')
@@ -148,7 +148,7 @@ class ProjectService(BaseService, AgentMixIn):
                     session.insert(*self.impl.add_project_binds(cids, project_id))
                     if len(cron_param):
                         session.insert(*self.impl.update_cron_job_by_project_id(project_id, cron_param))
-                sign, result = self.op_update_project(self.impl.get_nodes(), project_id, remote_param)
+                sign, result = self.op_update_project(self.impl.get_all_node_ip(), project_id, remote_param)
                 if not sign:
                     log.warning(f'not all node update project:project_id->{project_id} =>{result}')
                     return Conflict(msg=f'not all node update this project change', data=result, errno=30007)
@@ -166,7 +166,7 @@ class ProjectService(BaseService, AgentMixIn):
             session.delete(*self.impl.delete_project(project_id))
             session.delete(*self.impl.delete_project_binds(project_id))
             session.delete(*self.impl.delete_cron_job(project_id))
-            sign, result = self.op_delete_project(self.impl.get_nodes(), project_id)
+            sign, result = self.op_delete_project(self.impl.get_all_node_ip(), project_id)
             if not sign:
                 log.error(f'all project delete failed:{project_id} =>{result}')
                 raise Conflict(msg='project delete failed', data=result, errno=30007)
@@ -196,7 +196,7 @@ class ProjectService(BaseService, AgentMixIn):
             self.datetime_to_str(info)
 
         return GetSuccess(
-            msg='get user list success!',
+            msg='get project list success!',
             data={
                 'items': infos,
                 'total': total,
@@ -204,11 +204,20 @@ class ProjectService(BaseService, AgentMixIn):
                 'limit': limit
             })
 
-    def get_module_id_by_name(self, cls_name: str) -> int:
+    def get_module_id_by_name(self, cls_name: str, param: dict) -> (int, dict):
         module_type = class_name2module_name(cls_name).split('_')[-1]
         data = self.impl.get_module_id_by_name_and_type(cls_name, module_type)
-        if len(data):
-            return data[0]['id']
-        raise Conflict(
-            msg=f'lack of necessary middleware <{cls_name}>!',
-            errno=30003)
+        if not len(data):
+            raise Conflict(
+                msg=f'lack of necessary module {module_type} <{cls_name}>!',
+                errno=30003)
+
+        if param.get('data_source'):
+            for index, data_source in param.get('data_source'):
+                data_source = self.impl.get_data_source_by_name(data_source)
+                if not len(data_source):
+                    raise Conflict(
+                        msg=f'Invalid data_source {data_source}!',
+                        errno=70003)
+
+        return data[0]['id'], param

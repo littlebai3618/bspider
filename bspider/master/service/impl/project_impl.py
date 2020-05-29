@@ -72,9 +72,13 @@ class ProjectImpl(BaseImpl):
         log.debug(f'SQL:{sql}')
         return sql, values
 
-    def delete_project(self, project_id):
+    def delete_project(self, project_id: int):
         sql = f'delete from {self.project_table} where `id`={project_id};'
         return sql,
+
+    def get_data_source_by_name(self, name: str):
+        sql = f'select id from {self.data_source_table} where `name`=%s and `status`=1;'
+        return self.mysql_client.select(sql, (name))
 
     def bind_queue(self, project_id):
         for exchange in EXCHANGE_NAME:
@@ -92,7 +96,3 @@ class ProjectImpl(BaseImpl):
             res = self.__mq_client.queue_delete(queue=f'{exchange}_{project_id}')
             log.debug(f'delete queue: {exchange}_{project_id} => res:{res}')
         return True
-
-    def get_nodes(self):
-        sql = f'select `ip` from {self.node_table} where `status` = 1'
-        return [info['ip'] for info in self.mysql_client.select(sql)]

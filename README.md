@@ -107,8 +107,8 @@ cd ${platform_name}/projects/${spider_name}
 
 TODO
 
-1. 校验pipeline 拟采用jsonschema实现 或者正则方式实现
+~~ 1. 校验pipeline 拟采用jsonschema实现 或者正则方式实现 ~~
 2. 前端权限校验 worker 只能修改自己的 job
-3. master 增加报警接口 为各节点提供统一的报警处理方式
+~~ 3. master 增加报警接口 为各节点提供统一的报警处理方式 ~~
 4. code 增加 doc 使用文档
 5. project页面直达 extractor编辑页面

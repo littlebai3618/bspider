@@ -70,6 +70,11 @@ P2C_TABLE = 'bspider_project_customcode'
 DOWNLOADER_STATUS_TABLE = 'bspider_downloader_status'
 # 任务解析状态存储表
 PARSER_STATUS_TABLE = 'bspider_parser_status'
+# 数据源表
+DATA_SOURCE_TABLE = 'bspider_data_source'
+# 数据源任务关联变
+P2DS_TABLE = 'bspider_project_data_source'
+
 # rabbitmq - exchange
 EXCHANGE_NAME = ('candidate', 'download', 'parse')
 # order key
