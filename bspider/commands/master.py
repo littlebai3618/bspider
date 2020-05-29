@@ -129,6 +129,8 @@ class Command(BSpiderCommand):
             return True
         else:
             print('Warning: Mysql Table is not create or destroyed')
+            print(remote_table)
+            print([table[0] for table in PLAIN_TABLE])
             while True:
                 in_content = input("Initialize MySQL table or not (Y/N)：")
                 if in_content.upper() == "N":
