@@ -49,6 +49,9 @@ class OperationParamError(ModuleError):
 class TaskParamError(ModuleError):
     pass
 
+class DataSourceError(Exception):
+    pass
 
-class DataSourceTypeError(Exception):
+
+class DataSourceTypeError(DataSourceError):
     pass
