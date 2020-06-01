@@ -9,6 +9,7 @@ from bspider.master.controller.validators.project_form import schema
 from bspider.master.service.impl.project_impl import ProjectImpl
 from bspider.core.api import BaseService, Conflict, NotFound, PostSuccess, DeleteSuccess, GetSuccess, \
     PatchSuccess, ParameterException, AgentMixIn
+from bspider.utils.database.mysql.session import DBSession
 from bspider.utils.tools import class_name2module_name, get_crontab_next_run_time
 
 
@@ -16,6 +17,26 @@ class ProjectService(BaseService, AgentMixIn):
 
     def __init__(self):
         self.impl = ProjectImpl()
+
+    def bind_project_relation(self, session: DBSession, project_id: int, r_config: dict):
+        self.impl.bind_queue(project_id=project_id)
+        log.debug(f'bind new project=>{r_config["project_name"]} queue success!')
+        code_ids = [[cid for cid in items.keys()][0] for items in r_config['downloader']['middleware']]
+        pipeline = {key: value for key, value in r_config['parser']['pipeline']}
+        code_ids.extend(pipeline.keys())
+        log.debug(f'code num: {code_ids}')
+        session.insert(*self.impl.add_project_code_binds(code_ids, project_id))
+        # 解析data_source
+        d_name = [param['data_source'] for param in pipeline.values() if 'data_source' in param]
+        log.debug(f'data_source list: {d_name}')
+        session.insert(*self.impl.add_project_data_source_binds(d_name, project_id))
+
+    def unbind_project_relation(self, session: DBSession, project_id: int):
+        self.impl.unbind_queue(project_id=project_id)
+        log.debug(f'unbind project=>{project_id} queue success!')
+        session.delete(*self.impl.delete_project_code_binds(project_id))
+        # 解析data_source
+        session.delete(*self.impl.delete_project_data_source_binds(project_id))
 
     def add(self, editor: str, config: list, status: int):
         project = Project(config[0],
@@ -41,13 +62,7 @@ class ProjectService(BaseService, AgentMixIn):
                 }
 
                 project_id = session.insert(*self.impl.add_project(data), lastrowid=True)
-                self.impl.bind_queue(project_id=project_id)
-                log.debug(f'bind new project=>{project.project_name} queue success!')
-                cids = [[cid for cid in items.keys()][0] for items in r_config['downloader']['middleware']]
-                cids.extend([[cid for cid in items.keys()][0] for items in r_config['parser']['pipeline']])
-                log.debug(f'code num: {cids}')
-                session.insert(*self.impl.add_project_binds(cids, project_id))
-
+                self.bind_project_relation(session, project_id, r_config)
                 timestamp, next_run_time = get_crontab_next_run_time(project.scheduler_settings.trigger, self.tz)
                 value = {
                     'project_id': project_id,
@@ -140,12 +155,8 @@ class ProjectService(BaseService, AgentMixIn):
                 r_config = changes.get('r_config')
                 log.debug(r_config)
                 if r_config:
-                    cids = [[cid for cid in items.keys()][0] for items in r_config['downloader']['middleware']]
-                    cids.extend([[cid for cid in items.keys()][0] for items in r_config['parser']['pipeline']])
-                    log.debug(f'code num: {cids}')
-                    # 20191224 bug修复，修复无法删除module引用
-                    session.delete(*self.impl.delete_project_binds(project_id))
-                    session.insert(*self.impl.add_project_binds(cids, project_id))
+                    self.unbind_project_relation(session, project_id)
+                    self.bind_project_relation(session, project_id, r_config)
                     if len(cron_param):
                         session.insert(*self.impl.update_cron_job_by_project_id(project_id, cron_param))
                 sign, result = self.op_update_project(self.impl.get_all_node_ip(), project_id, remote_param)
@@ -163,8 +174,7 @@ class ProjectService(BaseService, AgentMixIn):
 
     def delete(self, project_id):
         with self.impl.mysql_client.session() as session:
-            session.delete(*self.impl.delete_project(project_id))
-            session.delete(*self.impl.delete_project_binds(project_id))
+            self.unbind_project_relation(session, project_id)
             session.delete(*self.impl.delete_cron_job(project_id))
             sign, result = self.op_delete_project(self.impl.get_all_node_ip(), project_id)
             if not sign:

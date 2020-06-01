@@ -32,26 +32,36 @@ class ProjectImpl(BaseImpl):
         sql = f"insert into {self.project_table} set {fields};"
         return sql, values
 
-    def add_project_binds(self, cids, pid):
-        values = ', '.join([f'({pid}, {cid})' for cid in cids])
+    def add_project_code_binds(self, code_ids, pid, get_sql=True):
+        values = ', '.join([f'({pid}, {code_id})' for code_id in code_ids])
         sql = f'replace into `{self.p2c_table}`(`project_id`, `customcode_id`) ' \
               f'values{values};'
         log.debug(sql)
-        return sql,
+        if get_sql:
+            return sql,
+        return self.mysql_client.insert(sql)
 
-    def update_project(self, unique_value, data, unique_key='id'):
-        fields, values = BaseImpl.make_fv(data)
-        sql = f"update {self.project_table} set {fields} where `{unique_key}` = '{unique_value}';"
-        log.info(sql, values)
-        return sql, values
+    def add_project_data_source_binds(self, data_source_names, pid, get_sql=True):
+        values = ', '.join([f'({pid}, `"{data_source_name}"`)' for data_source_name in data_source_names])
+        sql = f'replace into `{self.p2ds_table}`(`project_id`, `data_source_name`) ' \
+              f'values{values};'
+        log.debug(sql)
+        if get_sql:
+            return sql,
+        return self.mysql_client.insert(sql)
+
+    def update_project(self, unique_value, data, unique_key='id', get_sql=True):
+        return self.update(unique_key, unique_value, data, self.project_table, get_sql=get_sql)
 
     def get_module_id_by_name_and_type(self, code_name, code_type):
         sql = f'select `id` from {self.code_table} where `name`="{code_name}" and `type`="{code_type}"'
         return self.mysql_client.select(sql)
 
-    def delete_project_binds(self, project_id):
-        sql = f'delete from {self.p2c_table} where `project_id`={project_id};'
-        return sql,
+    def delete_project_code_binds(self, project_id, get_sql=True):
+        return self.delete('project_id', project_id, self.p2c_table, get_sql=get_sql)
+
+    def delete_project_data_source_binds(self, project_id, get_sql=True):
+        return self.delete('project_id', project_id, self.p2ds_table, get_sql=get_sql)
 
     def delete_cron_job(self, project_id: int):
         sql = f"update {self.cron_table} set `status`=%s where `project_id` = '{project_id}';"
