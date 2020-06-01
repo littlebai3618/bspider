@@ -25,11 +25,13 @@ class ProjectService(BaseService, AgentMixIn):
         pipeline = {key: value for key, value in r_config['parser']['pipeline']}
         code_ids.extend(pipeline.keys())
         log.debug(f'code num: {code_ids}')
-        session.insert(*self.impl.add_project_code_binds(code_ids, project_id))
+        if len(code_ids):
+            session.insert(*self.impl.add_project_code_binds(code_ids, project_id))
         # 解析data_source
         d_name = [param['data_source'] for param in pipeline.values() if 'data_source' in param]
         log.debug(f'data_source list: {d_name}')
-        session.insert(*self.impl.add_project_data_source_binds(d_name, project_id))
+        if len(d_name):
+            session.insert(*self.impl.add_project_data_source_binds(d_name, project_id))
 
     def unbind_project_relation(self, session: DBSession, project_id: int):
         self.impl.unbind_queue(project_id=project_id)
