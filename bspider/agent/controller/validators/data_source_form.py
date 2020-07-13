@@ -12,8 +12,8 @@ class AddForm(BaseForm):
     param = StringField(validators=[ParamRequired()])
 
     def validate_param(self, value):
-        log.info(type(value))
-        log.info(value)
+        log.info(type(value.data))
+        log.info(value.data)
         value.data = json.loads(value.data)
 
 class UpdateForm(BaseForm):
