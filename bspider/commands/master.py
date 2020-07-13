@@ -166,11 +166,10 @@ class Command(BSpiderCommand):
             self.init_database()
             self.init_supervisor()
         rpc_socket = os.path.join(os.environ[PLATFORM_PATH_ENV], '.cache', 'supervisor.conf')
-
+        print(f'Use cmd: supervisorctl -c {rpc_socket} {op} {{module}}')
         print('=======supervisor output ========')
         for module in ('master', 'bcorn', 'scheduler'):
             cmd = f'supervisorctl -c {rpc_socket} {op} {module}'
-            print(f'Use cmd: {cmd}')
             print(os.popen(cmd).read().strip())
         print('=================================')
         # print(f'A new BSpider master node {op}!')
