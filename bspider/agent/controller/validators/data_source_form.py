@@ -1,10 +1,10 @@
 from wtforms import IntegerField, StringField
 
-from bspider.core.api import BaseForm, ParamRequired, json
+from bspider.core.api import BaseForm, ParamRequired
 
 
 class AddForm(BaseForm):
-    name = IntegerField(validators=[ParamRequired()])
+    name = StringField(validators=[ParamRequired()])
     type = StringField(validators=[ParamRequired()])
     param = StringField(validators=[ParamRequired()])
 
