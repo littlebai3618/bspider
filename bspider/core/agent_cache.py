@@ -119,7 +119,7 @@ class AgentCache(object):
         return [{'name': name,'type': type, 'param': json.loads(param)} for name, type, param in self.sqlite3_client.select(sql, (name,))]
 
     def set_data_source(self, name: str, type: str, param: dict):
-        sql = f"insert or replace into {self.data_source_table} values(?, ?, ? datetime('now'))"
+        sql = f"insert or replace into {self.data_source_table} values(?, ?, ?, datetime('now'))"
         return self.sqlite3_client.insert(sql, (name, type, json.dumps(param)))
 
     def delete_data_source(self, name: str):
