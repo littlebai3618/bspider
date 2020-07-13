@@ -14,7 +14,7 @@ from bspider.downloader.async_downloader import AsyncDownloader
 from bspider.parser.async_parser import AsyncParser
 from bspider.http import Request
 from bspider.utils.conf import PLATFORM_NAME_ENV
-from bspider.utils.exceptions import ModuleExistError, ParserError
+from bspider.utils.exceptions import ModuleExistError, ParserError, DataSourceError
 from bspider.utils.database import MysqlClient
 from bspider.utils.logger import LoggerPool
 from bspider.utils.sign import Sign
@@ -116,7 +116,7 @@ class Debuger(object):
                 self.log.info(f'debuger follow url {self.max_follow_url_num} second')
                 break
 
-    def load_module(self, cls_name):
+    def load_module(self, cls_name, params):
         module_name = class_name2module_name(cls_name)
         module_type = module_name.split('_')[-1]
         if module_type == 'extractor':
@@ -138,7 +138,15 @@ class Debuger(object):
         sql = "select `content` from `{}` where `name`=%s;".format(self.frame_settings['CODE_STORE_TABLE'])
         info = self.mysql_client.select(sql, (cls_name))
         if len(info):
+            if params.get('data_source'):
+                for index, data_source in params.get('data_source'):
+                    sql = f"select `name`, `type`, `param` from {self.frame_settings['DATA_SOURCE_TABLE']} where `name`=%s;'"
+                    data_source_config = self.mysql_client.select(sql, (data_source))
+                    if not len(data_source_config):
+                        raise DataSourceError('Invalid data_source %s-%s' % (index + 1, data_source))
+                    params['data_source'][index] = self.mysql_client.select(sql, (data_source))[0]
+
             self.log.debug(f'success find module:{cls_name} from remote')
-            return cls_name, info[0]['content']
+            return (cls_name, info[0]['content'])
         else:
             raise ModuleExistError('load module from remote failed %s is not exists' % (cls_name))

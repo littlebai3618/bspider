@@ -1,6 +1,5 @@
 p, admin, *, *
 p, agent, POST, node_bp
-p, agent, GET, project_bp
 p, operation, PATCH, project_bp
 p, work, GET, chart_bp
 p, work, GET, code_bp
@@ -16,6 +15,7 @@ p, work, PATCH, project_bp
 p, work, GET, rabbitmq_bp
 p, work, PATCH, rabbitmq_bp
 p, work, *, tools_bp
+p, work, GET, data_source_bp
 p, read, GET, chart_bp
 p, read, GET, cron_bp
 p, read, GET, node_bp

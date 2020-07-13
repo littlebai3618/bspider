@@ -11,6 +11,13 @@ class NodeImpl(BaseImpl):
         log.debug(f'SQL:{sql}')
         return self.mysql_client.select(sql)
 
+    def get_all_data_source(self):
+        sql = f'select `name`, `type`, `param` ' \
+              f'from {self.data_source_table} ' \
+              f'where `status`= 1'
+        log.debug(f'SQL:{sql}')
+        return self.mysql_client.select(sql)
+
     def get_all_codes(self):
         sql = f'select `id` as `code_id`, `content` from {self.code_table} where `type` in ("pipeline", "middleware", "extractor");'
         log.debug(f'SQL:{sql}')
@@ -27,35 +34,17 @@ class NodeImpl(BaseImpl):
         log.debug(f'SQL:{sql} {values}')
         return self.mysql_client.insert(sql, values)
 
-    def delete_node(self, node_id, get_sql=False):
-        """a common delete func"""
-        sql = f"delete from {self.node_table} where `id`={node_id};"
-        log.debug(f'SQL:{sql}')
-        if get_sql:
-            return sql,
-        return self.mysql_client.delete(sql)
+    def delete_node(self, node_id: int, get_sql=False):
+        return self.delete('id', node_id, self.node_table, get_sql)
 
-    def delete_worker_by_id(self, worker_id, get_sql=False):
-        sql = f"delete from {self.worker_table} where `id` = '{worker_id}';"
-        log.debug(f'SQL:{sql}')
-        if get_sql:
-            return sql,
-        return self.mysql_client.delete(sql)
+    def delete_worker_by_id(self, worker_id: int, get_sql=False):
+        return self.delete('id', worker_id, self.worker_table, get_sql)
 
-    def delete_worker_by_ip(self, node_ip, get_sql=False):
-        sql = f"delete from {self.worker_table} where `ip` = '{node_ip}';"
-        log.debug(f'SQL:{sql}')
-        if get_sql:
-            return sql,
-        return self.mysql_client.delete(sql)
+    def delete_worker_by_ip(self, node_ip: str, get_sql=False):
+        return self.delete('ip', node_ip, self.worker_table, get_sql)
 
-    def update_node(self, node_id, data, get_sql=False):
-        fields, values = BaseImpl.make_fv(data)
-        sql = f"update {self.node_table} set {fields} where `id` = {node_id};"
-        log.debug(f'SQL:{sql}')
-        if get_sql:
-            return sql, values
-        return self.mysql_client.update(sql, values)
+    def update_node(self, node_id: int, data: dict, get_sql=False):
+        return self.update('id', node_id, data, self.node_table, get_sql)
 
     def get_node(self, node_id):
         sql = f'select `id`, `ip`, `name`, `description`, `cpu_num`, ' \
@@ -87,13 +76,8 @@ class NodeImpl(BaseImpl):
             return sql, values
         return self.mysql_client.insert(sql, values)
 
-    def update_worker(self, worker_id, data, get_sql=False):
-        fields, values = BaseImpl.make_fv(data)
-        sql = f"update {self.worker_table} set {fields} where `id` = {worker_id};"
-        log.debug(f'SQL:{sql}')
-        if get_sql:
-            return sql, values
-        return self.mysql_client.update(sql, values)
+    def update_worker(self, worker_id: int, data: dict, get_sql=False):
+        return self.update('id', worker_id, data, self.worker_table, get_sql)
 
     def get_worker(self, worker_id):
         sql = f'select `id`, `ip`, `name`, `type`, `description`, `coroutine_num`, `status`, `create_time`, `update_time` from {self.worker_table} where `id`={worker_id};'

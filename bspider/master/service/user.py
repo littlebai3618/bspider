@@ -48,7 +48,7 @@ class UserService(BaseService):
             'status': status
         }
         try:
-            user_id = self.impl.add_user(data)
+            user_id = self.impl.add_user(data, get_sql=False)
             data['user_id'] = user_id
             data.pop('password')
             log.info(f'user->identity:{identity} add success')
@@ -60,14 +60,14 @@ class UserService(BaseService):
             raise e
 
     def remove_user(self, user_id):
-        self.impl.remove_user(user_id)
+        self.impl.remove_user(user_id, get_sql=False)
         log.warning(f'user->user_id:{user_id} delete success')
         return DeleteSuccess()
 
     def update_user(self, user_id, **kwargs):
         if 'password' in kwargs:
             kwargs['password'] = generate_password_hash(kwargs['password'])
-        self.impl.update_user(user_id, kwargs)
+        self.impl.update_user(user_id, kwargs, get_sql=False)
         log.info(f'user->user_id:{user_id}->{kwargs} update success')
         return PatchSuccess(msg='update user success!')
 

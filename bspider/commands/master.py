@@ -58,7 +58,9 @@ PLAIN_TABLE = [
     ('bspider_project', dict()),
     ('bspider_project_customcode', dict()),
     ('bspider_user', dict(password=generate_password_hash('admin'))),
-    ('bspider_worker', dict())
+    ('bspider_worker', dict()),
+    ('bspider_data_source', dict()),
+    ('bspider_project_data_source', dict())
 ]
 
 
@@ -127,6 +129,8 @@ class Command(BSpiderCommand):
             return True
         else:
             print('Warning: Mysql Table is not create or destroyed')
+            print(remote_table)
+            print([table[0] for table in PLAIN_TABLE])
             while True:
                 in_content = input("Initialize MySQL table or not (Y/N)：")
                 if in_content.upper() == "N":
@@ -162,11 +166,11 @@ class Command(BSpiderCommand):
             self.init_database()
             self.init_supervisor()
         rpc_socket = os.path.join(os.environ[PLATFORM_PATH_ENV], '.cache', 'supervisor.conf')
-
+        print(f'Use cmd: supervisorctl -c {rpc_socket} {op} {{module}}')
         print('=======supervisor output ========')
         for module in ('master', 'bcorn', 'scheduler'):
             cmd = f'supervisorctl -c {rpc_socket} {op} {module}'
             print(os.popen(cmd).read().strip())
         print('=================================')
-        print(f'A new BSpider master node {op}!')
+        # print(f'A new BSpider master node {op}!')
         print(f'see /platform/logs/supervisor/{module}.log to check process status!')

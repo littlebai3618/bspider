@@ -39,7 +39,7 @@ class CronService(BaseService):
             'next_run_time': timestamp,
         }
         try:
-            cron_id = self.impl.add_job(data=value)
+            cron_id = self.impl.add_job(data=value, get_sql=False)
             log.info(f'cron job->project_id:{project_id}-code_id:{code_id} add success')
             return PostSuccess(msg='add cron job success', data={'cron_id': cron_id})
         except IntegrityError:
@@ -47,7 +47,7 @@ class CronService(BaseService):
             return Conflict(msg='cron job is already exist', errno=50001)
 
     def update_job(self, cron_id, changes):
-        self.impl.update_job(cron_id, changes)
+        self.impl.update_job(cron_id, changes, get_sql=False)
         log.info(f'update cron job->cron_id:{cron_id}->{changes} success')
         return PatchSuccess(msg=f'cron job update success')
 

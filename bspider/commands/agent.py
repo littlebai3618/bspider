@@ -66,9 +66,11 @@ class Command(BSpiderCommand):
             raise UsageError('unknow op: %s' % (op))
         rpc_socket = os.path.join(os.environ[PLATFORM_PATH_ENV], '.cache', 'supervisor.conf')
         cmd = f'supervisorctl -c {rpc_socket} {op} agent'
-        print(cmd)
+        print('=======supervisor output ========')
+        print(f'Use cmd: {cmd}')
         print(os.popen(cmd).read().strip())
-        print(f'A new BSpider agent node {op} success')
+        print('=================================')
+        # print(f'A new BSpider agent node {op} success')
 
 
 if __name__ == '__main__':

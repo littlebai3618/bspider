@@ -14,19 +14,14 @@ class UserImpl(BaseImpl):
               f'from {self.user_table} where `id`=%s;'
         return self.mysql_client.select(sql, user_id)
 
-    def add_user(self, data):
-        fields, values = self.make_fv(data)
-        sql = f'insert into {self.user_table} set {fields};'
-        return self.mysql_client.insert(sql, values, lastrowid=True)
+    def add_user(self, data, get_sql=True):
+        return self.insert(data, self.user_table, lastrowid=True, get_sql=get_sql)
 
-    def remove_user(self, user_id):
-        sql = f"update {self.user_table} set `status`=-1 where `id` = '{user_id}';"
-        return self.mysql_client.update(sql)
+    def remove_user(self, user_id, get_sql=True):
+        return self.update('id', user_id, {'status': -1}, self.user_table, get_sql)
 
-    def update_user(self, user_id, data):
-        fields, values = self.make_fv(data)
-        sql = f"update {self.user_table} set {fields} where `id` = '{user_id}';"
-        return self.mysql_client.update(sql, values)
+    def update_user(self, user_id, data, get_sql=True):
+        return self.update('id', user_id, data, self.user_table, get_sql)
 
     def get_users(self, page, limit, search, sort):
         start = (page - 1) * limit

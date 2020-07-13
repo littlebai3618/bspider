@@ -112,6 +112,16 @@ class AgentMixIn(RemoteMixIn):
                     result[ip] = data['msg']
         return not len(result), result
 
+    def op_add_data_source(self, ip_list: list, data: dict, token: str = None) -> (bool, dict):
+        # 向节点推送数据源配置
+        return self.__op_query(ip_list, 'POST', '/data_source', data, token=token)
+
+    def op_update_data_source(self, ip_list: list, name: str, data: dict, token: str = None) -> (bool, dict):
+        return self.__op_query(ip_list, 'PATCH', f'/data_source/{name}', data, token=token)
+
+    def op_delete_data_source(self, ip_list: list, name: str, token: str = None) -> (bool, dict):
+        return self.__op_query(ip_list, 'DELETE', f'/data_source/{name}', token=token)
+
     def op_add_project(self, ip_list: list, data: dict, token: str = None) -> (bool, dict):
         # project_id, name, config, rate, status
         return self.__op_query(ip_list, 'POST', '/project', data, token=token)
@@ -187,9 +197,8 @@ class RabbitMQMixIn(object):
 
     def op_purge_queue_msg(self, project_id: int):
         uri = f'api/queues/bspider/candidate_{project_id}/contents'
-        req = self.request(self.base_url % uri, 'DELETE', params={"vhost": self.virtual_host,"name":f"candidate_{project_id}","mode":"purge"})
+        req = self.request(self.base_url % uri, 'DELETE',
+                           params={"vhost": self.virtual_host, "name": f"candidate_{project_id}", "mode": "purge"})
         if req.status_code == 204:
             return None
         raise RemoteOPError('purge queue info Failed %s' % (req.text))
-
-

@@ -211,14 +211,14 @@ class BaseModuleSettings(object):
     def __iter__(self):
         return self
 
-    def __next__(self) -> (str, dict):
+    def __next__(self):
         self.__cur += 1
         if self.__cur == self.__end:
             raise StopIteration()
 
         for cls, params in self.__data[self.__cur].items():
             if self.__serializer_method:
-                return {self.__serializer_method(cls): params}
+                cls, params = self.__serializer_method(cls, params)
             return {cls: params}
             # raise ProjectSettingsError('serializer_method is None')
 

@@ -18,6 +18,10 @@ class ParserError(Exception):
     pass
 
 
+class SaverError(Exception):
+    pass
+
+
 class RemoteOPError(Exception):
     pass
 
@@ -43,4 +47,11 @@ class OperationParamError(ModuleError):
 
 
 class TaskParamError(ModuleError):
+    pass
+
+class DataSourceError(Exception):
+    pass
+
+
+class DataSourceTypeError(DataSourceError):
     pass

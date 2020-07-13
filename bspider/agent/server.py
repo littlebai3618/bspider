@@ -9,13 +9,14 @@ from flask import Flask
 from werkzeug.exceptions import HTTPException
 
 from bspider.agent import log
-from bspider.core.api import APIException, MasterMixIn
+from bspider.core.api import APIException, MasterMixIn, json
 from bspider.core import AgentCache
 from bspider.config import FrameSettings
 
 from bspider.agent.controller.project import project
 from bspider.agent.controller.node import node, node_service
 from bspider.agent.controller.code import code
+from bspider.agent.controller.data_source import data_source
 
 from bspider.utils.exceptions import RemoteOPError
 from bspider.utils.system import System
@@ -32,6 +33,7 @@ class CreateApp(MasterMixIn):
         app.register_blueprint(node)
         app.register_blueprint(project)
         app.register_blueprint(code)
+        app.register_blueprint(data_source)
 
         @app.errorhandler(Exception)
         def framework_error(error):
@@ -42,7 +44,7 @@ class CreateApp(MasterMixIn):
             tp, msg, tb = sys.exc_info()
             e_msg = ''.join(traceback.format_exception(tp, msg, tb))
             log.error(f'server exec:{e_msg}')
-            return APIException()
+            return APIException(msg=str(error))
 
         if self.__init_agent(**self.frame_settings['AGENT']):
             log.info('Agent:{name}->{ip}:{port} run success!'.format(**self.frame_settings['AGENT']))
@@ -86,6 +88,10 @@ class CreateApp(MasterMixIn):
 
             for project in data['projects']:
                 cache.set_project(**project)
+
+            for data_source in data['data_sources']:
+                data_source['param'] = json.loads(data_source['param'])
+                cache.set_data_source(**data_source)
         except Exception:
             tp, msg, tb = sys.exc_info()
             e_msg = ''.join(traceback.format_exception(tp, msg, tb))

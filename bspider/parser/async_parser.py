@@ -52,8 +52,7 @@ class AsyncParser(object):
                             raise ParserError(
                                 '%s pipeline init failed: %s like: %s' % (self.project_name, cls_name, e))
                 else:
-                    msg = f'{self.project_name} pipeline init failed: {cls_name}'
-                    raise ParserError(msg)
+                    raise ParserError('%s pipeline init failed: %s' % (self.project_name, cls_name))
         # 增加默认的 SendRequestHelper
         self.pipes.append(SendRequestHelper())
 

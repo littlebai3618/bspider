@@ -13,6 +13,7 @@ from bspider.master import log
 from bspider.master.controller.chart import chart
 from bspider.master.controller.cron import cron
 from bspider.master.controller.code import code
+from bspider.master.controller.data_source import data_source
 from bspider.master.controller.project import project
 from bspider.master.controller.node import node
 from bspider.master.controller.rabbitmq import rabbitmq
@@ -45,6 +46,8 @@ def create_app():
     app.register_blueprint(rabbitmq, url_prefix="/rabbitmq")
     # chart
     app.register_blueprint(chart, url_prefix="/chart")
+    # data_source
+    app.register_blueprint(data_source)
 
 
     @app.errorhandler(Exception)

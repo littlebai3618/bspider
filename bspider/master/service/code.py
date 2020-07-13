@@ -23,11 +23,11 @@ class CodeService(BaseService, AgentMixIn):
                     'content': code,
                     'editor': editor
                 }
-                code_id = session.insert(*self.impl.add_code(data=data))
+                code_id = session.insert(*self.impl.add_code(data=data, get_sql=True))
 
-                sign, result = self.op_add_code(self.impl.get_nodes(), {'code_id': code_id, 'content': code})
+                sign, result = self.op_add_code(self.impl.get_all_node_ip(), {'code_id': code_id, 'content': code})
                 if not sign:
-                    log.warning(f'not all node add cide:{name} =>{result}')
+                    log.warning(f'not all node add code:{name} =>{result}')
                     raise Conflict(msg=f'not all node add code:{name}', data=result, errno=40006)
             log.info(f'add code success:{name}-{editor}')
             return PostSuccess(msg='add code success', data={'code_id': code_id})
@@ -36,17 +36,11 @@ class CodeService(BaseService, AgentMixIn):
             return Conflict(msg='code is already exist', errno=40002)
 
     def update(self, code_id, content, editor):
-        infos = self.impl.get_code(code_id)
-        if not len(infos):
+        info = self.impl.get_code(code_id)
+        if not len(info):
             return NotFound(msg='code is not exist', errno=40001)
 
-        project = list()
-        for info in infos:
-            project.append(str(info['project_id']))
-        infos[0].pop('project_id')
-        infos[0].pop('project_name')
-        infos[0]['project'] = project
-        info = infos[0]
+        project = [str(project['id']) for project in info['project']]
         update_info = dict()
 
         with self.impl.mysql_client.session() as session:
@@ -64,11 +58,15 @@ class CodeService(BaseService, AgentMixIn):
                 update_info['description'] = description
 
             if code != info['content']:
-                sign, result = self.op_update_code(self.impl.get_nodes(), code_id,
-                                                   {'content': code, 'project': ','.join(project)})
-                if not sign:
-                    log.warning(f'code:code_id->:{code_id} update exception')
-                    raise Conflict(msg=f'not all code:code_id->:{code_id} was update', data=result, errno=40006)
+                if len(project):
+                    # 优化，进当有project 使用时通知分节点同步消息
+                    sign, result = self.op_update_code(
+                        ip_list=self.impl.get_all_node_ip(),
+                        code_id=code_id,
+                        data={'content': code, 'project': ','.join(project)})
+                    if not sign:
+                        log.warning(f'code:code_id->:{code_id} update exception')
+                        raise Conflict(msg=f'update code:code_id->:{code_id} failed', data=result, errno=40006)
                 update_info['content'] = code
 
             session.update(*self.impl.update_code(code_id, update_info))
@@ -82,7 +80,7 @@ class CodeService(BaseService, AgentMixIn):
             return Conflict(msg='can\'t delete in use code', data=project_list, errno=40004)
         else:
             with self.impl.mysql_client.session() as session:
-                sign, result = self.op_delete_code(self.impl.get_nodes(), code_id)
+                sign, result = self.op_delete_code(self.impl.get_all_node_ip(), code_id)
                 if not sign:
                     log.warning(f'code:code_id->:{code_id} delete exec')
                     raise Conflict(msg=f'not all code:code_id->:{code_id} was delete', data=result, errno=40006)
@@ -91,18 +89,9 @@ class CodeService(BaseService, AgentMixIn):
             return DeleteSuccess()
 
     def get_code(self, code_id):
-        infos = self.impl.get_code(code_id)
-        if len(infos):
-            project = []
-            sign = set()
-            for info in infos:
-                if info['project_id'] and info['project_id'] not in sign:
-                    project.append({'id': info['project_id'], 'name': info['project_name']})
-                    sign.add(info['project_id'])
-            infos[0].pop('project_id')
-            infos[0].pop('project_name')
-            infos[0]['project'] = project
-            return GetSuccess(msg='get code success', data=infos[0])
+        info = self.impl.get_code(code_id)
+        if len(info):
+            return GetSuccess(msg='get code success', data=info)
         else:
             return NotFound(msg='code is not exist', errno=40001)
 
@@ -116,7 +105,7 @@ class CodeService(BaseService, AgentMixIn):
             self.datetime_to_str(info)
 
         return GetSuccess(
-            msg='get user list success!',
+            msg='get code list success!',
             data={
                 'items': infos,
                 'total': total,
