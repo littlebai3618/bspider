@@ -16,6 +16,7 @@ from bspider.config import FrameSettings
 from bspider.agent.controller.project import project
 from bspider.agent.controller.node import node, node_service
 from bspider.agent.controller.code import code
+from bspider.agent.controller.data_source import data_source
 
 from bspider.utils.exceptions import RemoteOPError
 from bspider.utils.system import System
@@ -32,6 +33,7 @@ class CreateApp(MasterMixIn):
         app.register_blueprint(node)
         app.register_blueprint(project)
         app.register_blueprint(code)
+        app.register_blueprint(data_source)
 
         @app.errorhandler(Exception)
         def framework_error(error):
