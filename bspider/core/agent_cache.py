@@ -42,8 +42,7 @@ class AgentCache(object):
         ); 
         DROP table if exists {data_source_table};
         CREATE TABLE `{data_source_table}` (
-            `id` int(11) PRIMARY KEY NOT NULL,
-            `name` varchar(50) NOT NULL,
+            `name` varchar(50) PRIMARY KEY NOT NULL,
             `type` varchar(50) NOT NULL,
             `param` text NOT NULL,
             `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
