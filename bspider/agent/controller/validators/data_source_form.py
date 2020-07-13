@@ -2,6 +2,7 @@ import json
 
 from wtforms import StringField
 
+from bspider.agent import log
 from bspider.core.api import BaseForm, ParamRequired
 
 
@@ -11,7 +12,8 @@ class AddForm(BaseForm):
     param = StringField(validators=[ParamRequired()])
 
     def validate_param(self, value):
-        print(type(value), value)
+        log.info(type(value))
+        log.info(value)
         value.data = json.loads(value.data)
 
 class UpdateForm(BaseForm):
