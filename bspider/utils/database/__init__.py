@@ -11,7 +11,7 @@ invalid_data_source = {
 
 def valid(param: dict, conn_type: str):
     if conn_type in invalid_data_source:
-        return invalid_data_source[conn_type](**param).test_conn()
+        return invalid_data_source[conn_type](param).test_conn()
     raise DataSourceTypeError('Invalid data source type: %s' % (conn_type))
 
 

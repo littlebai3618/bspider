@@ -10,6 +10,9 @@ class AddForm(BaseForm):
     type = StringField(validators=[ParamRequired()])
     param = StringField(validators=[ParamRequired()])
 
+    def validate_param(self, value):
+        value.data = json.loads(value.data)
+
 class UpdateForm(BaseForm):
     type = StringField(validators=[ParamRequired()])
     param = StringField(validators=[ParamRequired()])
