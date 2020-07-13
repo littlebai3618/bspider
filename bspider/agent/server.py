@@ -44,7 +44,7 @@ class CreateApp(MasterMixIn):
             tp, msg, tb = sys.exc_info()
             e_msg = ''.join(traceback.format_exception(tp, msg, tb))
             log.error(f'server exec:{e_msg}')
-            return APIException()
+            return APIException(msg=str(error))
 
         if self.__init_agent(**self.frame_settings['AGENT']):
             log.info('Agent:{name}->{ip}:{port} run success!'.format(**self.frame_settings['AGENT']))
