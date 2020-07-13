@@ -27,7 +27,7 @@ class DataSourceImpl(BaseImpl):
             sql = f'select `id`, `name`, `description`, `type`, `status`, `create_time`, `update_time` ' \
                   f'from {self.data_source_table} order by `id` {sort} limit {start},{limit};'
         log.debug(f'SQL:{sql}')
-        return self.mysql_client.select(sql), self.total_num(search, self.code_table)
+        return self.mysql_client.select(sql), self.total_num(search, self.data_source_table)
 
 
     def update_data_source(self, name: str, data: dict, get_sql=True):
