@@ -170,7 +170,8 @@ class Command(BSpiderCommand):
         print('=======supervisor output ========')
         for module in ('master', 'bcorn', 'scheduler'):
             cmd = f'supervisorctl -c {rpc_socket} {op} {module}'
+            print(f'Use cmd: {cmd}')
             print(os.popen(cmd).read().strip())
         print('=================================')
-        print(f'A new BSpider master node {op}!')
+        # print(f'A new BSpider master node {op}!')
         print(f'see /platform/logs/supervisor/{module}.log to check process status!')
