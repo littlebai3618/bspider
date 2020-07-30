@@ -1,0 +1,12 @@
+import gevent.monkey
+gevent.monkey.patch_all()
+loglevel = '${log_level}'
+bind = '${agent_ip}:${agent_port}'
+pidfile = '${platform_path}/.cache/agent_gunicorn.pid'
+workers = 1
+worker_connections = 2000
+worker_class = 'gevent'
+x_forwarded_for_header = 'X-Forwarded-For'
+
+accesslog = "${platform_path}/log/agent.log"      #访问日志文件
+errorlog = "${platform_path}/log/agent.log"        #错误日志文件

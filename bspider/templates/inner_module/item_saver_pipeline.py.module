@@ -1,0 +1,50 @@
+"""
+@name=ItemSaverPipeline
+@description=ItemSaverPipeline 通用的存储pipeline 将数据存入指定的数据源
+@type=pipeline
+@editor=bspider
+"""
+import pymysql
+
+from bspider.parser import BasePipeline
+from bspider.utils.exceptions import ParserError
+from bspider.utils.database import prepare_insert_sql, invalid_data_source
+from bspider.parser.item import Item, MySQLSaverItem
+
+
+class ItemSaverPipeline(BasePipeline):
+    """因为异步handler事件循环有问题暂时修改为同步"""
+
+    def __init__(self, project, settings, log):
+        super().__init__(project, settings, log)
+        self.clients = dict()
+        for data_source_config in self.settings['data_source']:
+            self.clients[data_source_config['name']] = invalid_data_source[data_source_config['type']](**data_source_config['param'])
+
+    async def process_item(self, item):
+        """
+        对item进行处理,各个pipeline重写
+        可以yield返回也可以return
+        返回类型为自订定义的类型，会传递给后面的pipeline，返回None将会丢弃这个item
+        :param item: previous pipeline result
+        :return: param to next pipeline
+        """
+        if issubclass(item, Item):
+            return item
+
+        if item.data_source not in self.clients:
+            raise ParserError(f'Invalid db name at:{item}')
+
+        if isinstance(item, MySQLSaverItem):
+            while True:
+                try:
+                    sql, values = prepare_insert_sql(item.table, item.capacity, auto_update=item.auto_update)
+                    self.clients[item.data_source].insert(sql, values)
+                    break
+                except pymysql.Error as e:
+                    errid, errmsg = e.args
+                    if errid == 1146:
+                        self.clients[item.data_source].query(item.schema)
+                        continue
+                    raise e
+        return item

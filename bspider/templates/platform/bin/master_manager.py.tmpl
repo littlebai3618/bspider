@@ -1,0 +1,18 @@
+"""
+ A master server to manage all node by Flask
+ *** master can't run in Windows
+ * BSpider use gunicorn and supervisor
+ *** in Linux/MacOS, use 'bspider master start' to run a master process
+"""
+from flask import render_template
+
+from bspider.master.server import create_app
+
+app = create_app()
+
+@app.route('/', methods=["GET"])
+def index():
+    return render_template('index.html')
+
+if __name__ == '__main__':
+    app.run(debug=True, port=5000)

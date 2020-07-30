@@ -1,0 +1,65 @@
+"""
+@name=NodeStatusAlertOperation
+@description=各个节点探活和状态回报脚本，每执行一次轮询所有节点状态
+@type=operation
+@editor=bspider
+"""
+import sys
+import traceback
+
+from bspider.bcron import BaseOperation
+from bspider.config import FrameSettings
+from bspider.core.api import AgentMixIn
+from bspider.utils.database import MysqlClient
+from bspider.utils.exceptions import RemoteOPError
+from bspider.utils.notify import ding
+from bspider.utils.tools import make_fields_values
+
+
+class NodeStatusAlertOperation(BaseOperation):
+    """
+    集群各节点的健康检查
+    """
+
+    def execute_task(self):
+        frame_settings = FrameSettings()
+        node_table = frame_settings['NODE_TABLE']
+        node_status_table = frame_settings['NODE_STATUS_TABLE']
+        mysql_client = MysqlClient(frame_settings['WEB_STUDIO_DB'])
+
+        sql = f"select `id`, `ip` from {node_table} where `status` = 1"
+
+        node_list = mysql_client.select(sql)
+
+        mixin = AgentMixIn()
+        msg = list()
+
+        for node in node_list:
+            data = {
+                'ip': node['ip'],
+                'cpu': 0,
+                'memory': 0,
+                'disk': 0
+            }
+            try:
+                # {"cpu_num": 1, "cpu_percent": 2.6, "mem_size": 1.8331985473632812, "mem_percent": 58.3, "disk_size": 49.214473724365234, "disk_percent": 48.6}
+                tmp = mixin.op_get_node_status(node['ip'])
+                data['cpu'] = tmp['cpu_percent']
+                data['memory'] = tmp['mem_percent']
+                data['disk'] = tmp['disk_percent']
+                self.log.info('check {ip} success'.format(**node))
+            except RemoteOPError:
+                e_msg = ''.join(traceback.format_exception(*sys.exc_info()))
+                self.log.info(e_msg)
+                msg.append('> {ip} heartbeat FATAL'.format(**node))
+
+            fields, values = make_fields_values(data)
+            sql = f"insert into {node_status_table} set {fields};"
+            mysql_client.insert(sql, values)
+
+            self.log.debug(f'insert node data success! {values}')
+
+
+        self.log.info('heartbeat check finished')
+        if len(msg):
+            ding('\n'.join(msg), 'node exception')

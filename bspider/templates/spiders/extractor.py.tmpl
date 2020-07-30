@@ -1,0 +1,54 @@
+"""
+@description=default
+"""
+from bspider.debug import Debuger
+from bspider.parser import BaseExtractor, MySQLSaverItem
+from bspider.http import Request
+
+
+class ${ProjectName}Extractor(BaseExtractor):
+
+    # with constructed function
+    # def __init__(self, settings, log):
+    #     super().__init__(settings, log)
+    #     your code
+    def start_url(self):
+        """生成任务起始的URL"""
+        yield Request('url')
+
+    def parser(self, response):
+        """
+        解析逻辑 如果request对象未指定callback 默认执行parser方法
+        :param response: bspider response instance
+        :return:
+        """
+        text = response.text
+        json_obj = response.json
+        xpath_selector = response.xpath_selector
+        info = xpath_selector.xpath('//div[@class="demo"]/text()')
+        item = MySQLSaverItem(table='pp', database='aa', info=info)
+        self.log.info(f'Project name: {self.project.project_name}, {self.project.rate}')
+        # 递归新链接
+        yield Request('http://xxxxx', callback=self.parser)
+        # 存入 MySQL
+        yield item
+
+    # def callback(self, response):
+    #    """
+    #    解析逻辑
+    #    :param response: bspider response instance
+    #    :return:
+    #    """
+    #    pass
+
+    # def errback(self, response: Response, e: Exception):
+    #    """
+    #    此方法不一定需要重构
+    #    只是提供一个demo
+    #    ***一个extractor 可以有多个errback方法和 callback方法
+    #    """
+    #    raise e
+
+
+if __name__ == '__main__':
+    Debuger().start()

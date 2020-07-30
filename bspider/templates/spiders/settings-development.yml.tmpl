@@ -1,0 +1,40 @@
+# 开发测试配置
+project_name: ${project_name}
+# 抓取任务的组别，无实际意义，方便多抓取任务分组管理
+group: 基础数据抓取
+description: project的简介
+
+# 任务调度配置
+scheduler:
+  # 抓取任务的抓取速度
+  rate: 10
+  # 抓取任务的调度周期
+  trigger: '* * * * *'
+  # 定时任务类型，目前只支持crontab
+  trigger_type: cron
+  # 调度说明
+  description: 调度说明
+
+# 全局配置 可不填
+# global_settings:
+  # project_name: ${project_name}
+  # 这里的配置项作用于project全局所有 Middleware 和 Pipeline 都可读取
+  # 如和Middleware 和 Pipeline的私有配置重复则以私有配置为主
+# 下载器配置
+downloader:
+  # max_retry_times: 3 # int 下载url异常的最大重试次数 default: 3
+  # ignore_retry_http_code: # list 下载器忽略重试的http code
+    # - 599 # 框架内部异常code 默认此code不重试
+  middleware:
+    - DemoMiddleware:
+        # 这里的配置项仅作用于DemoMiddleware 其余Middleware 和 Pipeline 无法获取
+        param: value
+    - DemoMiddleware2:
+        # 这里的配置项仅作用于DemoMiddleware 其余Middleware 和 Pipeline 无法获取
+        param: value
+# 解析器配置
+parser:
+  pipeline:
+    - DemoPipeline:
+        # 这里的配置项仅作用于DemoPipeline 其余Middleware 和 Pipeline 无法获取
+        param: 'value'

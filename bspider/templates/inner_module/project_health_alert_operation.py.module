@@ -1,0 +1,71 @@
+"""
+@name=ProjectHealthAlertOperation
+@description=各个抓取任务健康检查
+@type=operation
+@editor=bspider
+"""
+from bspider.bcron import BaseOperation
+from bspider.config import FrameSettings
+from bspider.utils.database import MysqlClient
+from bspider.utils.notify import ding
+
+
+class ProjectHealthAlertOperation(BaseOperation):
+    """
+    各个抓取任务健康检查
+    """
+
+    def execute_task(self):
+        """do you work to produce start urls"""
+        frame_settings = FrameSettings()
+        downloader_status_table = frame_settings['DOWNLOADER_STATUS_TABLE']
+        parser_status_table = frame_settings['PARSER_STATUS_TABLE']
+
+        self.handler = MysqlClient(frame_settings['WEB_STUDIO_DB'])
+
+        parser_data = self.__do_query(parser_status_table, '`status` is not null')
+
+        msg = dict()
+
+        for info in parser_data:
+            if info['exce_num'] == 0:
+                continue
+
+            per = info['exce_num'] / info['total_num']
+
+            msg[info['project_id']] = [info['project_name'], f'P.ERR:{per:.2%}', '']
+
+        downloader_data = self.__do_query(downloader_status_table, '`status` != 200')
+
+        for info in downloader_data:
+            if info['exce_num'] == 0:
+                continue
+
+            per = info['exce_num'] / info['total_num']
+            if per < 0.1:
+                self.log.info('project {} exce_per < 0.1 is {}'.format(info['project_name'], per))
+                continue
+            if info['project_id'] in msg:
+                msg[info['project_id']][2] = f'D.ERR:{per:.2%}'
+
+            else:
+                msg[info['project_id']] = (info['project_name'], '', f'D.ERR:{per:.2%}')
+
+        if len(msg):
+            tmp = list()
+            for project_id, m in msg.items():
+                tmp.append('> {}-{} EXEC: {} {}'.format(project_id, *m))
+            ding('\n'.join(tmp), 'project exception')
+            self.log.info(f'send project exception alert msg: {msg}')
+            return
+        self.log.info(f'check project health success: all project is best!')
+
+    def __do_query(self, table, expr):
+        sql = f'SELECT `project_id`,`project_name`, ' \
+              f'COUNT(IF ({expr}, TRUE, NULL)) AS exce_num, ' \
+              f'COUNT(1) AS total_num ' \
+              f'FROM {table} ' \
+              f'WHERE `create_time`> now()-INTERVAL 15 MINUTE GROUP BY `project_id`;'
+
+        infos = self.handler.select(sql)
+        return infos
