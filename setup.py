@@ -42,7 +42,7 @@ setup(
         'cffi==1.12.3',
         'chardet==3.0.4',
         'Click==7.0',
-        'cryptography==2.7',
+        'cryptography==3.2',
         'DBUtils==1.3',
         'Flask==1.1.1',
         'Flask-Cors==3.0.8',
