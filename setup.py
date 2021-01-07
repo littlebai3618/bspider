@@ -54,7 +54,7 @@ setup(
         'idna==2.8',
         'itsdangerous==1.1.0',
         'Jinja2==2.10.1',
-        'lxml==4.4.1',
+        'lxml==4.6.2',
         'MarkupSafe==1.1.1',
         'meld3==1.0.2',
         'multidict==4.5.2',
