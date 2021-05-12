@@ -90,7 +90,7 @@ class DataSourceService(BaseService, AgentMixIn):
         if len(info):
             tmp_param = json.loads(info['param'])
             tmp_param['password'] = self.password_mask
-            info['param'] = json.dumps(tmp_param)
+            info['param'] = json.dumps(tmp_param, sort_keys=True, indent=2)
             return GetSuccess(msg='get data_source success', data=info)
         else:
             return NotFound(msg='data_source is not exist', errno=70003)
