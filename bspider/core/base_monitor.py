@@ -56,6 +56,7 @@ class BaseMonitor(object):
                 total_sum += info['rate']
 
             worker_obj = self.projects.get(info['id'])
+            self.log.info(info['config'])
             if isinstance(info['config'], str):
                 info['config'] = json.loads(info['config'])
             project = Project(
