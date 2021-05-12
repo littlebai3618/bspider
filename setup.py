@@ -34,7 +34,7 @@ setup(
         "aiomysql==0.0.21",
         "aiormq==2.7.2",
         "APScheduler==3.7.0",
-        "DBUtils==2.0.1",
+        "DBUtils==1.3",
         "Flask==2.0.0",
         "Flask-Cors==3.0.10",
         "Flask-HTTPAuth==4.3.0",
