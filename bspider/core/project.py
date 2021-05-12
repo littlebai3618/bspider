@@ -238,7 +238,10 @@ class BaseModuleSettings(object):
         return self.__serializer_method is not None
 
     def get_data(self):
-        return self.__data
+        cls, params = self.__data[0]
+        if self.__serializer_method is not None:
+            cls, params = self.__serializer_method(cls, params)
+            return cls, params
 
     __str__ = __repr__
 
