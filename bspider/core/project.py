@@ -216,6 +216,7 @@ class BaseModuleSettings(object):
         if self.__cur == self.__end:
             raise StopIteration()
 
+        print(self.__data)
         cls, params = self.__data[self.__cur]
         if self.__serializer_method:
             cls, params = self.__serializer_method(cls, params)
