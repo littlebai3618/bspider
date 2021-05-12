@@ -15,10 +15,10 @@ class MySQLSaverPipeline(BasePipeline):
     def __init__(self, project, settings, log):
         super().__init__(project, settings, log)
         # 实例化MySQL操作对象
-        db_config = settings.get("mysql_config")
+        db_config = settings.get("data_source")
         self.mysql_handler = dict()
         if db_config is None:
-            raise ParserError('\'mysql_config\' must be set in settings.')
+            raise ParserError('\'data_source\' must be set in settings.')
 
         for config in db_config:
             self.mysql_handler[config['db']] = MysqlClient(config)

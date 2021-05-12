@@ -99,8 +99,7 @@ class BaseMonitor(object):
         cls_name, _ = find_class_name_by_content(content)
         # Monkey Patch 为了兼容数据源模块，不得已而为之
         if params.get('data_source'):
-            for index, data_source in params.get('data_source'):
-                params['data_source'][index] = self.__cache.get_data_source(data_source)[0]
+            params['data_source'] = self.__cache.get_data_source(params.get('data_source'))[0]['param']
         return (cls_name, content), params
 
     def get_work_obj(self, project: Project, sign: Sign):

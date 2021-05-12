@@ -223,11 +223,10 @@ class ProjectService(BaseService, AgentMixIn):
                 errno=30003)
 
         if param.get('data_source'):
-            for index, data_source in param.get('data_source'):
-                data_source = self.impl.get_data_source_by_name(data_source)
-                if not len(data_source):
-                    raise Conflict(
-                        msg=f'Invalid data_source {data_source}!',
-                        errno=70003)
+            data_source = self.impl.get_data_source_by_name(param.get('data_source'))
+            if not len(data_source):
+                raise Conflict(
+                    msg=f'Invalid data_source {data_source}!',
+                    errno=70003)
 
         return data[0]['id'], param
