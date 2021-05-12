@@ -3,13 +3,11 @@ from bspider.core.api import BaseService, Conflict, NotFound, PostSuccess, Delet
 from bspider.core.api import AgentMixIn
 from bspider.utils.exceptions import RemoteOPError
 from bspider.master.server import log
-from bspider.master.service.impl.node_impl import NodeImpl
+from bspider.master.dao import NodeDao
 
 
 class Node(BaseService, AgentMixIn):
-
-    def __init__(self):
-        self.impl = NodeImpl()
+    impl = NodeDao()
 
     # node API
     def add_node(self, ip, description, name, cpu_num, mem_size, disk_size, port):

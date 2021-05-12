@@ -4,13 +4,11 @@ from bspider.core.api import BaseService, Conflict, NotFound, PostSuccess, Patch
     GetSuccess, ParameterException
 from bspider.core.api import AgentMixIn
 from bspider.master.server import log
-from bspider.master.service.impl.code_impl import CodeImpl
+from bspider.master.dao import CodeDao
 
 
 class CodeService(BaseService, AgentMixIn):
-
-    def __init__(self):
-        self.impl = CodeImpl()
+    impl = CodeDao()
 
     def add(self, content, editor):
         name, code_type, description, code = content

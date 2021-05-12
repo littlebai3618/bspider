@@ -14,7 +14,7 @@ from bspider.utils.database import AioMysqlClient
 from bspider.utils.logger import LoggerPool
 
 from .broker import RabbitMQBroker
-from .api import BaseImpl
+from .api import BaseDao
 
 
 class BaseManager(object):
@@ -103,7 +103,7 @@ class BaseManager(object):
             data['data'] = json.dumps(response.request.data)
         else:
             data['data'] = None
-        fields, values = BaseImpl.make_fv(data)
+        fields, values = BaseDao.make_fv(data)
         sql = f'insert into {self.status_table} set {fields};'.replace('`url_sign`=%s', '`url_sign`=md5(%s)')
         await self.mysql_client.insert(sql, values)
         self.log.info('send success info [{}]'.format(fields % values))
@@ -129,7 +129,7 @@ class BaseManager(object):
             data['data'] = json.dumps(request.data)
         else:
             data['data'] = None
-        fields, values = BaseImpl.make_fv(data)
+        fields, values = BaseDao.make_fv(data)
         sql = f'insert into {self.status_table} set {fields};'
         await self.mysql_client.insert(sql.replace('`url_sign`=%s', '`url_sign`=md5(%s)'), values)
         self.log.info('send error info [{}]'.format(fields % values))

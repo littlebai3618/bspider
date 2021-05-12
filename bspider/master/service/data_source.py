@@ -4,13 +4,11 @@ from bspider.core.api import BaseService, Conflict, NotFound, PostSuccess, Patch
     GetSuccess, ParameterException
 from bspider.core.api import AgentMixIn, json
 from bspider.master.server import log
-from bspider.master.service.impl.data_source_impl import DataSourceImpl
+from bspider.master.dao import DataSourceDao
 
 
 class DataSourceService(BaseService, AgentMixIn):
-
-    def __init__(self):
-        self.impl = DataSourceImpl()
+    impl = DataSourceDao()
 
     def add(self, name: str, type: str, param: dict, description: str):
         try:

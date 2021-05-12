@@ -8,13 +8,13 @@ from apscheduler.triggers.cron import CronTrigger
 
 from bspider.core.api import BaseService, GetSuccess, NotFound, AgentMixIn
 
-from .impl.tools_impl import ToolsImpl
+from bspider.master.dao import ToolsDao
 
 
 class ToolsService(BaseService, AgentMixIn):
+    impl = ToolsDao()
 
     def __init__(self):
-        self.impl = ToolsImpl()
         self.tz = pytz.timezone(self.frame_settings['TIMEZONE'])
 
     def get_node_list(self):

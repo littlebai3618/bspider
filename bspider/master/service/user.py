@@ -5,13 +5,11 @@ from bspider.core.api import BaseService, ParameterException, NotFound, Conflict
 from bspider.core.api.auth.token import make_token
 
 from bspider.master.server import log
-from bspider.master.service.impl.user_impl import UserImpl
+from bspider.master.dao import UserDao
 
 
 class UserService(BaseService):
-
-    def __init__(self):
-        self.impl = UserImpl()
+    impl = UserDao()
 
     def login_by_identity(self, identity, password):
         infos = self.impl.get_user(identity)

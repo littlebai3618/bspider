@@ -6,24 +6,20 @@
 -- 考虑到多核cpu和一些 cpu密集型程序，
 -- 这里采用 多线程的方式执行定时任务
 """
-from datetime import datetime
 
-from apscheduler.triggers.cron import CronTrigger
-from apscheduler.util import datetime_to_utc_timestamp, obj_to_ref, utc_timestamp_to_datetime
+from apscheduler.util import obj_to_ref, utc_timestamp_to_datetime
 from pymysql import IntegrityError
 
 from bspider.core.api import BaseService, Conflict, PostSuccess, PatchSuccess, DeleteSuccess, GetSuccess, NotFound, \
     ParameterException
 from bspider.bcron.todo import do
 from bspider.master import log
-from bspider.master.service.impl.cron_impl import CronImpl
+from bspider.master.dao import CronDao
 from bspider.utils.tools import get_crontab_next_run_time
 
 
 class CronService(BaseService):
-
-    def __init__(self):
-        self.impl = CronImpl()
+    impl = CronDao()
 
     def add_cron(self, project_id, code_id, cron_type, trigger, description):
         timestamp, next_run_time = get_crontab_next_run_time(trigger, self.tz)

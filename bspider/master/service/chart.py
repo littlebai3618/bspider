@@ -1,11 +1,9 @@
 from bspider.core.api import BaseService, GetSuccess
-from .impl.chart_impl import ChartImpl
+from bspider.master.dao import ChartDao
 
 
 class ChartService(BaseService):
-
-    def __init__(self):
-        self.impl = ChartImpl()
+    impl = ChartDao()
 
     def parser_pv(self, project_id: int = None):
         p_total = list()

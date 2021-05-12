@@ -6,7 +6,7 @@ from bspider.bcron import do
 from bspider.core import Project
 from bspider.master import log
 from bspider.master.controller.validators.project_form import schema
-from bspider.master.service.impl.project_impl import ProjectImpl
+from bspider.master.dao import ProjectDao
 from bspider.core.api import BaseService, Conflict, NotFound, PostSuccess, DeleteSuccess, GetSuccess, \
     PatchSuccess, ParameterException, AgentMixIn
 from bspider.utils.database.mysql.session import DBSession
@@ -14,9 +14,7 @@ from bspider.utils.tools import class_name2module_name, get_crontab_next_run_tim
 
 
 class ProjectService(BaseService, AgentMixIn):
-
-    def __init__(self):
-        self.impl = ProjectImpl()
+    impl = ProjectDao()
 
     def bind_project_relation(self, session: DBSession, project_id: int, r_config: dict):
         self.impl.bind_queue(project_id=project_id)
@@ -68,7 +66,7 @@ class ProjectService(BaseService, AgentMixIn):
                 timestamp, next_run_time = get_crontab_next_run_time(project.scheduler_settings.trigger, self.tz)
                 value = {
                     'project_id': project_id,
-                    'code_id': self.get_module_id_by_name(project.parser_settings.extractor),
+                    'code_id': self.get_module_id_by_name(project.parser_settings.extractor, dict())[0],
                     'type': 'crawl',
                     'trigger': project.scheduler_settings.trigger,
                     'trigger_type': project.scheduler_settings.trigger_type,

@@ -1,4 +1,4 @@
-from .base_impl import BaseImpl
+from .base_dao import BaseDao
 from .base_service import BaseService
 from .base_form import BaseForm, ParamRequired
 from .auth import auth
