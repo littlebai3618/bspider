@@ -45,7 +45,7 @@ class ProjectDao(BaseDao):
         values = ', '.join([f'({pid}, `"{data_source_name}"`)' for data_source_name in data_source_names])
         sql = f'replace into `{self.p2ds_table}`(`project_id`, `data_source_name`) ' \
               f'values{values};'
-        log.debug(sql)
+        log.info(sql)
         if get_sql:
             return sql,
         return self.mysql_client.insert(sql)

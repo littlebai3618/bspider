@@ -20,8 +20,7 @@ class MySQLSaverPipeline(BasePipeline):
         if db_config is None:
             raise ParserError('\'data_source\' must be set in settings.')
 
-        for config in db_config:
-            self.mysql_handler[config['db']] = MysqlClient(config)
+        self.mysql_handler = MysqlClient(config)
 
     async def process_item(self, item):
         """
@@ -33,9 +32,6 @@ class MySQLSaverPipeline(BasePipeline):
         """
         if isinstance(item, MySQLSaverItem):
             sql, values = prepare_insert_sql(item.table, item.capacity, auto_update=item.auto_update)
-            if not item.db in self.mysql_handler:
-                raise ParserError(f'Invalid db name at:{item}')
-
-            self.mysql_handler[item.db].insert(sql, values)
+            self.mysql_handler.insert(sql, values)
             self.log.info(f'insert success->{item}')
         return item
