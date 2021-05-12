@@ -35,6 +35,19 @@ BSpider [Demo](http://bspider-demo.baishanglin.top/)
 * rabbitmq `>3.7.x` 并启用 `rabbitmq management plugins` 提供有访问UI权限的账号
 * MySQL `>5.x`
 
+近期更新
+============
+###### 2021-05-12 修复了部分已知问题
+####### 后端部分
+1. 定时任务和抓取任务绑定时，绑定失败
+2. 查询数据源接口返回异常
+3. 调整了有问题的目录层级、类名
+4. 更新了核心包 aiohttp、aiomysql、aiormq、APScheduler等 的版本
+####### 前端部分
+1. 增加对后端 read 角色用户的支持
+2. 增加对data_source模块的前端支持
+3. 微调了登录页面的文案
+
 安装
 =======
 
