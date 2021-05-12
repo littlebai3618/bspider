@@ -31,7 +31,7 @@ setup(
     python_requires='>=3.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*',
     install_requires=[
         "aiohttp==3.7.4.post0",
-        "aiomysql==0.0.20",
+        "aiomysql==0.0.21",
         "aiormq==2.7.2",
         "aniso8601==9.0.1",
         "APScheduler==3.7.0",
@@ -63,7 +63,7 @@ setup(
         "pika==1.2.0",
         "psutil==5.8.0",
         "pycparser==2.20",
-        "PyMySQL==1.0.2",
+        "PyMySQL==0.9.3",
         "pytz==2021.1",
         "PyYAML==5.4.1",
         "redis==3.5.3",
