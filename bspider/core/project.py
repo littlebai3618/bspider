@@ -216,11 +216,11 @@ class BaseModuleSettings(object):
         if self.__cur == self.__end:
             raise StopIteration()
 
-        for cls, params in self.__data[self.__cur]:
-            if self.__serializer_method:
+        cls, params = self.__data[self.__cur]
+        if self.__serializer_method:
                 cls, params = self.__serializer_method(cls, params)
-            return (cls, params)
-            # raise ProjectSettingsError('serializer_method is None')
+        return (cls, params)
+        # raise ProjectSettingsError('serializer_method is None')
 
     def __eq__(self, other):
         return operator.eq(self.__data, other)
