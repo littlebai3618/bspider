@@ -46,10 +46,10 @@ class AsyncDownloader(object):
             # for i in middleware:
             #     self.log.info(len(i))
             # self.log.info(type(middleware))
-            for midd in middleware:
-                cls, params = midd
-                self.log.info(midd)
-                cls_name, code = cls
+            for cls_name, code, params in middleware:
+                # cls, params = midd
+                # self.log.info(midd)
+                # cls_name, code = cls
                 if isinstance(code, str):
                     mod = import_module_by_code(cls_name, code)
                 else:
