@@ -22,7 +22,7 @@ class ProjectService(BaseService, AgentMixIn):
         self.impl.bind_queue(project_id=project_id)
         log.debug(f'bind new project=>{r_config["project_name"]} queue success!')
         log.info(json.dumps(r_config))
-        code_ids = [[cid for cid, _ in items][0] for items in r_config['downloader']['middleware']]
+        code_ids = [items[0] for items in r_config['downloader']['middleware']]
         pipeline = {key: value for key, value in r_config['parser']['pipeline']}
         code_ids.extend(pipeline.keys())
         log.debug(f'code num: {code_ids}')
