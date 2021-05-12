@@ -216,7 +216,6 @@ class BaseModuleSettings(object):
         if self.__cur == self.__end:
             raise StopIteration()
 
-        print(self.__data)
         cls, params = self.__data[self.__cur]
         if self.__serializer_method:
             cls, params = self.__serializer_method(cls, params)
@@ -234,6 +233,9 @@ class BaseModuleSettings(object):
         for module in self.__data:
             result.append(str(module[0]))
         return '<{}: {} items>'.format(self.__class__.__name__, '->'.join(result))
+
+    def has_method(self):
+        return self.__serializer_method is not None
 
     __str__ = __repr__
 
