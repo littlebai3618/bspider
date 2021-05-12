@@ -219,7 +219,7 @@ class BaseModuleSettings(object):
         for cls, params in self.__data[self.__cur].items():
             if self.__serializer_method:
                 cls, params = self.__serializer_method(cls, params)
-            return {cls: params}
+            return (cls, params)
             # raise ProjectSettingsError('serializer_method is None')
 
     def __eq__(self, other):

@@ -36,7 +36,7 @@ class AsyncParser(object):
 
         self.pipes = []
         for pipeline in project.parser_settings.pipeline:
-            for cls, params in pipeline.items():
+            for cls, params in pipeline:
                 cls_name, code = cls
                 if isinstance(code, str):
                     mod = import_module_by_code(cls_name, code)
