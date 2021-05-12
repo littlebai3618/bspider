@@ -15,7 +15,6 @@ from bspider.utils.exceptions import DownloaderError
 from bspider.utils.importer import import_module_by_code
 from bspider.utils.logger import LoggerPool
 from bspider.utils.sign import Sign
-from bspider.utils.tools import find_class_name_by_content
 
 
 class AsyncDownloader(object):

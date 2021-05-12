@@ -206,13 +206,13 @@ class BaseModuleSettings(object):
         self.__data = data
         self.__serializer_method = serializer_method
         self.__end = len(data)
-        self.__cur = -1
         self.module_type = module_type
 
     def __iter__(self):
+        self.__cur = -1
         return self
 
-    def __next__(self) -> TupleC:
+    def __next__(self):
         self.__cur += 1
         if self.__cur == self.__end:
             raise StopIteration()
