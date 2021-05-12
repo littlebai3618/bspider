@@ -146,7 +146,7 @@ class ParserSettings(object):
     @property
     def extractor(self):
         for pipeline in self.__pipeline:
-            for key, _ in pipeline.items():
+            for key, _ in pipeline:
                 if key.endswith('Extractor'):
                     return key
 
@@ -216,7 +216,7 @@ class BaseModuleSettings(object):
         if self.__cur == self.__end:
             raise StopIteration()
 
-        for cls, params in self.__data[self.__cur].items():
+        for cls, params in self.__data[self.__cur]:
             if self.__serializer_method:
                 cls, params = self.__serializer_method(cls, params)
             return (cls, params)
