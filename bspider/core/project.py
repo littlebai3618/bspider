@@ -237,6 +237,9 @@ class BaseModuleSettings(object):
     def has_method(self):
         return self.__serializer_method is not None
 
+    def get_data(self):
+        return self.__data
+
     __str__ = __repr__
 
 
