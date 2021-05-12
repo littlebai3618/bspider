@@ -41,7 +41,6 @@ setup(
         "casbin==1.0.4",
         "certifi==2020.12.5",
         "cffi==1.14.5",
-        "chardet==4.0.0",
         "click==8.0.0",
         "cryptography==3.3.2",
         "DBUtils==2.0.1",
