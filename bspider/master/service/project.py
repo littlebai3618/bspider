@@ -6,6 +6,7 @@ from pymysql import IntegrityError
 
 from bspider.bcron import do
 from bspider.core import Project
+from bspider.core.my_tuple import TupleC
 from bspider.master import log
 from bspider.master.controller.validators.project_form import schema
 from bspider.master.dao import ProjectDao
@@ -217,7 +218,7 @@ class ProjectService(BaseService, AgentMixIn):
                 'limit': limit
             })
 
-    def get_module_id_by_name(self, cls_name: str, param: dict) -> (int, dict):
+    def get_module_id_by_name(self, cls_name: str, param: dict) -> TupleC:
         module_type = class_name2module_name(cls_name).split('_')[-1]
         data = self.impl.get_module_id_by_name_and_type(cls_name, module_type)
         if not len(data):
@@ -232,4 +233,4 @@ class ProjectService(BaseService, AgentMixIn):
                     msg=f'Invalid data_source {data_source}!',
                     errno=70003)
 
-        return data[0]['id'], param
+        return TupleC(data[0]['id'], param)

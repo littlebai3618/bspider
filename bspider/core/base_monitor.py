@@ -10,6 +10,7 @@ from bspider.utils.sign import Sign
 from bspider.utils.tools import find_class_name_by_content
 
 from .agent_cache import AgentCache
+from .my_tuple import TupleC
 from .project import Project
 
 
@@ -95,13 +96,13 @@ class BaseMonitor(object):
                 if seed < 0:
                     return project_id
 
-    def code_id_to_content(self, code_id, params):
+    def code_id_to_content(self, code_id, params) -> TupleC:
         content = self.__cache.get_code(code_id)[0]['content']
         cls_name, _ = find_class_name_by_content(content)
         # Monkey Patch 为了兼容数据源模块，不得已而为之
         if params.get('data_source'):
             params['data_source'] = self.__cache.get_data_source(params.get('data_source'))[0]['param']
-        return cls_name, content, params
+        return TupleC((cls_name, content), params)
 
     def get_work_obj(self, project: Project, sign: Sign):
         """继承重写 -> 根据配置返回对象"""

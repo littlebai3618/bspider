@@ -11,6 +11,7 @@
 import operator
 import types
 
+from bspider.core.my_tuple import TupleC
 from bspider.utils.exceptions import ProjectSettingsError
 
 
@@ -211,7 +212,7 @@ class BaseModuleSettings(object):
     def __iter__(self):
         return self
 
-    def __next__(self):
+    def __next__(self) -> TupleC:
         self.__cur += 1
         if self.__cur == self.__end:
             raise StopIteration()
@@ -219,7 +220,7 @@ class BaseModuleSettings(object):
         cls, params = self.__data[self.__cur]
         if self.__serializer_method is not None:
             return self.__serializer_method(cls, params)
-        return cls, params
+        return TupleC(cls, params)
         # raise ProjectSettingsError('serializer_method is None')
 
     def __eq__(self, other):
