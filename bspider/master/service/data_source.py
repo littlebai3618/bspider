@@ -10,6 +10,8 @@ from bspider.master.dao import DataSourceDao
 class DataSourceService(BaseService, AgentMixIn):
     impl = DataSourceDao()
 
+    password_mask = "********"
+
     def add(self, name: str, type: str, param: dict, description: str):
         try:
             with self.impl.mysql_client.session() as session:
@@ -40,6 +42,9 @@ class DataSourceService(BaseService, AgentMixIn):
         info = self.impl.get_data_source(name)
         if not len(info):
             return NotFound(msg='data_source is not exist', errno=70003)
+
+        if param.get("password") == self.password_mask:
+            return Conflict(f"invalid password for data_source: {name}", errno=70004)
 
         update_info = dict()
 
@@ -84,7 +89,7 @@ class DataSourceService(BaseService, AgentMixIn):
         info = self.impl.get_data_source(name)
         if len(info):
             tmp_param = json.loads(info['param'])
-            tmp_param['password'] = "********"
+            tmp_param['password'] = self.password_mask
             info['param'] = json.dumps(tmp_param)
             return GetSuccess(msg='get data_source success', data=info)
         else:
