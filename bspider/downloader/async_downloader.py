@@ -15,6 +15,7 @@ from bspider.utils.exceptions import DownloaderError
 from bspider.utils.importer import import_module_by_code
 from bspider.utils.logger import LoggerPool
 from bspider.utils.sign import Sign
+from bspider.utils.tools import find_class_name_by_content
 
 
 class AsyncDownloader(object):
@@ -44,9 +45,9 @@ class AsyncDownloader(object):
             for i in middleware:
                 self.log.info(len(i))
             self.log.info(type(middleware))
-            for cls, params in middleware:
-                self.log.info(cls)
-                cls_name, code = cls
+            for code, params in middleware:
+                cls_name, _ = find_class_name_by_content(code)
+                self.log.info(cls_name)
                 if isinstance(code, str):
                     mod = import_module_by_code(cls_name, code)
                 else:
