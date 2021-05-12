@@ -107,6 +107,6 @@ cd ${platform_name}/projects/${spider_name}
 
 TODO
 
-2. 前端权限校验 worker 只能修改自己的 job
-4. code 增加 doc 使用文档
-5. project页面直达 extractor编辑页面
+1. 前端权限校验 worker 只能修改自己的 job
+2. code 增加 doc 使用文档
+3. project页面直达 extractor编辑页面
