@@ -20,7 +20,7 @@ class APIException(HTTPException):
         self.data = data
         super().__init__(description=self.msg)
 
-    def get_body(self, environ=None):
+    def get_body(self, environ=None, scope=None):
         req_uri = '{} {}'.format(request.method, str(request.full_path).split('?')[0])
         body = {
             'msg': self.msg,
@@ -31,7 +31,7 @@ class APIException(HTTPException):
             body['data'] = self.data
         return json.dumps(body)
 
-    def get_headers(self, environ=None):
+    def get_headers(self, environ=None, scope=None):
         return [("Content-Type", "application/json")]
 
 
