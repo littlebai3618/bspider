@@ -1,6 +1,6 @@
 import os
 
-from bspider.core.api import BaseImpl, json
+from bspider.core.api import BaseDao, json
 from bspider.utils.conf import PLATFORM_PATH_ENV
 from bspider.utils.database import SqlLite3Client
 
@@ -79,7 +79,7 @@ class AgentCache(object):
         return self.sqlite3_client.delete(sql)
 
     def update_project(self, project_id, data):
-        fields, values = BaseImpl.make_fv(data)
+        fields, values = BaseDao.make_fv(data)
         sql = f"update {self.project_table} set {fields} where `id` = {project_id};".replace('%s', '?')
         return self.sqlite3_client.update(sql, values)
 
@@ -100,7 +100,7 @@ class AgentCache(object):
         return self.sqlite3_client.delete(sql)
 
     def update_code(self, code_id: int, data: dict , project: list):
-        fields, values = BaseImpl.make_fv(data)
+        fields, values = BaseDao.make_fv(data)
         sql = f"update {self.code_table} set {fields} where `id` = {code_id};".replace('%s', '?')
         self.sqlite3_client.update(sql, values)
         # 在更新代码的时候 更新project 的时间
@@ -126,7 +126,7 @@ class AgentCache(object):
         return self.sqlite3_client.delete(sql, (name,))
 
     def update_data_source(self, name: str, data: dict , project: list):
-        fields, values = BaseImpl.make_fv(data)
+        fields, values = BaseDao.make_fv(data)
         sql = f"update {self.data_source_table} set {fields} where `name` = '{name}';".replace('%s', '?')
         self.sqlite3_client.update(sql, values)
         # 在更新代码的时候 更新project 的时间
