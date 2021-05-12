@@ -1,3 +1,5 @@
+import json
+
 import yaml
 from apscheduler.util import obj_to_ref
 from pymysql import IntegrityError
@@ -19,6 +21,7 @@ class ProjectService(BaseService, AgentMixIn):
     def bind_project_relation(self, session: DBSession, project_id: int, r_config: dict):
         self.impl.bind_queue(project_id=project_id)
         log.debug(f'bind new project=>{r_config["project_name"]} queue success!')
+        print(json.dumps(r_config))
         code_ids = [[cid for cid in items.keys()][0] for items in r_config['downloader']['middleware']]
         pipeline = {key: value for key, value in r_config['parser']['pipeline']}
         code_ids.extend(pipeline.keys())
