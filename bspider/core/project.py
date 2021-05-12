@@ -231,8 +231,7 @@ class BaseModuleSettings(object):
     def __repr__(self):
         result = list()
         for module in self.__data:
-            for cls, _ in module:
-                result.append(str(cls))
+            result.append(str(module[0]))
         return '<{}: {} items>'.format(self.__class__.__name__, '->'.join(result))
 
     __str__ = __repr__
