@@ -40,6 +40,9 @@ class AsyncDownloader(object):
         self.mws = []
         for middleware in project.downloader_settings.middleware:
             self.log.info(project.downloader_settings.middleware.has_method())
+
+            for i in middleware:
+                self.log.info(len(i))
             self.log.info(type(middleware))
             for cls, params in middleware:
                 self.log.info(cls)
