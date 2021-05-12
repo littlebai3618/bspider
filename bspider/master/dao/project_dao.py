@@ -42,7 +42,7 @@ class ProjectDao(BaseDao):
         return self.mysql_client.insert(sql)
 
     def add_project_data_source_binds(self, data_source_names, pid, get_sql=True):
-        values = ', '.join([f'({pid}, `"{data_source_name}"`)' for data_source_name in data_source_names])
+        values = ', '.join([f'({pid}, "{data_source_name}")' for data_source_name in data_source_names])
         sql = f'replace into `{self.p2ds_table}`(`project_id`, `data_source_name`) ' \
               f'values{values};'
         log.info(sql)
