@@ -30,7 +30,7 @@ setup(
     ],
     python_requires='>=3.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*',
     install_requires=[
-        "aiohttp==3.7.4",
+        "aiohttp==3.7.4.post0",
         "aiomysql==0.0.20",
         "aiormq==2.7.2",
         "aniso8601==9.0.1",
@@ -41,6 +41,7 @@ setup(
         "casbin==1.0.4",
         "certifi==2020.12.5",
         "cffi==1.14.5",
+        "chardet==4.0.0",
         "click==8.0.0",
         "cryptography==3.3.2",
         "DBUtils==2.0.1",
