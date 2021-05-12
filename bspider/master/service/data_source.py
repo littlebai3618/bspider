@@ -83,6 +83,9 @@ class DataSourceService(BaseService, AgentMixIn):
     def get_data_source(self, name: str):
         info = self.impl.get_data_source(name)
         if len(info):
+            tmp_param = json.loads(info['param'])
+            tmp_param['password'] = "********"
+            info['param'] = json.dumps(tmp_param)
             return GetSuccess(msg='get data_source success', data=info)
         else:
             return NotFound(msg='data_source is not exist', errno=70003)
