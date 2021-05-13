@@ -67,6 +67,7 @@ class CodeService(BaseService, AgentMixIn):
                         raise Conflict(msg=f'update code:code_id->:{code_id} failed', data=result, errno=40006)
                 update_info['content'] = code
 
+            log.info(update_info)
             log.info(*self.impl.update_code(code_id, update_info))
             session.update(*self.impl.update_code(code_id, update_info))
         log.info(f'update code success: {update_info}')
