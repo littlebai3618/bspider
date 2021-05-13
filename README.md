@@ -13,10 +13,11 @@
 简介
 ========
 
-BSpider [Demo](http://bspider-demo.baishanglin.top/)
-是一个纯Python实现的高等级分布式全异步web抓取框架，框架采用多进程 + 
+BSpider 是一个纯Python实现的高等级分布式全异步web抓取框架，框架采用多进程 + 
 协程的方式规避 GIL锁带来的不良影响，充分利用多核CPU性能，同时框架设计上尽可能的
 减少框架自身对系统性能的影响，使尽可能多的计算资源用于抓取、解析操作。
+* [Demo](http://bspider-demo.baishanglin.top/) 
+* 只读 用户名 reader 密码 reader 
 
 特色
 ========
