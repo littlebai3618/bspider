@@ -3,13 +3,11 @@ class Item(object):
     item对象,
     """
 
-    def __init__(self, data_source: str, schema=None, **kwargs):
+    def __init__(self, schema=None, **kwargs):
         """
-        :param data_source: 数据源名称
         :param schema: 建表语句，要求有建表权限
         :param kwargs: 要存储的数据
         """
-        self.data_source = data_source
         self.capacity = kwargs
         self.schema = schema
 
@@ -52,7 +50,7 @@ class Item(object):
 
 class MySQLSaverItem(Item):
 
-    def __init__(self, data_source: str, table: str, auto_update=True, schema=None, **kwargs):
-        super().__init__(data_source, schema, **kwargs)
+    def __init__(self, table: str, auto_update=True, schema=None, **kwargs):
+        super().__init__(schema, **kwargs)
         self.table = table
         self.auto_update = auto_update
