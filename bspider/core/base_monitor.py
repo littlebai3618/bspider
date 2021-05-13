@@ -36,7 +36,6 @@ class BaseMonitor(object):
                 tp, msg, tb = sys.exc_info()
                 e_msg = ''.join(traceback.format_exception(tp, msg, tb))
                 self.log.error(f'sync project failed:{e_msg}')
-                self.log.error(f'sync project failed:{e}')
             await asyncio.sleep(2)
 
     async def __sync_config(self):
