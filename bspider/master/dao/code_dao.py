@@ -14,6 +14,7 @@ class CodeDao(BaseDao):
         return self.mysql_client.select(sql)
 
     def update_code(self, code_id: int, data: dict, get_sql=True):
+        log.info(self.update('id', code_id, data, self.data_source_table, get_sql))
         return self.update('id', code_id, data, self.data_source_table, get_sql)
     
     def delete_code(self, code_id: int):
